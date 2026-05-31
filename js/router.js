@@ -1,81 +1,54 @@
 /* ---------------------------------------------------------
-   Antenna Workbench — Router
-   Handles module switching, sidebar activation, and content loading
+   HF Workbench — Router
+   Loads the correct module into #content based on hash route.
 --------------------------------------------------------- */
 
-import { $ } from "./dom.js";
-import { log } from "./log.js";
+import initVerticalDX from "./modules/vertical-dx.js";
+import initPerformer from "./modules/performer.js";
+import initDominator from "./modules/dominator.js";
+import initVerticalNVIS from "./modules/vertical-nvis.js";
+import initNVISDesigner from "./modules/nvis-designer.js";
 
-const modules = {};
-let currentModule = null;
+import initOCF from "./modules/ocf.js";
+import initEFHW from "./modules/efhw.js";
+import initRandomWire from "./modules/random-wire.js";
+import initDoublet from "./modules/doublet.js";
+import initHLoop from "./modules/hloop.js";
+import initSkyloop from "./modules/skyloop.js";
 
-/* ---------------------------------------------------------
-   REGISTER A MODULE
---------------------------------------------------------- */
-export function registerModule(id, loaderFn) {
-    modules[id] = loaderFn;
-}
+const routes = {
+    "#vertical-dx": initVerticalDX,
+    "#performer": initPerformer,
+    "#dominator": initDominator,
+    "#vertical-nvis": initVerticalNVIS,
+    "#nvis-designer": initNVISDesigner,
 
-/* ---------------------------------------------------------
-   ACTIVATE SIDEBAR ITEM
---------------------------------------------------------- */
-function activateSidebar(id) {
-    const items = document.querySelectorAll(".menu-item");
-    items.forEach(item => item.classList.remove("active"));
+    "#ocf": initOCF,
+    "#efhw": initEFHW,
+    "#random-wire": initRandomWire,
+    "#doublet": initDoublet,
+    "#hloop": initHLoop,
+    "#skyloop": initSkyloop
+};
 
-    const active = document.querySelector(`.menu-item[data-module='${id}']`);
-    if (active) active.classList.add("active");
-}
+function loadRoute() {
+    const hash = window.location.hash || "#vertical-dx";
+    const loader = routes[hash];
 
-/* ---------------------------------------------------------
-   LOAD A MODULE
---------------------------------------------------------- */
-export function loadModule(id) {
-    if (!modules[id]) {
-        console.error(`Router: Module "${id}" not found`);
-        return;
-    }
+    const content = document.querySelector("#content");
+    if (!content) return;
 
-    log("router", `Loading module: ${id}`);
-
-    const content = $("#content");
-    content.innerHTML = "<p>Loading…</p>";
-
-    activateSidebar(id);
-
-    currentModule = id;
-
-    // Load module content
-    try {
-        modules[id](content);
-    } catch (err) {
-        console.error(`Router: Error loading module "${id}"`, err);
-        content.innerHTML = `<p>Error loading module: ${id}</p>`;
+    if (loader) {
+        loader(content);
+    } else {
+        content.innerHTML = `
+            <section class="tool">
+                <h2>Unknown Tool</h2>
+                <p>The requested tool does not exist.</p>
+            </section>
+        `;
     }
 }
 
-/* ---------------------------------------------------------
-   GET CURRENT MODULE
---------------------------------------------------------- */
-export function getCurrentModule() {
-    return currentModule;
-}
-
-/* ---------------------------------------------------------
-   INITIALIZE ROUTER
---------------------------------------------------------- */
-export function initRouter(defaultModule = null) {
-    // Sidebar click handling
-    document.addEventListener("click", e => {
-        const item = e.target.closest(".menu-item");
-        if (!item) return;
-
-        const id = item.dataset.module;
-        if (id) loadModule(id);
-    });
-
-    // Load default module
-    if (defaultModule && modules[defaultModule]) {
-        loadModule(defaultModule);
-    }
-}
+window.addEventListener("hashchange", loadRoute);
+window.addEventListener("DOMContentLoaded", loadRoute);
