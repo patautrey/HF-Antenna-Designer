@@ -126,9 +126,9 @@ export default function initDominator(root) {
 
         const freq = toNumber(freqInput.value);
         const elements = toNumber(elementsInput.value);
-        const spacing = toNumber(spacingInput.value);
+        let spacing = toNumber(spacingInput.value);
         const phase = toNumber(phaseInput.value);
-        const height = toNumber(heightInput.value);
+        let height = toNumber(heightInput.value);
         const radials = toNumber(radialsInput.value);
         const ground = groundSelect.value;
 
@@ -141,6 +141,20 @@ export default function initDominator(root) {
         if (errors.length) {
             summaryDiv.innerHTML = warnBox(errors.join("<br>"));
             return;
+        }
+
+        const lambda = wavelengthMeters(freq);
+
+        // DX Turbo: force height to 0.70 λ and lock field
+        let turboNote = "";
+        if (boostDxTurbo.checked) {
+            const turboHeight = 0.70 * lambda;
+            height = turboHeight;
+            heightInput.value = turboHeight.toFixed(2);
+            heightInput.readOnly = true;
+            turboNote = `<p><strong>DX Turbo:</strong> radiator height forced to 0.70 λ (${turboHeight.toFixed(2)} m)</p>`;
+        } else {
+            heightInput.readOnly = false;
         }
 
         const band = findBand(freq);
@@ -185,6 +199,7 @@ export default function initDominator(root) {
             <p><strong>Boost breakdown:</strong><br>${boostLines}</p>
             <p><strong>Estimated array DX gain:</strong> ${totalGain.toFixed(1)} dBi</p>
             <p><strong>Estimated TOA:</strong> ${base.toa.toFixed(0)}°</p>
+            ${turboNote}
         `);
     });
 }
