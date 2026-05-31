@@ -3,15 +3,18 @@
    Multi-element phased vertical array + boost controls
 --------------------------------------------------------- */
 
-import { wavelength } from "../utils.js";
 import { requireFrequency, requirePositive, toNumber } from "../validators.js";
 import { infoBox, warnBox } from "../dom.js";
 import { findBand } from "../constants.js";
 import { log } from "../log.js";
 import { BoostEngine } from "../boost-engine.js";
 
+function wavelengthMeters(freqMHz) {
+    return 300 / freqMHz;
+}
+
 function computeArrayGain(freqMHz, elements, spacingM, phaseDeg, heightM, radialCount, groundType) {
-    const lambda = wavelength(freqMHz);
+    const lambda = wavelengthMeters(freqMHz);
     const frac = heightM / lambda;
 
     let baseSingle = 1.5;
