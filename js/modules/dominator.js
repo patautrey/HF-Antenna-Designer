@@ -10,13 +10,10 @@ import { findBand } from "../constants.js";
 import { log } from "../log.js";
 import { BoostEngine } from "../boost-engine.js";
 
-function $(root, sel) { return root.querySelector(sel); }
-
 function computeArrayGain(freqMHz, elements, spacingM, phaseDeg, heightM, radialCount, groundType) {
     const lambda = wavelength(freqMHz);
     const frac = heightM / lambda;
 
-    // base single-vertical gain
     let baseSingle = 1.5;
     if (groundType === "good") baseSingle += 0.8;
     if (groundType === "poor") baseSingle -= 0.8;
@@ -25,14 +22,12 @@ function computeArrayGain(freqMHz, elements, spacingM, phaseDeg, heightM, radial
     const radialFactor = Math.log10(Math.max(1, radialCount)) * 1.2;
     baseSingle += radialFactor;
 
-    // array factor approximation
     const nGain = 10 * Math.log10(Math.max(1, elements));
     const spacingLambda = spacingM / lambda;
     const phaseNorm = Math.abs(phaseDeg) / 90;
     const directivityBonus = Math.min(3, spacingLambda * 3 * phaseNorm);
 
     const arrayGain = baseSingle + nGain + directivityBonus;
-
     const toa = Math.max(5, 20 - (frac - 0.25) * 40);
 
     return {
@@ -49,9 +44,10 @@ function computeArrayGain(freqMHz, elements, spacingM, phaseDeg, heightM, radial
    EXPORT DEFAULT
 --------------------------------------------------------- */
 export default function initDominator(root) {
-    if (!root) return;
+    const container = document.querySelector("#content") || root;
+    if (!container) return;
 
-    root.innerHTML = `
+    container.innerHTML = `
         <section class="tool">
             <h2>Dominator Array</h2>
 
@@ -104,21 +100,23 @@ export default function initDominator(root) {
         </section>
     `;
 
-    const freqInput = $("#dom-freq");
-    const elementsInput = $("#dom-elements");
-    const spacingInput = $("#dom-spacing");
-    const phaseInput = $("#dom-phase");
-    const heightInput = $("#dom-height");
-    const radialsInput = $("#dom-radials");
-    const groundSelect = $("#dom-ground");
+    const freqInput = document.getElementById("dom-freq");
+    const elementsInput = document.getElementById("dom-elements");
+    const spacingInput = document.getElementById("dom-spacing");
+    const phaseInput = document.getElementById("dom-phase");
+    const heightInput = document.getElementById("dom-height");
+    const radialsInput = document.getElementById("dom-radials");
+    const groundSelect = document.getElementById("dom-ground");
 
-    const boostGroundScreen = $("#dom-boost-groundscreen");
-    const boostElevated = $("#dom-boost-elevated");
-    const boostSaltwater = $("#dom-boost-saltwater");
-    const boostDxTurbo = $("#dom-boost-dxturbo");
+    const boostGroundScreen = document.getElementById("dom-boost-groundscreen");
+    const boostElevated = document.getElementById("dom-boost-elevated");
+    const boostSaltwater = document.getElementById("dom-boost-saltwater");
+    const boostDxTurbo = document.getElementById("dom-boost-dxturbo");
 
-    const summaryDiv = $("#dom-summary");
-    const button = $("#dom-compute");
+    const summaryDiv = document.getElementById("dom-summary");
+    const button = document.getElementById("dom-compute");
+
+    if (!button || !summaryDiv) return;
 
     button.addEventListener("click", () => {
         const errors = [];
