@@ -1,12 +1,13 @@
 /* ---------------------------------------------------------
-   Antenna Workbench — Global UI Shell
+   Antenna Workbench — Global UI Shell (v2)
    Adds, in this order:
    1) Home button to every module
    2) Antenna tags (DX, NVIS, multiband, portable, etc.)
    3) Favorites panel (stored in localStorage)
    4) Side-by-side compare view
-   5) VHF/UHF Workbench entry point (stub)
-   6) Export/Print summary buttons
+   5) VHF/UHF Workbench entry point
+   6) Export/Print summary (print-ready, PDF via browser)
+   7) Dark mode toggle + mobile-friendly layout
 --------------------------------------------------------- */
 
 const AW_HOME_MODULE = "./master-index.js";
@@ -63,9 +64,11 @@ const AW_TAGS = {
     "feedline-calculator": ["Tool", "Feedline"],
     "dx-propagation": ["Tool", "DX"],
 
-    // VHF/UHF (stub entry)
+    // VHF/UHF Workbench
     "vhf-uhf-workbench": ["VHF/UHF", "Workbench"]
 };
+
+/* ---------- Favorites ---------- */
 
 function awLoadFavorites() {
     try {
@@ -112,7 +115,7 @@ function awRenderFavoritesPanel(root) {
             <h3>Favorites</h3>
             <ul class="aw-favorites-list"></ul>
         `;
-        root.appendChild(panel);
+        document.body.appendChild(panel);
     }
     const list = panel.querySelector(".aw-favorites-list");
     list.innerHTML = "";
@@ -135,11 +138,33 @@ function awRenderFavoritesPanel(root) {
     });
 }
 
-function awAttachShell(root, moduleId, moduleLabel) {
+/* ---------- Dark mode ---------- */
+
+const AW_DARK_KEY = "antennaWorkbench_darkMode_v1";
+
+function awIsDarkMode() {
+    try {
+        return localStorage.getItem(AW_DARK_KEY) === "1";
+    } catch {
+        return false;
+    }
+}
+
+function awSetDarkMode(on) {
+    try {
+        localStorage.setItem(AW_DARK_KEY, on ? "1" : "0");
+    } catch {
+        // ignore
+    }
+    document.documentElement.classList.toggle("aw-dark", on);
+}
+
+/* ---------- Shell attachment ---------- */
+
+export function awAttachShell(root, moduleId, moduleLabel) {
     const content = document.querySelector("#content") || root;
     if (!content) return;
 
-    // Wrap existing content in a shell container
     if (!content.querySelector(".aw-shell")) {
         const shell = document.createElement("div");
         shell.className = "aw-shell";
@@ -152,10 +177,11 @@ function awAttachShell(root, moduleId, moduleLabel) {
                 <span class="aw-shell-title"></span>
             </div>
             <div class="aw-shell-right">
+                <button id="aw-dark-toggle" title="Toggle dark mode">🌙</button>
                 <span class="aw-shell-tags"></span>
                 <button id="aw-fav-btn" title="Toggle favorite">☆</button>
                 <button id="aw-export-btn" title="Export summary">⬇</button>
-                <button id="aw-print-btn" title="Print summary">🖨</button>
+                <button id="aw-print-btn" title="Print / PDF">🖨</button>
                 <button id="aw-compare-side-btn" title="Side-by-side compare">⇄</button>
                 <button id="aw-vhfuhf-btn" title="VHF/UHF Workbench">VHF/UHF</button>
             </div>
@@ -164,7 +190,6 @@ function awAttachShell(root, moduleId, moduleLabel) {
         const body = document.createElement("div");
         body.className = "aw-shell-body";
 
-        // Move existing children into body
         while (content.firstChild) {
             body.appendChild(content.firstChild);
         }
@@ -182,18 +207,17 @@ function awAttachShell(root, moduleId, moduleLabel) {
     const printBtn = content.querySelector("#aw-print-btn");
     const compareSideBtn = content.querySelector("#aw-compare-side-btn");
     const vhfuhfBtn = content.querySelector("#aw-vhfuhf-btn");
+    const darkToggle = content.querySelector("#aw-dark-toggle");
 
     if (titleSpan) {
         titleSpan.textContent = moduleLabel || "Antenna Workbench";
     }
 
-    // Tags
     const tags = AW_TAGS[moduleId] || [];
     if (tagsSpan) {
         tagsSpan.innerHTML = tags.map(t => `<span class="aw-tag">${t}</span>`).join(" ");
     }
 
-    // Home button
     if (homeBtn) {
         homeBtn.onclick = () => {
             import(AW_HOME_MODULE).then(mod => {
@@ -204,7 +228,6 @@ function awAttachShell(root, moduleId, moduleLabel) {
         };
     }
 
-    // Favorite button
     if (favBtn) {
         const updateFavIcon = () => {
             favBtn.textContent = awIsFavorite(moduleId) ? "★" : "☆";
@@ -213,11 +236,10 @@ function awAttachShell(root, moduleId, moduleLabel) {
         favBtn.onclick = () => {
             awToggleFavorite(moduleId, moduleLabel || moduleId);
             updateFavIcon();
-            awRenderFavoritesPanel(document.body);
+            awRenderFavoritesPanel(root);
         };
     }
 
-    // Export summary
     if (exportBtn) {
         exportBtn.onclick = () => {
             const summary = content.querySelector(".summary");
@@ -237,7 +259,6 @@ function awAttachShell(root, moduleId, moduleLabel) {
         };
     }
 
-    // Print summary
     if (printBtn) {
         printBtn.onclick = () => {
             const summary = content.querySelector(".summary");
@@ -245,11 +266,18 @@ function awAttachShell(root, moduleId, moduleLabel) {
                 alert("No summary found to print.");
                 return;
             }
-            const w = window.open("", "_blank", "width=800,height=600");
+            const w = window.open("", "_blank", "width=900,height=700");
             if (!w) return;
             w.document.write(`
                 <html>
-                <head><title>${moduleLabel || "Antenna Summary"}</title></head>
+                <head>
+                    <title>${moduleLabel || "Antenna Summary"}</title>
+                    <style>
+                        body { font-family: system-ui, sans-serif; padding: 1rem; }
+                        h1 { margin-top: 0; }
+                        pre { white-space: pre-wrap; font-family: system-ui, sans-serif; }
+                    </style>
+                </head>
                 <body>
                     <h1>${moduleLabel || ""}</h1>
                     <pre>${summary.innerText}</pre>
@@ -258,11 +286,10 @@ function awAttachShell(root, moduleId, moduleLabel) {
             `);
             w.document.close();
             w.focus();
-            w.print();
+            w.print(); // user can choose "Save as PDF"
         };
     }
 
-    // Side-by-side compare
     if (compareSideBtn) {
         compareSideBtn.onclick = () => {
             const otherId = prompt("Enter module ID to compare side-by-side (e.g., hf-moxon):", "");
@@ -271,19 +298,32 @@ function awAttachShell(root, moduleId, moduleLabel) {
         };
     }
 
-    // VHF/UHF Workbench entry (stub)
     if (vhfuhfBtn) {
         vhfuhfBtn.onclick = () => {
             awOpenVhfUhfWorkbench(root);
         };
     }
 
-    // Global favorites panel (once)
+    if (darkToggle) {
+        const syncIcon = () => {
+            darkToggle.textContent = awIsDarkMode() ? "☀️" : "🌙";
+        };
+        syncIcon();
+        darkToggle.onclick = () => {
+            const next = !awIsDarkMode();
+            awSetDarkMode(next);
+            syncIcon();
+        };
+    }
+
     awEnsureShellStyles();
-    awRenderFavoritesPanel(document.body);
+    awRenderFavoritesPanel(root);
+    awSetDarkMode(awIsDarkMode());
 }
 
-function awOpenSideBySide(idA, idB, root) {
+/* ---------- Side-by-side ---------- */
+
+export function awOpenSideBySide(idA, idB, root) {
     const content = document.querySelector("#content") || root;
     if (!content) return;
 
@@ -300,7 +340,6 @@ function awOpenSideBySide(idA, idB, root) {
         </div>
     `;
 
-    // Clear content and mount wrapper
     content.innerHTML = "";
     content.appendChild(wrapper);
 
@@ -320,38 +359,25 @@ function awOpenSideBySide(idA, idB, root) {
     awLoadModule(idB, colB);
 }
 
-function awOpenVhfUhfWorkbench(root) {
-    const content = document.querySelector("#content") || root;
-    if (!content) return;
+/* ---------- VHF/UHF Workbench ---------- */
 
-    content.innerHTML = `
-        <section class="tool">
-            <h2>VHF/UHF Workbench (Coming Online)</h2>
-            <p>This will host 2m/70cm Yagis, Moxons, Slim Jims, J-poles, collinears, and satellite antennas.</p>
-            <p>For now, this is a stub entry point wired into the global shell.</p>
-            <button id="aw-vhf-back">Back to Home</button>
-        </section>
-    `;
-
-    const backBtn = content.querySelector("#aw-vhf-back");
-    if (backBtn) {
-        backBtn.onclick = () => {
-            import(AW_HOME_MODULE).then(mod => {
-                if (typeof mod.default === "function") {
-                    mod.default(root);
-                }
-            });
-        };
-    }
-
-    awAttachShell(root, "vhf-uhf-workbench", "VHF/UHF Workbench");
+export function awOpenVhfUhfWorkbench(root) {
+    import("./vhf-uhf-workbench.js").then(mod => {
+        if (typeof mod.default === "function") {
+            mod.default(root);
+        }
+    }).catch(err => {
+        console.error("Failed to load VHF/UHF Workbench", err);
+        alert("VHF/UHF Workbench module not found.");
+    });
 }
 
-function awLoadModule(moduleId, mountRoot) {
+/* ---------- Module loader ---------- */
+
+export function awLoadModule(moduleId, mountRoot) {
     import(`./${moduleId}.js`).then(mod => {
         if (typeof mod.default === "function") {
             mod.default(mountRoot);
-            // Try to infer label from document
             const h2 = (document.querySelector("#content") || mountRoot).querySelector("h2");
             const label = h2 ? h2.textContent.trim() : moduleId;
             awAttachShell(mountRoot, moduleId, label);
@@ -362,12 +388,91 @@ function awLoadModule(moduleId, mountRoot) {
     });
 }
 
+/* ---------- Recent helpers for master index ---------- */
+
+const AW_RECENT_KEY = "antennaWorkbench_recentAntennas_v1";
+const AW_MAX_RECENT = 8;
+
+export function awLoadRecent() {
+    try {
+        const raw = localStorage.getItem(AW_RECENT_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch {
+        return [];
+    }
+}
+
+export function awSaveRecent(list) {
+    try {
+        localStorage.setItem(AW_RECENT_KEY, JSON.stringify(list.slice(0, AW_MAX_RECENT)));
+    } catch {
+        // ignore
+    }
+}
+
+export function awAddRecent(id, label) {
+    const current = awLoadRecent();
+    const filtered = current.filter(item => item.id !== id);
+    filtered.unshift({ id, label });
+    awSaveRecent(filtered);
+}
+
+export function awRenderRecent(recentList, root) {
+    recentList.innerHTML = "";
+    const recent = awLoadRecent();
+    if (!recent.length) {
+        const li = document.createElement("li");
+        li.textContent = "(none yet)";
+        recentList.appendChild(li);
+        return;
+    }
+    recent.forEach(entry => {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.textContent = entry.label;
+        btn.addEventListener("click", () => {
+            awLoadModule(entry.id, root);
+        });
+        li.appendChild(btn);
+        recentList.appendChild(li);
+    });
+}
+
+/* ---------- Filter helper ---------- */
+
+export function awFilterItems(categoryPanels, query) {
+    const sections = categoryPanels.querySelectorAll(".index-category");
+    sections.forEach(section => {
+        const items = section.querySelectorAll(".index-item-btn");
+        let anyVisible = false;
+        items.forEach(btn => {
+            const label = btn.querySelector(".item-label")?.textContent.toLowerCase() || "";
+            const match = !query || label.includes(query);
+            btn.closest("li").style.display = match ? "" : "none";
+            if (match) anyVisible = true;
+        });
+        section.style.display = anyVisible ? "" : "none";
+    });
+}
+
+/* ---------- Styles (dark mode + mobile) ---------- */
+
 function awEnsureShellStyles() {
     if (document.getElementById("aw-shell-style")) return;
     const css = `
+        :root {
+            color-scheme: light dark;
+        }
+        :root.aw-dark, .aw-dark body {
+            background-color: #111;
+            color: #eee;
+        }
         .aw-shell {
             border: 1px solid #ddd;
             border-radius: 4px;
+            background: var(--aw-bg, #fff);
         }
         .aw-shell-header {
             display: flex;
@@ -377,6 +482,10 @@ function awEnsureShellStyles() {
             background: #f5f5f5;
             border-bottom: 1px solid #ddd;
             gap: 0.5rem;
+        }
+        .aw-dark .aw-shell-header {
+            background: #222;
+            border-color: #444;
         }
         .aw-shell-left {
             display: flex;
@@ -402,6 +511,9 @@ function awEnsureShellStyles() {
             background: #e0ecff;
             font-size: 0.75rem;
         }
+        .aw-dark .aw-tag {
+            background: #334766;
+        }
         #aw-favorites-panel {
             position: fixed;
             right: 0.5rem;
@@ -416,6 +528,11 @@ function awEnsureShellStyles() {
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
             font-size: 0.85rem;
             z-index: 9999;
+        }
+        .aw-dark #aw-favorites-panel {
+            background: #222;
+            border-color: #555;
+            color: #eee;
         }
         #aw-favorites-panel h3 {
             margin: 0 0 0.25rem 0;
@@ -438,6 +555,7 @@ function awEnsureShellStyles() {
         .aw-side-by-side-wrapper {
             border: 1px solid #ddd;
             border-radius: 4px;
+            background: var(--aw-bg, #fff);
         }
         .aw-side-by-side-header {
             display: flex;
@@ -447,6 +565,10 @@ function awEnsureShellStyles() {
             background: #f5f5f5;
             border-bottom: 1px solid #ddd;
             font-size: 0.9rem;
+        }
+        .aw-dark .aw-side-by-side-header {
+            background: #222;
+            border-color: #444;
         }
         .aw-side-by-side-columns {
             display: grid;
@@ -473,8 +595,12 @@ function awEnsureShellStyles() {
     document.head.appendChild(style);
 }
 
-// Auto-hook: if master index is loaded, we don't interfere.
-// Individual modules can call awAttachShell via awLoadModule wrapper.
-// If you want to globally wrap after any module load, you can call
-// awAttachShell from each module after rendering, but this file
-// is designed to be used primarily via awLoadModule and the master index.
+/* ---------- Expose helpers for master index ---------- */
+
+window.awAttachShell = awAttachShell;
+window.awLoadModule = awLoadModule;
+window.awRenderRecent = awRenderRecent;
+window.awAddRecent = awAddRecent;
+window.awFilterItems = awFilterItems;
+window.awOpenSideBySide = awOpenSideBySide;
+window.awOpenVhfUhfWorkbench = awOpenVhfUhfWorkbench;
