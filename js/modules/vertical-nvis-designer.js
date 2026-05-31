@@ -3,7 +3,6 @@
    Short vertical with NVIS focus + boost controls
 --------------------------------------------------------- */
 
-import { wavelength } from "../utils.js";
 import { requireFrequency, requirePositive, toNumber } from "../validators.js";
 import { infoBox, warnBox } from "../dom.js";
 import { findBand } from "../constants.js";
@@ -11,13 +10,18 @@ import { log } from "../log.js";
 import { BoostEngine } from "../boost-engine.js";
 import { computeNVISReflector, logNVISReflector } from "../engines/nvis-reflector.js";
 
+/* LOCAL WAVELENGTH (meters) */
+function wavelengthMeters(freqMHz) {
+    return 300 / freqMHz;
+}
+
 /* BASE MODEL */
 function computeVerticalNVIS(freqMHz, heightM) {
-    const lambda = wavelength(freqMHz);
+    const lambda = wavelengthMeters(freqMHz);
     const frac = heightM / lambda;
 
     let baseGain = 0.5; // dBi baseline
-    const toa = Math.min(80, 60 + (0.25 - frac) * 80); // high-angle NVIS-ish
+    const toa = Math.min(80, Math.max(30, 60 + (0.25 - frac) * 80));
 
     return { lambda, frac, baseGain, toa };
 }
