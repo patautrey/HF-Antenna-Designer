@@ -1,11 +1,11 @@
 /* ---------------------------------------------------------
    HF Workbench — Bobtail Curtain
-   (Three verticals with two top horizontal wires)
+   (Three 1/4-wave verticals in phase for strong low-angle DX)
    - Geometry panel
    - Unified boost panel (two-column .boost-grid)
-   - Vertical leg length + spacing + top span
+   - Vertical height + spacing + wire diameter + configuration
    - Feedline family + type + length
-   - Transformer Requirements (matching network + 1:1 choke)
+   - Transformer Requirements (1:1 choke recommended; phasing harness required)
 --------------------------------------------------------- */
 
 import { requireFrequency, requirePositive, toNumber } from "../validators.js";
@@ -16,12 +16,14 @@ import { GeometryEngine } from "../engines/geometry-engine.js";
 import { BoostEngine } from "../engines/boost-engine.js";
 import { TransformerEngine } from "../engines/transformer-engine.js";
 
-function baseBobtailGain(frac) {
-    // Bobtail = strong broadside low-angle DX radiator
-    if (frac < 0.40) return 4.5;
-    if (frac < 0.60) return 5.0;
-    if (frac < 0.80) return 5.4;
-    return 5.8;
+function baseBobtailGain(frac, spacing) {
+    // Bobtail Curtain gain increases with proper spacing (≈0.5 λ)
+    let base = 3.0; // baseline vertical gain
+    if (spacing < 0.35) base += 1.0;
+    else if (spacing < 0.45) base += 2.2;
+    else if (spacing < 0.55) base += 3.0;
+    else base += 2.5;
+    return base;
 }
 
 export default function initBobtailCurtain(root) {
@@ -39,20 +41,24 @@ export default function initBobtailCurtain(root) {
                     <input id="bt-freq" type="number" step="0.01" value="7.1">
                 </label>
 
-                <label>Vertical leg length (m)
-                    <input id="bt-vert" type="number" step="0.1" value="10">
+                <label>Vertical height (m)
+                    <input id="bt-height" type="number" step="0.1" value="10">
                 </label>
 
-                <label>Spacing between verticals (m)
+                <label>Element spacing (m)
                     <input id="bt-spacing" type="number" step="0.1" value="20">
                 </label>
 
-                <label>Top horizontal span (m)
-                    <input id="bt-top" type="number" step="0.1" value="40">
+                <label>Wire diameter (mm)
+                    <input id="bt-wire" type="number" step="0.1" value="2">
                 </label>
 
-                <label>Feedpoint height (m)
-                    <input id="bt-height" type="number" step="0.5" value="2">
+                <label>Configuration
+                    <select id="bt-config">
+                        <option value="vertical">Vertical</option>
+                        <option value="sloper">Sloper</option>
+                        <option value="tilted">Tilted</option>
+                    </select>
                 </label>
 
             </div>
@@ -106,10 +112,10 @@ export default function initBobtailCurtain(root) {
     `;
 
     const freqInput = document.getElementById("bt-freq");
-    const vertInput = document.getElementById("bt-vert");
-    const spacingInput = document.getElementById("bt-spacing");
-    const topInput = document.getElementById("bt-top");
     const heightInput = document.getElementById("bt-height");
+    const spacingInput = document.getElementById("bt-spacing");
+    const wireInput = document.getElementById("bt-wire");
+    const configInput = document.getElementById("bt-config");
 
     const todInput = document.getElementById("bt-tod");
     const seasideInput = document.getElementById("bt-seaside");
@@ -128,16 +134,15 @@ export default function initBobtailCurtain(root) {
         const errors = [];
 
         const freq = toNumber(freqInput.value);
-        const vert = toNumber(vertInput.value);
-        const spacing = toNumber(spacingInput.value);
-        const top = toNumber(topInput.value);
         const height = toNumber(heightInput.value);
+        const spacing = toNumber(spacingInput.value);
+        const wire = toNumber(wireInput.value);
+        const config = configInput.value;
 
         requireFrequency(freq, errors);
-        requirePositive(vert, "Vertical leg length", errors);
-        requirePositive(spacing, "Spacing", errors);
-        requirePositive(top, "Top span", errors);
-        requirePositive(height, "Feedpoint height", errors);
+        requirePositive(height, "Vertical height", errors);
+        requirePositive(spacing, "Element spacing", errors);
+        requirePositive(wire, "Wire diameter", errors);
 
         if (errors.length) {
             summaryDiv.innerHTML = warnBox(errors.join("<br>"));
@@ -146,21 +151,22 @@ export default function initBobtailCurtain(root) {
 
         const band = findBand(freq);
 
-        const totalWire = (3 * vert) + (2 * spacing) + top;
+        const spacingWL = spacing / (300 / freq);
+        const avgHeight = height / 2;
 
         const geom = GeometryEngine.computeGeometry({
             freqMHz: freq,
-            heightM: height + vert / 2,
-            spanM: totalWire
+            heightM: avgHeight,
+            spanM: height
         });
 
-        const baseGain = baseBobtailGain(geom.frac);
+        const baseGain = baseBobtailGain(geom.frac, spacingWL);
 
         const feedFamily = feedFamilyInput.value === "ladder" ? "ladder" : "coax";
 
         const boost = BoostEngine.computeBoost({
-            reflectorCount: 0,
-            directorCount: 0,
+            reflectorCount: 1,
+            directorCount: 1,
             timeOfDay: todInput.value,
             seaside: seasideInput.checked,
             groundScreen: groundScreenInput.checked,
@@ -169,18 +175,23 @@ export default function initBobtailCurtain(root) {
             feedlineFamily: feedFamily,
             feedlineType: feedTypeInput.value,
             feedlineLengthFt: toNumber(feedLenInput.value),
-            dxTurboPatternBonus: false
+            dxTurboPatternBonus: true
         });
 
         const totalGain = baseGain + geom.totalGeomGainDelta + boost.totalBoost;
-        const finalToa = Math.max(8, Math.min(28, geom.toa + boost.toaShift));
+
+        let toaBase = 12;
+        if (config === "sloper") toaBase = 18;
+        if (config === "tilted") toaBase = 15;
+
+        const finalToa = Math.max(6, Math.min(28, toaBase + (boost.toaShift || 0)));
 
         const geomLines = [
-            `Vertical legs: ${vert.toFixed(2)} m`,
-            `Spacing between verticals: ${spacing.toFixed(2)} m`,
-            `Top span: ${top.toFixed(2)} m`,
-            `Total wire length: ${totalWire.toFixed(2)} m`,
-            `Feedpoint height: ${height.toFixed(2)} m`,
+            `Vertical height: ${height.toFixed(1)} m`,
+            `Element spacing: ${spacing.toFixed(1)} m (${spacingWL.toFixed(2)} λ)`,
+            `Wire diameter: ${wire.toFixed(1)} mm`,
+            `Configuration: ${config}`,
+            `Bobtail Curtain produces very strong low-angle DX radiation.`,
             ...(geom.components.length ? geom.components.map(c => c.note ?? "") : [])
         ].join("<br>");
 
@@ -198,11 +209,12 @@ export default function initBobtailCurtain(root) {
 
         log("BobtailCurtain", {
             freq,
-            vert,
-            spacing,
-            top,
             height,
-            totalWire,
+            spacing,
+            spacingWL,
+            wire,
+            config,
+            avgHeight,
             geom,
             baseGain,
             boost,
@@ -213,7 +225,7 @@ export default function initBobtailCurtain(root) {
         summaryDiv.innerHTML = infoBox(`
             <p><strong>Operating frequency:</strong> ${freq.toFixed(2)} MHz (${band?.label ?? "Unknown band"})</p>
 
-            <p><strong>Base Bobtail Curtain Gain:</strong> ${baseGain.toFixed(1)} dBi (broadside)</p>
+            <p><strong>Base Bobtail Curtain Gain:</strong> ${baseGain.toFixed(1)} dBi</p>
 
             <p><strong>Geometry details:</strong><br>${geomLines}</p>
 
