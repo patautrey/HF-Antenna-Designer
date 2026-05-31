@@ -108,7 +108,7 @@ export default function initVerticalNVIS(root) {
         const errors = [];
 
         const freq = toNumber(freqInput.value);
-        const height = toNumber(heightInput.value);
+        let height = toNumber(heightInput.value);
         const topHat = toNumber(topHatInput.value);
         const groundLoss = toNumber(groundLossInput.value);
         const radials = toNumber(radialsInput.value);
