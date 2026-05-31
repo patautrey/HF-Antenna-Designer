@@ -62,7 +62,7 @@ export const GeometryEngine = {
             const factor = Math.max(0, Math.min(0.4, linearLoadingFactor));
             effectiveHeight *= 1 + factor;
 
-            linearPenalty = -0.1 - factor * 0.3; // –0.1 to –0.22 dB typical
+            linearPenalty = -0.1 - factor * 0.3;
             linearNote = `Linear loading: effective length +${(factor * 100).toFixed(0)}%, small loss penalty.`;
         }
 
@@ -71,13 +71,12 @@ export const GeometryEngine = {
         let coilNote = null;
         if (coilEnabled) {
             let lossFactor = 1.0;
-            if (coilPosition === "base") lossFactor = 1.0;
-            else if (coilPosition === "mid") lossFactor = 0.7;
+            if (coilPosition === "mid") lossFactor = 0.7;
             else if (coilPosition === "top") lossFactor = 0.4;
 
             const q = Math.max(50, Math.min(400, coilQ));
-            const baseLoss = 1.5 / (q / 100); // rough scaling
-            coilPenalty = -baseLoss * lossFactor; // –0.2 to –1.5 dB typical
+            const baseLoss = 1.5 / (q / 100);
+            coilPenalty = -baseLoss * lossFactor;
 
             coilNote = `Loading coil: ${coilPosition} position, Q≈${q}, efficiency penalty ≈ ${coilPenalty.toFixed(1)} dB.`;
         }
@@ -91,12 +90,11 @@ export const GeometryEngine = {
             const hatEffect = radiusFrac * spokeFactor;
 
             effectiveHeight *= 1 + hatEffect * 0.4;
-            hatBonus = 0.2 + hatEffect * 1.0; // +0.2 to +0.6 dB typical
+            hatBonus = 0.2 + hatEffect * 1.0;
 
             hatNote = `Capacitance hat: radius=${hatRadiusM.toFixed(1)} m, spokes=${hatSpokes}, efficiency boost ≈ ${hatBonus.toFixed(1)} dB.`;
         }
 
-        // --- Final electrical fraction and TOA estimate ---
         const frac = effectiveHeight / lambda;
 
         let toa = 80 - frac * 140;
