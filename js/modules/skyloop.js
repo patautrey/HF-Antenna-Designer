@@ -1,60 +1,61 @@
 /* ---------------------------------------------------------
-   HF Workbench — Skyloop Module (Fixed)
-   Horizontal full-wave loop with NVIS / DX behavior
+   HF Workbench — Skyloop
 --------------------------------------------------------- */
 
 import { requireFrequency, requirePositive, toNumber } from "../validators.js";
 import { infoBox, warnBox } from "../dom.js";
 import { findBand } from "../constants.js";
 import { log } from "../log.js";
+import { BoostEngine } from "../engines/boost-engine.js";
+import { TransformerEngine } from "../engines/transformer-engine.js";
 
-/* Wavelength (meters) */
-function wavelengthMeters(freqMHz) {
-    return 300 / freqMHz;
-}
-
-/* Skyloop model */
-function computeSkyloop(freqMHz, perimeterM, heightM) {
-    const lambda = wavelengthMeters(freqMHz);
+function skyloopBaseGain(freqMHz, perimeterM) {
+    const lambda = 300 / freqMHz;
     const frac = perimeterM / lambda;
-
-    let pattern = "High-angle NVIS dominant";
-    if (frac > 1.2 && frac <= 2.0) pattern = "Mixed NVIS + low-angle lobes";
-    if (frac > 2.0) pattern = "Multi-band, complex pattern";
-
-    let gain = 2.0;
-    if (frac >= 0.9 && frac <= 1.1) gain = 3.0;
-    if (frac > 1.1 && frac <= 2.0) gain = 4.0;
-    if (frac > 2.0) gain = 5.0;
-
-    const hFrac = heightM / lambda;
-    const toa = Math.min(80, Math.max(10, 80 - hFrac * 100));
-
-    return { lambda, frac, pattern, gain, toa };
+    if (frac < 0.8) return 1.8;
+    if (frac < 1.2) return 2.3;
+    return 2.7;
 }
 
-/* ---------------------------------------------------------
-   EXPORT DEFAULT
---------------------------------------------------------- */
 export default function initSkyloop(root) {
     const container = document.querySelector("#content") || root;
     if (!container) return;
 
     container.innerHTML = `
         <section class="tool">
-            <h2>Skyloop Designer</h2>
+            <h2>Skyloop</h2>
 
             <div class="field-grid">
                 <label>Frequency (MHz)
                     <input id="sl-freq" type="number" step="0.01" value="3.8">
                 </label>
-
                 <label>Perimeter (m)
-                    <input id="sl-perim" type="number" step="0.1" value="80">
+                    <input id="sl-perim" type="number" step="1" value="130">
                 </label>
-
                 <label>Height (m)
-                    <input id="sl-height" type="number" step="0.1" value="12">
+                    <input id="sl-height" type="number" step="0.5" value="15">
+                </label>
+            </div>
+
+            <h3>Boost</h3>
+            <div class="field-grid">
+                <label>Time of day
+                    <select id="sl-tod">
+                        <option value="day">Day</option>
+                        <option value="night">Night</option>
+                        <option value="dawn">Dawn</option>
+                        <option value="dusk">Dusk</option>
+                    </select>
+                </label>
+                <label>Feedline type (ladder line)
+                    <select id="sl-feed-type">
+                        <option value="450Ω">450Ω</option>
+                        <option value="300Ω">300Ω</option>
+                        <option value="600Ω">600Ω</option>
+                    </select>
+                </label>
+                <label>Feedline length (ft)
+                    <input id="sl-feed-length" type="number" step="5" value="100">
                 </label>
             </div>
 
@@ -67,10 +68,12 @@ export default function initSkyloop(root) {
     const freqInput = document.getElementById("sl-freq");
     const perimInput = document.getElementById("sl-perim");
     const heightInput = document.getElementById("sl-height");
+    const todInput = document.getElementById("sl-tod");
+    const feedTypeInput = document.getElementById("sl-feed-type");
+    const feedLenInput = document.getElementById("sl-feed-length");
+
     const summaryDiv = document.getElementById("sl-summary");
     const button = document.getElementById("sl-compute");
-
-    if (!button || !summaryDiv) return;
 
     button.addEventListener("click", () => {
         const errors = [];
@@ -89,24 +92,57 @@ export default function initSkyloop(root) {
         }
 
         const band = findBand(freq);
-        const model = computeSkyloop(freq, perim, height);
 
-        log("Skyloop", { freq, perim, height, model });
+        const baseGain = skyloopBaseGain(freq, perim);
+
+        const boost = BoostEngine.computeBoost({
+            reflectorCount: 0,
+            directorCount: 0,
+            timeOfDay: todInput.value,
+            seaside: false,
+            groundScreen: false,
+            elevatedRadials: false,
+            nvisReflector: false,
+            feedlineFamily: "ladder",
+            feedlineType: feedTypeInput.value,
+            feedlineLengthFt: toNumber(feedLenInput.value),
+            dxTurboPatternBonus: false
+        });
+
+        const totalGain = baseGain + boost.totalBoost;
+        const finalToa = Math.max(25, Math.min(80, 90 - (height / (300 / freq)) * 120));
+
+        const boostLines = boost.components.length
+            ? boost.components.map(d => {
+                const parts = [];
+                if (d.boost) parts.push(`${d.boost.toFixed(1)} dB from ${d.label}`);
+                else parts.push(d.label);
+                if (d.toaShift) parts.push(`TOA shift ${d.toaShift > 0 ? "+" : ""}${d.toaShift}°`);
+                return parts.join(" — ");
+            }).join("<br>")
+            : "No boost options enabled.";
+
+        const transformerHtml = TransformerEngine.getTransformerNote("skyloop", "ladder");
+
+        log("Skyloop", {
+            freq,
+            perim,
+            height,
+            baseGain,
+            boost,
+            totalGain,
+            finalToa
+        });
 
         summaryDiv.innerHTML = infoBox(`
             <p><strong>Design frequency:</strong> ${freq.toFixed(2)} MHz (${band?.label ?? "Unknown band"})</p>
-
-            <p><strong>Perimeter:</strong> ${perim.toFixed(1)} m  
-               (${(model.frac * 100).toFixed(1)}% of λ)</p>
-
-            <p><strong>Height:</strong> ${height.toFixed(1)} m  
-               (${(height / model.lambda * 100).toFixed(1)}% of λ)</p>
-
-            <p><strong>Estimated pattern:</strong> ${model.pattern}</p>
-
-            <p><strong>Estimated gain:</strong> ${model.gain.toFixed(1)} dBi</p>
-
-            <p><strong>Estimated TOA:</strong> ${model.toa.toFixed(0)}°</p>
+            <p><strong>Perimeter:</strong> ${perim.toFixed(1)} m</p>
+            <p><strong>Height:</strong> ${height.toFixed(1)} m</p>
+            <p><strong>Base Gain:</strong> ${baseGain.toFixed(1)} dBi</p>
+            <p><strong>Boost Breakdown:</strong><br>${boostLines}</p>
+            <p><strong>Total Gain:</strong> ${totalGain.toFixed(1)} dBi</p>
+            <p><strong>Estimated TOA:</strong> ${finalToa.toFixed(0)}°</p>
+            ${transformerHtml}
         `);
     });
 }
