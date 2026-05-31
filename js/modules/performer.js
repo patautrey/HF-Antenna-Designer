@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------
-   Antenna Workbench — Performer Vertical
-   High-efficiency single-element vertical + boost controls
+   HF Workbench — Performer Vertical
+   Compact loaded vertical with DX Turbo support
 --------------------------------------------------------- */
 
 import { requireFrequency, requirePositive, toNumber } from "../validators.js";
@@ -13,30 +13,19 @@ function wavelengthMeters(freqMHz) {
     return 300 / freqMHz;
 }
 
-function computePerformer(freqMHz, heightM, baseLoadingUh, radialCount, groundType) {
+function computePerformer(freqMHz, heightM) {
     const lambda = wavelengthMeters(freqMHz);
     const frac = heightM / lambda;
 
-    let baseGain = 2.0;
+    let baseGain = 0.8;
+    if (frac > 0.20) baseGain = 1.2;
+    if (frac > 0.25) baseGain = 1.5;
 
-    if (groundType === "good") baseGain += 0.8;
-    if (groundType === "poor") baseGain -= 0.8;
-    if (groundType === "saltwater") baseGain += 2.0;
+    const toa = Math.min(80, Math.max(18, 85 - frac * 140));
 
-    const loadingPenalty = Math.log10(Math.max(1, baseLoadingUh)) * 0.7;
-    baseGain -= loadingPenalty;
-
-    const radialFactor = Math.log10(Math.max(1, radialCount)) * 1.3;
-    baseGain += radialFactor;
-
-    const toa = Math.max(5, 20 - (frac - 0.25) * 35);
-
-    return { lambda, frac, baseGain, toa, loadingPenalty };
+    return { lambda, frac, baseGain, toa };
 }
 
-/* ---------------------------------------------------------
-   EXPORT DEFAULT
---------------------------------------------------------- */
 export default function initPerformer(root) {
     const container = document.querySelector("#content") || root;
     if (!container) return;
@@ -47,114 +36,80 @@ export default function initPerformer(root) {
 
             <div class="field-grid">
                 <label>Frequency (MHz)
-                    <input id="perf-freq" type="number" step="0.01" value="14.1">
+                    <input id="pf-freq" type="number" step="0.01" value="14.2">
                 </label>
 
                 <label>Height (m)
-                    <input id="perf-height" type="number" step="0.01" value="12">
+                    <input id="pf-height" type="number" step="0.01" value="5">
                 </label>
 
-                <label>Base Loading (µH)
-                    <input id="perf-load" type="number" step="0.1" value="0">
-                </label>
-
-                <label>Radial Count
-                    <input id="perf-radials" type="number" value="32">
+                <label>Ground Loss (Ω)
+                    <input id="pf-groundloss" type="number" step="0.1" value="8">
                 </label>
             </div>
 
-            <label>Ground Type
-                <select id="perf-ground">
-                    <option value="good">Good soil</option>
-                    <option value="average" selected>Average soil</option>
-                    <option value="poor">Poor soil</option>
-                    <option value="saltwater">Saltwater</option>
-                </select>
-            </label>
-
-            <h3 style="margin-top:1rem;">Boost Controls</h3>
+            <h3>Boost Options</h3>
             <div class="field-grid">
-                <label><input id="perf-boost-groundscreen" type="checkbox"> Ground screen</label>
-                <label><input id="perf-boost-elevated" type="checkbox"> Elevated radials</label>
-                <label><input id="perf-boost-saltwater" type="checkbox"> Saltwater enhancement</label>
-                <label><input id="perf-boost-dxturbo" type="checkbox"> 0.70λ DX Turbo</label>
+                <label><input id="pf-boost-groundscreen" type="checkbox"> Ground Screen / Faraday Cloth</label>
+                <label><input id="pf-boost-elevated" type="checkbox"> Elevated Radials</label>
+                <label><input id="pf-boost-saltwater" type="checkbox"> Seaside Enhancement</label>
+                <label><input id="pf-boost-dxturbo" type="checkbox"> DX Turbo (0.70λ)</label>
             </div>
 
-            <button id="perf-compute" style="margin-top:1rem;">Compute Performer</button>
+            <button id="pf-compute" style="margin-top:1rem;">Compute Performer</button>
 
-            <div id="perf-summary" class="summary" style="margin-top:1rem;"></div>
+            <div id="pf-summary" class="summary" style="margin-top:1rem;"></div>
         </section>
     `;
 
-    const freqInput = document.getElementById("perf-freq");
-    const heightInput = document.getElementById("perf-height");
-    const loadInput = document.getElementById("perf-load");
-    const radialsInput = document.getElementById("perf-radials");
-    const groundSelect = document.getElementById("perf-ground");
+    const freqInput = document.getElementById("pf-freq");
+    const heightInput = document.getElementById("pf-height");
+    const groundLossInput = document.getElementById("pf-groundloss");
 
-    const boostGroundScreen = document.getElementById("perf-boost-groundscreen");
-    const boostElevated = document.getElementById("perf-boost-elevated");
-    const boostSaltwater = document.getElementById("perf-boost-saltwater");
-    const boostDxTurbo = document.getElementById("perf-boost-dxturbo");
+    const boostGroundScreen = document.getElementById("pf-boost-groundscreen");
+    const boostElevated = document.getElementById("pf-boost-elevated");
+    const boostSaltwater = document.getElementById("pf-boost-saltwater");
+    const boostDXTurbo = document.getElementById("pf-boost-dxturbo");
 
-    const summaryDiv = document.getElementById("perf-summary");
-    const button = document.getElementById("perf-compute");
-
-    if (!button || !summaryDiv) return;
+    const summaryDiv = document.getElementById("pf-summary");
+    const button = document.getElementById("pf-compute");
 
     button.addEventListener("click", () => {
         const errors = [];
 
         const freq = toNumber(freqInput.value);
-        let height = toNumber(heightInput.value);
-        const baseLoad = toNumber(loadInput.value);
-        const radials = toNumber(radialsInput.value);
-        const ground = groundSelect.value;
+        const height = toNumber(heightInput.value);
+        const groundLoss = toNumber(groundLossInput.value);
 
         requireFrequency(freq, errors);
         requirePositive(height, "Height", errors);
-        requirePositive(radials, "Radial count", errors);
-        if (baseLoad < 0) errors.push("Base loading must be ≥ 0 µH.");
+        if (groundLoss < 0) errors.push("Ground loss must be ≥ 0 Ω.");
 
         if (errors.length) {
             summaryDiv.innerHTML = warnBox(errors.join("<br>"));
             return;
         }
 
-        const lambda = wavelengthMeters(freq);
-
-        // DX Turbo: force height to 0.70 λ and lock field
-        let turboNote = "";
-        if (boostDxTurbo.checked) {
-            const turboHeight = 0.70 * lambda;
-            height = turboHeight;
-            heightInput.value = turboHeight.toFixed(2);
-            heightInput.readOnly = true;
-            turboNote = `<p><strong>DX Turbo:</strong> radiator height forced to 0.70 λ (${turboHeight.toFixed(2)} m)</p>`;
-        } else {
-            heightInput.readOnly = false;
-        }
-
         const band = findBand(freq);
-        const base = computePerformer(freq, height, baseLoad, radials, ground);
+
+        const base = computePerformer(freq, height);
 
         const boost = BoostEngine.computeBoost({
             groundScreen: boostGroundScreen.checked,
             elevatedRadials: boostElevated.checked,
             saltwater: boostSaltwater.checked,
-            dxTurbo: boostDxTurbo.checked
+            dxTurbo: boostDXTurbo.checked
         });
 
         const totalGain = base.baseGain + boost.totalBoost;
 
-        log("Performer Vertical", {
+        log("Performer", {
             freq,
             height,
-            baseLoad,
-            radials,
-            ground,
+            groundLoss,
             base,
-            boost
+            boost,
+            totalGain
         });
 
         const boostLines = boost.details.length
@@ -163,16 +118,18 @@ export default function initPerformer(root) {
 
         summaryDiv.innerHTML = infoBox(`
             <p><strong>Design frequency:</strong> ${freq.toFixed(2)} MHz (${band?.label ?? "Unknown band"})</p>
-            <p><strong>Height:</strong> ${height.toFixed(1)} m (${(base.frac * 100).toFixed(1)}% of λ)</p>
-            <p><strong>Base loading:</strong> ${baseLoad.toFixed(2)} µH (penalty ≈ ${base.loadingPenalty.toFixed(1)} dB)</p>
-            <p><strong>Radials:</strong> ${radials}</p>
-            <p><strong>Ground type:</strong> ${ground}</p>
-            <p><strong>Base estimated gain:</strong> ${base.baseGain.toFixed(1)} dBi</p>
-            <p><strong>Total boost:</strong> +${boost.totalBoost.toFixed(1)} dB</p>
-            <p><strong>Boost breakdown:</strong><br>${boostLines}</p>
-            <p><strong>Estimated DX gain:</strong> ${totalGain.toFixed(1)} dBi</p>
-            <p><strong>Estimated TOA:</strong> ${base.toa.toFixed(0)}°</p>
-            ${turboNote}
+
+            <p><strong>Height:</strong> ${height.toFixed(2)} m  
+               (${(base.frac * 100).toFixed(1)}% of λ)</p>
+
+            <p><strong>Base Gain:</strong> ${base.baseGain.toFixed(1)} dBi</p>
+            <p><strong>TOA:</strong> ${base.toa.toFixed(0)}°</p>
+
+            <p><strong>Total Gain:</strong> ${totalGain.toFixed(1)} dBi</p>
+
+            <p><strong>Boost Breakdown:</strong><br>${boostLines}</p>
+
+            <p><strong>Note:</strong> The telescopic whip can be replaced with antenna wire with identical response.</p>
         `);
     });
 }
