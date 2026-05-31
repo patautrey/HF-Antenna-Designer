@@ -1,5 +1,12 @@
 /* ---------------------------------------------------------
    HF Workbench — Performer Vertical
+   Updated with:
+   - Full geometry panel
+   - Full unified boost panel (two-column .boost-grid)
+   - DX Turbo height override
+   - DX Turbo pattern bonus
+   - Transformer Requirements section
+   - Whip/Wire equivalence note
 --------------------------------------------------------- */
 
 import { requireFrequency, requirePositive, toNumber } from "../validators.js";
@@ -11,9 +18,10 @@ import { BoostEngine } from "../engines/boost-engine.js";
 import { TransformerEngine } from "../engines/transformer-engine.js";
 
 function basePerformerGain(frac) {
-    if (frac < 0.15) return 0.8;
-    if (frac < 0.25) return 1.2;
-    return 1.5;
+    if (frac < 0.25) return 1.8;
+    if (frac < 0.50) return 2.4;
+    if (frac < 0.75) return 2.9;
+    return 3.1;
 }
 
 export default function initPerformer(root) {
@@ -30,17 +38,21 @@ export default function initPerformer(root) {
                     <input id="pf-freq" type="number" step="0.01" value="14.2">
                 </label>
                 <label>Height (m)
-                    <input id="pf-height" type="number" step="0.01" value="5">
+                    <input id="pf-height" type="number" step="0.1" value="5">
                 </label>
+
                 <label><input id="pf-dxturbo-height" type="checkbox"> DX Turbo height override (0.70λ)</label>
+
                 <label><input id="pf-fold-enable" type="checkbox"> Foldover enabled</label>
                 <label>Foldover angle (deg)
                     <input id="pf-fold-angle" type="number" step="1" value="0">
                 </label>
+
                 <label><input id="pf-ll-enable" type="checkbox"> Linear loading enabled</label>
                 <label>Linear loading factor (0–0.4)
                     <input id="pf-ll-factor" type="number" step="0.05" value="0">
                 </label>
+
                 <label><input id="pf-coil-enable" type="checkbox"> Loading coil enabled</label>
                 <label>Coil position
                     <select id="pf-coil-pos">
@@ -52,6 +64,7 @@ export default function initPerformer(root) {
                 <label>Coil Q
                     <input id="pf-coil-q" type="number" step="10" value="200">
                 </label>
+
                 <label><input id="pf-hat-enable" type="checkbox"> Capacitance hat enabled</label>
                 <label>Hat radius (m)
                     <input id="pf-hat-radius" type="number" step="0.5" value="0">
@@ -62,13 +75,15 @@ export default function initPerformer(root) {
             </div>
 
             <h3>Boost</h3>
-            <div class="field-grid">
+            <div class="field-grid boost-grid">
                 <label>Reflectors
-                    <input id="pf-reflectors" type="number" min="0" max="2" step="1" value="0">
+                    <input id="pf-reflectors" type="number" min="0" max="2" step="1" value="1">
                 </label>
+
                 <label>Directors
-                    <input id="pf-directors" type="number" min="0" max="3" step="1" value="0">
+                    <input id="pf-directors" type="number" min="0" max="3" step="1" value="1">
                 </label>
+
                 <label>Time of day
                     <select id="pf-tod">
                         <option value="day">Day</option>
@@ -77,9 +92,11 @@ export default function initPerformer(root) {
                         <option value="dusk">Dusk</option>
                     </select>
                 </label>
+
                 <label><input id="pf-seaside" type="checkbox"> Seaside (+10 dB)</label>
                 <label><input id="pf-groundscreen" type="checkbox"> Ground Screen / Faraday Cloth</label>
                 <label><input id="pf-elevated" type="checkbox"> Elevated Radials</label>
+
                 <label>Feedline type
                     <select id="pf-feed-type">
                         <option value="RG-213">RG-213</option>
@@ -88,9 +105,11 @@ export default function initPerformer(root) {
                         <option value="RG-58">RG-58</option>
                     </select>
                 </label>
+
                 <label>Feedline length (ft)
-                    <input id="pf-feed-length" type="number" step="5" value="50">
+                    <input id="pf-feed-length" type="number" step="5" value="75">
                 </label>
+
                 <label><input id="pf-dxturbo-pattern" type="checkbox"> DX Turbo pattern bonus</label>
             </div>
 
@@ -100,16 +119,21 @@ export default function initPerformer(root) {
         </section>
     `;
 
+    // Inputs
     const freqInput = document.getElementById("pf-freq");
     const heightInput = document.getElementById("pf-height");
     const dxTurboHeightInput = document.getElementById("pf-dxturbo-height");
+
     const foldEnable = document.getElementById("pf-fold-enable");
     const foldAngle = document.getElementById("pf-fold-angle");
+
     const llEnable = document.getElementById("pf-ll-enable");
     const llFactor = document.getElementById("pf-ll-factor");
+
     const coilEnable = document.getElementById("pf-coil-enable");
     const coilPos = document.getElementById("pf-coil-pos");
     const coilQ = document.getElementById("pf-coil-q");
+
     const hatEnable = document.getElementById("pf-hat-enable");
     const hatRadius = document.getElementById("pf-hat-radius");
     const hatSpokes = document.getElementById("pf-hat-spokes");
@@ -120,8 +144,10 @@ export default function initPerformer(root) {
     const seasideInput = document.getElementById("pf-seaside");
     const groundScreenInput = document.getElementById("pf-groundscreen");
     const elevatedInput = document.getElementById("pf-elevated");
+
     const feedTypeInput = document.getElementById("pf-feed-type");
     const feedLenInput = document.getElementById("pf-feed-length");
+
     const dxTurboPatternInput = document.getElementById("pf-dxturbo-pattern");
 
     const summaryDiv = document.getElementById("pf-summary");
@@ -143,6 +169,7 @@ export default function initPerformer(root) {
 
         const band = findBand(freq);
 
+        // Geometry
         const geom = GeometryEngine.computeGeometry({
             freqMHz: freq,
             heightM: height,
@@ -160,6 +187,8 @@ export default function initPerformer(root) {
         });
 
         const baseGain = basePerformerGain(geom.frac);
+
+        // Boost
         const boost = BoostEngine.computeBoost({
             reflectorCount: toNumber(refInput.value),
             directorCount: toNumber(dirInput.value),
@@ -205,13 +234,24 @@ export default function initPerformer(root) {
 
         summaryDiv.innerHTML = infoBox(`
             <p><strong>Design frequency:</strong> ${freq.toFixed(2)} MHz (${band?.label ?? "Unknown band"})</p>
-            <p><strong>Electrical height:</strong> ${geom.effectiveHeight.toFixed(2)} m (${(geom.frac * 100).toFixed(1)}% of λ)</p>
+
+            <p><strong>Electrical height:</strong> 
+                ${geom.effectiveHeight.toFixed(2)} m 
+                (${(geom.frac * 100).toFixed(1)}% of λ)
+            </p>
+
             <p><strong>Base Gain:</strong> ${baseGain.toFixed(1)} dBi</p>
+
             <p><strong>Geometry adjustments:</strong><br>${geomLines}</p>
+
             <p><strong>Boost Breakdown:</strong><br>${boostLines}</p>
+
             <p><strong>Total Gain:</strong> ${totalGain.toFixed(1)} dBi</p>
-            <p><strong>TOA:</strong> ${finalToa.toFixed(0)}°</p>
+
+            <p><strong>Estimated TOA:</strong> ${finalToa.toFixed(0)}°</p>
+
             <p><strong>Note:</strong> The telescopic whip can be replaced with antenna wire with identical response.</p>
+
             ${transformerHtml}
         `);
     });
