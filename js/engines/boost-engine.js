@@ -9,38 +9,28 @@
 export const BoostEngine = {
     computeBoost(params) {
         const {
-            // Reflectors / directors
-            reflectorCount = 0,   // 0–2
-            directorCount = 0,    // 0–3
-
-            // Time of day
-            timeOfDay = "day",    // "day" | "night" | "dawn" | "dusk"
-
-            // Environment
+            reflectorCount = 0,
+            directorCount = 0,
+            timeOfDay = "day",
             seaside = false,
             groundScreen = false,
             elevatedRadials = false,
             nvisReflector = false,
-
-            // Feedline
-            feedlineFamily = "coax", // "coax" | "ladder"
-            feedlineType = null,     // e.g. "LMR-400", "RG-8X", "450Ω"
+            feedlineFamily = "coax",
+            feedlineType = null,
             feedlineLengthFt = 50,
-
-            // DX Turbo already handled in GeometryEngine; here we only
-            // allow a small "pattern" bonus if desired
             dxTurboPatternBonus = false
         } = params;
 
         const components = [];
         let totalBoost = 0;
         let toaShift = 0;
-        let pathBias = null; // "east", "west", or null
+        let pathBias = null;
 
-        // --- Reflectors ---
+        // Reflectors
         if (reflectorCount > 0) {
             const n = Math.max(0, Math.min(2, reflectorCount));
-            const boost = 1.2 * n; // ~1.2 dB per reflector
+            const boost = 1.2 * n;
             totalBoost += boost;
             components.push({
                 type: "reflector",
@@ -50,10 +40,10 @@ export const BoostEngine = {
             });
         }
 
-        // --- Directors ---
+        // Directors
         if (directorCount > 0) {
             const n = Math.max(0, Math.min(3, directorCount));
-            const boost = 1.0 + 0.7 * (n - 1); // ~1.0, 1.7, 2.4 dB
+            const boost = 1.0 + 0.7 * (n - 1);
             totalBoost += boost;
             components.push({
                 type: "director",
@@ -63,9 +53,9 @@ export const BoostEngine = {
             });
         }
 
-        // --- Time of day ---
+        // Time of day
         if (timeOfDay === "day") {
-            toaShift += +5; // more NVIS-ish
+            toaShift += +5;
             components.push({
                 type: "timeOfDay",
                 mode: "day",
@@ -109,20 +99,20 @@ export const BoostEngine = {
             });
         }
 
-        // --- Seaside ---
+        // Seaside +10 dB
         if (seaside) {
-            const boost = 2.0;
+            const boost = 10.0;
             totalBoost += boost;
-            toaShift += -3;
+            toaShift += -5;
             components.push({
                 type: "seaside",
                 boost,
-                toaShift: -3,
-                label: "Seaside (saltwater horizon gain)"
+                toaShift: -5,
+                label: "Seaside (saltwater horizon gain +10 dB)"
             });
         }
 
-        // --- Ground screen / Faraday cloth ---
+        // Ground screen
         if (groundScreen) {
             const boost = 1.2;
             totalBoost += boost;
@@ -133,7 +123,7 @@ export const BoostEngine = {
             });
         }
 
-        // --- Elevated radials ---
+        // Elevated radials
         if (elevatedRadials) {
             const boost = 0.8;
             totalBoost += boost;
@@ -144,7 +134,7 @@ export const BoostEngine = {
             });
         }
 
-        // --- NVIS reflector (for NVIS verticals only) ---
+        // NVIS reflector
         if (nvisReflector) {
             const boost = 1.0;
             totalBoost += boost;
@@ -157,7 +147,7 @@ export const BoostEngine = {
             });
         }
 
-        // --- Feedline (auto-selected family) ---
+        // Feedline
         if (feedlineFamily === "coax") {
             const { boost, label } = coaxBoost(feedlineType, feedlineLengthFt);
             totalBoost += boost;
@@ -178,7 +168,7 @@ export const BoostEngine = {
             });
         }
 
-        // --- DX Turbo pattern bonus (optional) ---
+        // DX Turbo pattern bonus
         if (dxTurboPatternBonus) {
             const boost = 0.3;
             totalBoost += boost;
@@ -200,14 +190,9 @@ export const BoostEngine = {
     }
 };
 
-/* ---------------------------------------------------------
-   Helpers: feedline models
---------------------------------------------------------- */
-
 function coaxBoost(type, lengthFt) {
     const len = Math.max(0, lengthFt || 50);
 
-    // Approximate HF loss per 100 ft at ~14 MHz
     const table = {
         "LMR-400": 0.35,
         "LMR-240": 0.6,
@@ -220,11 +205,10 @@ function coaxBoost(type, lengthFt) {
     const lossPer100 = table[labelType] ?? table["RG-213"];
     const loss = (lossPer100 * len) / 100;
 
-    // Baseline = RG-213 at 50 ft
     const baselineLoss = (table["RG-213"] * 50) / 100;
-    const delta = baselineLoss - loss; // positive = better than baseline
+    const delta = baselineLoss - loss;
 
-    const boost = delta; // treat reduced loss as positive dB
+    const boost = delta;
 
     const label = `Feedline: ${labelType} @ ${len} ft (≈${loss.toFixed(2)} dB loss)`;
 
@@ -234,7 +218,6 @@ function coaxBoost(type, lengthFt) {
 function ladderBoost(type, lengthFt) {
     const len = Math.max(0, lengthFt || 50);
 
-    // Approximate HF loss per 100 ft at ~14 MHz
     const table = {
         "300Ω": 0.25,
         "450Ω": 0.18,
@@ -245,11 +228,10 @@ function ladderBoost(type, lengthFt) {
     const lossPer100 = table[labelType] ?? table["450Ω"];
     const loss = (lossPer100 * len) / 100;
 
-    // Baseline = 450Ω at 50 ft
     const baselineLoss = (table["450Ω"] * 50) / 100;
     const delta = baselineLoss - loss;
 
-    const boost = delta + 0.5; // ladder line gets a general efficiency bonus
+    const boost = delta + 0.5;
 
     const label = `Feedline: ${labelType} ladder line @ ${len} ft (≈${loss.toFixed(2)} dB loss)`;
 
