@@ -3,16 +3,20 @@
    1/4-wave vertical with radials + always-visible boost controls
 --------------------------------------------------------- */
 
-import { wavelength } from "../utils.js";
 import { requireFrequency, requirePositive, toNumber } from "../validators.js";
 import { infoBox, warnBox } from "../dom.js";
 import { findBand } from "../constants.js";
 import { log } from "../log.js";
 import { BoostEngine } from "../boost-engine.js";
 
+/* LOCAL WAVELENGTH (meters) */
+function wavelengthMeters(freqMHz) {
+    return 300 / freqMHz; // good enough for design work
+}
+
 /* BASE MODEL */
 function computeVerticalDX(freqMHz, heightM, radialCount, radialLengthM, groundType) {
-    const lambda = wavelength(freqMHz);
+    const lambda = wavelengthMeters(freqMHz);
     const frac = heightM / lambda;
 
     let baseGain = 1.5; // baseline 1/4λ vertical
@@ -34,7 +38,6 @@ function computeVerticalDX(freqMHz, heightM, radialCount, radialLengthM, groundT
    EXPORT DEFAULT
 --------------------------------------------------------- */
 export default function initVerticalDX(root) {
-    // root may be anything; we only trust the DOM
     const container = document.querySelector("#content") || root;
     if (!container) return;
 
