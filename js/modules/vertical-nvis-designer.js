@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------
    Antenna Workbench — Vertical NVIS Designer
-   Short vertical with NVIS focus + boost controls
+   Short vertical with NVIS focus + boost + reflector
 --------------------------------------------------------- */
 
 import { requireFrequency, requirePositive, toNumber } from "../validators.js";
@@ -115,6 +115,7 @@ export default function initVerticalNVIS(root) {
         const radialLen = toNumber(radialLenInput.value);
 
         requireFrequency(freq, errors);
+        if (freq <= 0) errors.push("Frequency must be > 0 MHz.");
         requirePositive(height, "Height", errors);
         requirePositive(radials, "Radial count", errors);
         requirePositive(radialLen, "Radial length", errors);
@@ -130,12 +131,7 @@ export default function initVerticalNVIS(root) {
         const feedZ = estimateFeedZ(freq, groundLoss);
         const baseGain = estimateGain(base, groundLoss);
 
-        let nvisInfo = null;
-        if (boostNvis.checked) {
-            nvisInfo = computeNVISReflector(freq, height, radials, radialLen);
-            logNVISReflector("Vertical NVIS", nvisInfo);
-        }
-
+        // Boost (ground screen, elevated, saltwater)
         const boost = BoostEngine.computeBoost({
             groundScreen: boostGroundScreen.checked,
             elevatedRadials: boostElevated.checked,
@@ -143,7 +139,19 @@ export default function initVerticalNVIS(root) {
             dxTurbo: false
         });
 
-        const totalGain = baseGain + boost.totalBoost;
+        // Reflector (optional)
+        let reflectorInfo = null;
+        let reflectorGain = 0;
+        let toaWithReflector = null;
+
+        if (boostNvis.checked) {
+            reflectorInfo = computeNVISReflector(freq, height, radials, radialLen, base.toa);
+            logNVISReflector("Vertical NVIS", reflectorInfo);
+            reflectorGain = reflectorInfo.gainDb;
+            toaWithReflector = reflectorInfo.toaDeg;
+        }
+
+        const totalGain = baseGain + boost.totalBoost + reflectorGain;
 
         log("Vertical NVIS", {
             freq,
@@ -156,16 +164,32 @@ export default function initVerticalNVIS(root) {
             feedZ,
             baseGain,
             boost,
-            nvisInfo
+            reflectorInfo,
+            totalGain
         });
 
         const boostLines = boost.details.length
             ? boost.details.map(d => `+${d.boost.toFixed(1)} dB from ${d.label}`).join("<br>")
             : "No boost options enabled.";
 
-        const nvisLines = nvisInfo
-            ? `<p><strong>NVIS reflector:</strong> enabled<br>${nvisInfo.summary}</p>`
-            : `<p><strong>NVIS reflector:</strong> disabled</p>`;
+        const reflectorLines = reflectorInfo
+            ? `
+                <p><strong>NVIS reflector:</strong> enabled</p>
+                <p><strong>Reflector spacing:</strong><br>
+                    ${reflectorInfo.spacingLambda.toFixed(2)} λ<br>
+                    ${reflectorInfo.spacingM.toFixed(2)} m<br>
+                    ${reflectorInfo.spacingFt.toFixed(1)} ft (${reflectorInfo.spacingFeetInches})</p>
+                <p><strong>Reflector height:</strong><br>
+                    ${reflectorInfo.heightM.toFixed(2)} m<br>
+                    ${reflectorInfo.heightFt.toFixed(1)} ft (${reflectorInfo.heightFeetInches})</p>
+                <p><strong>Reflector gain:</strong> +${reflectorGain.toFixed(1)} dB</p>
+                <p><strong>TOA (no reflector):</strong> ${base.toa.toFixed(0)}°<br>
+                   <strong>TOA (reflector enabled):</strong> ${toaWithReflector.toFixed(0)}°</p>
+            `
+            : `
+                <p><strong>NVIS reflector:</strong> disabled</p>
+                <p><strong>TOA (no reflector):</strong> ${base.toa.toFixed(0)}°</p>
+            `;
 
         summaryDiv.innerHTML = infoBox(`
             <p><strong>Design frequency:</strong> ${freq.toFixed(2)} MHz (${band?.label ?? "Unknown band"})</p>
@@ -174,11 +198,10 @@ export default function initVerticalNVIS(root) {
             <p><strong>Radials:</strong> ${radials} × ${radialLen.toFixed(1)} m</p>
             <p><strong>Estimated feedpoint Z:</strong> ${feedZ.toFixed(0)} Ω</p>
             <p><strong>Base estimated NVIS gain:</strong> ${baseGain.toFixed(1)} dBi</p>
-            <p><strong>Total boost:</strong> +${boost.totalBoost.toFixed(1)} dB</p>
+            <p><strong>Boost gain:</strong> +${boost.totalBoost.toFixed(1)} dB</p>
+            ${reflectorLines}
+            <p><strong>Total NVIS gain:</strong> ${totalGain.toFixed(1)} dBi</p>
             <p><strong>Boost breakdown:</strong><br>${boostLines}</p>
-            <p><strong>Estimated NVIS gain:</strong> ${totalGain.toFixed(1)} dBi</p>
-            <p><strong>Estimated TOA:</strong> ${base.toa.toFixed(0)}°</p>
-            ${nvisLines}
         `);
     });
 }
