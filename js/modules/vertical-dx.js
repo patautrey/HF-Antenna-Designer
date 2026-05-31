@@ -10,11 +10,11 @@ import { GeometryEngine } from "../engines/geometry-engine.js";
 import { BoostEngine } from "../engines/boost-engine.js";
 import { TransformerEngine } from "../engines/transformer-engine.js";
 
-function baseVerticalGain(frac) {
-    if (frac < 0.15) return 0.5;
-    if (frac < 0.25) return 1.2;
-    if (frac < 0.35) return 1.8;
-    return 2.1;
+function baseVerticalDXGain(frac) {
+    if (frac < 0.25) return 1.5;
+    if (frac < 0.5) return 2.2;
+    if (frac < 0.75) return 2.8;
+    return 3.0;
 }
 
 export default function initVerticalDX(root) {
@@ -23,7 +23,7 @@ export default function initVerticalDX(root) {
 
     container.innerHTML = `
         <section class="tool">
-            <h2>Vertical DX</h2>
+            <h2>Vertical DX Designer</h2>
 
             <h3>Geometry</h3>
             <div class="field-grid">
@@ -31,7 +31,7 @@ export default function initVerticalDX(root) {
                     <input id="vdx-freq" type="number" step="0.01" value="14.2">
                 </label>
                 <label>Height (m)
-                    <input id="vdx-height" type="number" step="0.01" value="10">
+                    <input id="vdx-height" type="number" step="0.1" value="10">
                 </label>
                 <label><input id="vdx-dxturbo-height" type="checkbox"> DX Turbo height override (0.70λ)</label>
                 <label><input id="vdx-fold-enable" type="checkbox"> Foldover enabled</label>
@@ -63,7 +63,7 @@ export default function initVerticalDX(root) {
             </div>
 
             <h3>Boost</h3>
-            <div class="field-grid">
+            <div class="field-grid boost-grid">
                 <label>Reflectors
                     <input id="vdx-reflectors" type="number" min="0" max="2" step="1" value="0">
                 </label>
@@ -81,7 +81,6 @@ export default function initVerticalDX(root) {
                 <label><input id="vdx-seaside" type="checkbox"> Seaside (+10 dB)</label>
                 <label><input id="vdx-groundscreen" type="checkbox"> Ground Screen / Faraday Cloth</label>
                 <label><input id="vdx-elevated" type="checkbox"> Elevated Radials</label>
-                <label><input id="vdx-nvis-reflector" type="checkbox" disabled> NVIS Reflector (not used)</label>
                 <label>Feedline type
                     <select id="vdx-feed-type">
                         <option value="RG-213">RG-213</option>
@@ -91,7 +90,7 @@ export default function initVerticalDX(root) {
                     </select>
                 </label>
                 <label>Feedline length (ft)
-                    <input id="vdx-feed-length" type="number" step="5" value="50">
+                    <input id="vdx-feed-length" type="number" step="5" value="75">
                 </label>
                 <label><input id="vdx-dxturbo-pattern" type="checkbox"> DX Turbo pattern bonus</label>
             </div>
@@ -161,7 +160,8 @@ export default function initVerticalDX(root) {
             hatSpokes: toNumber(hatSpokes.value)
         });
 
-        const baseGain = baseVerticalGain(geom.frac);
+        const baseGain = baseVerticalDXGain(geom.frac);
+
         const boost = BoostEngine.computeBoost({
             reflectorCount: toNumber(refInput.value),
             directorCount: toNumber(dirInput.value),
@@ -208,11 +208,11 @@ export default function initVerticalDX(root) {
         summaryDiv.innerHTML = infoBox(`
             <p><strong>Design frequency:</strong> ${freq.toFixed(2)} MHz (${band?.label ?? "Unknown band"})</p>
             <p><strong>Electrical height:</strong> ${geom.effectiveHeight.toFixed(2)} m (${(geom.frac * 100).toFixed(1)}% of λ)</p>
-            <p><strong>Base Gain:</strong> ${baseGain.toFixed(1)} dBi</p>
+            <p><strong>Base DX Gain:</strong> ${baseGain.toFixed(1)} dBi</p>
             <p><strong>Geometry adjustments:</strong><br>${geomLines}</p>
             <p><strong>Boost Breakdown:</strong><br>${boostLines}</p>
-            <p><strong>Total Gain:</strong> ${totalGain.toFixed(1)} dBi</p>
-            <p><strong>TOA:</strong> ${finalToa.toFixed(0)}°</p>
+            <p><strong>Total DX Gain:</strong> ${totalGain.toFixed(1)} dBi</p>
+            <p><strong>Estimated TOA:</strong> ${finalToa.toFixed(0)}°</p>
             ${transformerHtml}
         `);
     });
