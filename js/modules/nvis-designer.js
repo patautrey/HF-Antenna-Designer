@@ -1,157 +1,147 @@
-export default function(content) {
-    content.innerHTML = `
-        <h2>NVIS Designer</h2>
-        <p class="vd-subtitle">
-            Near‑Vertical Incidence Skywave height optimization for regional HF coverage (0–500 miles).
-        </p>
+/* ---------------------------------------------------------
+   HF Workbench — NVIS Designer
+   High-level NVIS planning tool using Vertical NVIS model.
+--------------------------------------------------------- */
 
-        <div class="nvis-layout">
-            <div class="nvis-column nvis-left">
-                <h3>NVIS Parameters</h3>
+import { requireFrequency, toNumber } from "../validators.js";
+import { infoBox, warnBox } from "../dom.js";
+import { findBand } from "../constants.js";
+import { log } from "../log.js";
+import { GeometryEngine } from "../engines/geometry-engine.js";
+import { BoostEngine } from "../engines/boost-engine.js";
+import { TransformerEngine } from "../engines/transformer-engine.js";
 
-                <div class="nvis-field">
-                    <label for="nvis-band">Band</label>
-                    <select id="nvis-band">
-                        <option value="3.5">80 m (3.5 MHz)</option>
-                        <option value="5.3">60 m (5.3 MHz)</option>
-                        <option value="7.1" selected>40 m (7.1 MHz)</option>
+export default function initNVISDesigner(root) {
+    const container = document.querySelector("#content") || root;
+    if (!container) return;
+
+    container.innerHTML = `
+        <section class="tool">
+            <h2>NVIS Designer</h2>
+
+            <div class="field-grid">
+                <label>Frequency (MHz)
+                    <input id="nd-freq" type="number" step="0.01" value="5.3">
+                </label>
+                <label>Target coverage radius (km)
+                    <input id="nd-radius" type="number" step="10" value="300">
+                </label>
+                <label>Available mast height (m)
+                    <input id="nd-height" type="number" step="0.5" value="4">
+                </label>
+                <label>Time of day
+                    <select id="nd-tod">
+                        <option value="day">Day</option>
+                        <option value="night">Night</option>
+                        <option value="dawn">Dawn</option>
+                        <option value="dusk">Dusk</option>
                     </select>
-                </div>
-
-                <div class="nvis-field">
-                    <label for="nvis-height">Antenna Height (m)</label>
-                    <input id="nvis-height" type="number" step="0.1" value="6">
-                    <small>Height above ground of the horizontal radiator.</small>
-                </div>
-
-                <div class="nvis-field">
-                    <label for="nvis-ground">Ground Quality</label>
-                    <select id="nvis-ground">
-                        <option value="poor">Poor</option>
-                        <option value="average" selected>Average</option>
-                        <option value="good">Good</option>
+                </label>
+                <label>Feedline family
+                    <select id="nd-feed-family">
+                        <option value="coax">Coax</option>
+                        <option value="ladder">Ladder line</option>
                     </select>
-                </div>
-
-                <div class="nvis-field">
-                    <label for="nvis-time">Time of Day</label>
-                    <select id="nvis-time">
-                        <option value="day">Daytime</option>
-                        <option value="night" selected>Nighttime</option>
-                    </select>
-                </div>
-
-                <button id="nvis-compute-btn">Compute NVIS</button>
+                </label>
+                <label>Feedline length (ft)
+                    <input id="nd-feed-length" type="number" step="5" value="75">
+                </label>
             </div>
 
-            <div class="nvis-column nvis-right">
-                <h3>NVIS Summary</h3>
-                <div id="nvis-summary" class="nvis-summary">
-                    <p>Select parameters and click <strong>Compute NVIS</strong>.</p>
-                </div>
+            <button id="nd-compute" style="margin-top:1rem;">Design NVIS System</button>
 
-                <h3>Reference Data</h3>
-                <div id="nvis-ref" class="nvis-ref"></div>
-            </div>
-        </div>
+            <div id="nd-summary" class="summary" style="margin-top:1rem;"></div>
+        </section>
     `;
 
-    // INFO PANEL
-    const info = document.getElementById("sidebar");
-    info.innerHTML = `
-        <h3>NVIS Designer — Info Panel</h3>
-        <p>
-            NVIS (Near‑Vertical Incidence Skywave) is used for short‑range HF communication (0–500 miles).
-            It requires a high takeoff angle (60–90°) and a low antenna height (0.1–0.25 λ).
-        </p>
-        <ul>
-            <li>Best NVIS height: 0.1–0.2 λ</li>
-            <li>Nighttime supports lower frequencies (80/60m)</li>
-            <li>Daytime supports 40m NVIS when MUF is high enough</li>
-            <li>Poor ground increases absorption</li>
-        </ul>
-        <p>Future versions will integrate real‑time ionospheric data.</p>
-    `;
+    const freqInput = document.getElementById("nd-freq");
+    const radiusInput = document.getElementById("nd-radius");
+    const heightInput = document.getElementById("nd-height");
+    const todInput = document.getElementById("nd-tod");
+    const feedFamilyInput = document.getElementById("nd-feed-family");
+    const feedLenInput = document.getElementById("nd-feed-length");
 
-    const c = 300; // λ(m) ≈ 300 / f(MHz)
+    const summaryDiv = document.getElementById("nd-summary");
+    const button = document.getElementById("nd-compute");
 
-    const bandEl = document.getElementById("nvis-band");
-    const heightEl = document.getElementById("nvis-height");
-    const groundEl = document.getElementById("nvis-ground");
-    const timeEl = document.getElementById("nvis-time");
-    const btn = document.getElementById("nvis-compute-btn");
-    const summaryEl = document.getElementById("nvis-summary");
-    const refEl = document.getElementById("nvis-ref");
+    button.addEventListener("click", () => {
+        const errors = [];
 
-    function computeRefs() {
-        const fMHz = parseFloat(bandEl.value);
-        const lambda = c / fMHz;
+        const freq = toNumber(freqInput.value);
+        const radius = toNumber(radiusInput.value);
+        const height = toNumber(heightInput.value);
 
-        const h = parseFloat(heightEl.value);
-        const ratio = h / lambda;
+        requireFrequency(freq, errors);
+        if (radius <= 0) errors.push("Coverage radius must be positive.");
+        if (height <= 0) errors.push("Mast height must be positive.");
 
-        refEl.innerHTML = `
-            <table class="nvis-table">
-                <tr><th>Parameter</th><th>Value</th></tr>
-                <tr><td>Frequency</td><td>${fMHz.toFixed(2)} MHz</td></tr>
-                <tr><td>Wavelength (λ)</td><td>${lambda.toFixed(2)} m</td></tr>
-                <tr><td>Height Ratio</td><td>${(ratio * 100).toFixed(1)}% of λ</td></tr>
-                <tr><td>Ideal NVIS Height</td><td>${(lambda * 0.15).toFixed(2)} m</td></tr>
-            </table>
-        `;
-
-        return { fMHz, lambda, ratio };
-    }
-
-    function describeHeight(ratio) {
-        if (ratio < 0.08) return "Too low — excessive ground absorption";
-        if (ratio < 0.12) return "Low NVIS region — workable";
-        if (ratio < 0.22) return "Optimal NVIS height";
-        if (ratio < 0.35) return "High NVIS — still usable";
-        return "Too high — NVIS weak, more low‑angle radiation";
-    }
-
-    function computeNVIS() {
-        const { fMHz, lambda, ratio } = computeRefs();
-        const h = parseFloat(heightEl.value);
-        const ground = groundEl.value;
-        const tod = timeEl.value;
-
-        const heightDesc = describeHeight(ratio);
-
-        let groundLoss;
-        switch (ground) {
-            case "poor": groundLoss = "High absorption — NVIS degraded"; break;
-            case "average": groundLoss = "Moderate absorption — typical performance"; break;
-            case "good": groundLoss = "Low absorption — strong NVIS return"; break;
+        if (errors.length) {
+            summaryDiv.innerHTML = warnBox(errors.join("<br>"));
+            return;
         }
 
-        let todEffect;
-        if (tod === "day") {
-            if (fMHz < 5) todEffect = "D‑layer absorption may be high — 80m weaker";
-            else todEffect = "40m NVIS often strong during daytime";
-        } else {
-            if (fMHz < 5) todEffect = "80m/60m NVIS excellent at night";
-            else todEffect = "40m NVIS depends on MUF and solar conditions";
-        }
+        const band = findBand(freq);
 
-        const takeoffAngle = (80 - ratio * 120).toFixed(1);
-        const clampedAngle = Math.max(60, Math.min(90, takeoffAngle));
+        const geom = GeometryEngine.computeGeometry({
+            freqMHz: freq,
+            heightM: height,
+            dxTurbo: false,
+            foldoverEnabled: false,
+            foldAngleDeg: 0,
+            linearLoadingEnabled: false,
+            linearLoadingFactor: 0,
+            coilEnabled: false,
+            coilPosition: "base",
+            coilQ: 200,
+            hatEnabled: false,
+            hatRadiusM: 0,
+            hatSpokes: 0
+        });
 
-        summaryEl.innerHTML = `
-            <p><strong>Band:</strong> ${fMHz.toFixed(2)} MHz</p>
-            <p><strong>Height:</strong> ${h.toFixed(1)} m (${(ratio * 100).toFixed(1)}% of λ)</p>
-            <p><strong>Height Region:</strong> ${heightDesc}</p>
-            <p><strong>Estimated Takeoff Angle:</strong> ${clampedAngle}°</p>
-            <p><strong>Ground Effect:</strong> ${groundLoss}</p>
-            <p><strong>Time‑of‑Day Effect:</strong> ${todEffect}</p>
-            <hr>
-            <p><em>Note:</em> NVIS performance depends heavily on ionospheric conditions and D‑layer absorption.</p>
-        `;
-    }
+        const baseGain = 0.0; // conceptual NVIS baseline
 
-    computeRefs();
-    btn.addEventListener("click", computeNVIS);
-    bandEl.addEventListener("change", computeRefs);
-    heightEl.addEventListener("input", computeRefs);
+        const feedFamily = feedFamilyInput.value === "ladder" ? "ladder" : "coax";
+
+        const boost = BoostEngine.computeBoost({
+            reflectorCount: 0,
+            directorCount: 0,
+            timeOfDay: todInput.value,
+            seaside: false,
+            groundScreen: false,
+            elevatedRadials: false,
+            nvisReflector: true,
+            feedlineFamily: feedFamily,
+            feedlineType: feedFamily === "ladder" ? "450Ω" : "RG-213",
+            feedlineLengthFt: toNumber(feedLenInput.value),
+            dxTurboPatternBonus: false
+        });
+
+        const totalGain = baseGain + geom.totalGeomGainDelta + boost.totalBoost;
+        const finalToa = Math.max(30, Math.min(90, geom.toa + boost.toaShift + 10));
+
+        const transformerHtml = TransformerEngine.getTransformerNote("verticalNVIS", feedFamily);
+
+        const nvisScore = (finalToa / 90) * 10 + totalGain; // simple heuristic
+
+        log("NVISDesigner", {
+            freq,
+            radius,
+            height,
+            geom,
+            boost,
+            totalGain,
+            finalToa,
+            nvisScore
+        });
+
+        summaryDiv.innerHTML = infoBox(`
+            <p><strong>Design frequency:</strong> ${freq.toFixed(2)} MHz (${band?.label ?? "Unknown band"})</p>
+            <p><strong>Target NVIS radius:</strong> ${radius.toFixed(0)} km</p>
+            <p><strong>Mast height:</strong> ${height.toFixed(1)} m (${(geom.frac * 100).toFixed(1)}% of λ)</p>
+            <p><strong>Estimated NVIS gain (overhead):</strong> ${totalGain.toFixed(1)} dBi</p>
+            <p><strong>Estimated NVIS TOA:</strong> ${finalToa.toFixed(0)}°</p>
+            <p><strong>NVIS score (higher is better):</strong> ${nvisScore.toFixed(1)}</p>
+            ${transformerHtml}
+        `);
+    });
 }
