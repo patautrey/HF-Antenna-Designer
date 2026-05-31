@@ -1,20 +1,24 @@
 /* ---------------------------------------------------------
-   HF Workbench — EFHW
+   HF Workbench — End-Fed Half-Wave (EFHW)
+   - Geometry panel
+   - Unified boost panel (two-column .boost-grid)
+   - Feedline family + type + length
+   - Transformer Requirements / unun notes (49:1 / 64:1, etc.)
 --------------------------------------------------------- */
 
 import { requireFrequency, requirePositive, toNumber } from "../validators.js";
 import { infoBox, warnBox } from "../dom.js";
 import { findBand } from "../constants.js";
 import { log } from "../log.js";
+import { GeometryEngine } from "../engines/geometry-engine.js";
 import { BoostEngine } from "../engines/boost-engine.js";
 import { TransformerEngine } from "../engines/transformer-engine.js";
 
-function efhwBaseGain(freqMHz, lengthM) {
-    const lambda = 300 / freqMHz;
-    const frac = lengthM / lambda;
-    if (frac < 0.4) return 1.5;
-    if (frac < 0.6) return 2.0;
-    return 2.3;
+function baseEFHWGain(frac) {
+    if (frac < 0.40) return 1.8;
+    if (frac < 0.60) return 2.1;
+    if (frac < 0.80) return 2.4;
+    return 2.7;
 }
 
 export default function initEFHW(root) {
@@ -25,26 +29,29 @@ export default function initEFHW(root) {
         <section class="tool">
             <h2>End-Fed Half-Wave (EFHW)</h2>
 
+            <h3>Geometry</h3>
             <div class="field-grid">
                 <label>Frequency (MHz)
                     <input id="ef-freq" type="number" step="0.01" value="7.1">
                 </label>
-                <label>Wire length (m)
+                <label>Total wire length (m)
                     <input id="ef-length" type="number" step="0.5" value="40">
                 </label>
                 <label>Average height (m)
                     <input id="ef-height" type="number" step="0.5" value="10">
                 </label>
-                <label>Transformer ratio
-                    <select id="ef-ratio">
-                        <option value="49:1">49:1</option>
-                        <option value="64:1">64:1</option>
+                <label>Configuration
+                    <select id="ef-config">
+                        <option value="sloper">Sloper</option>
+                        <option value="flat-top">Flat-top</option>
+                        <option value="inverted-L">Inverted-L</option>
+                        <option value="random">Random / irregular</option>
                     </select>
                 </label>
             </div>
 
             <h3>Boost</h3>
-            <div class="field-grid">
+            <div class="field-grid boost-grid">
                 <label>Time of day
                     <select id="ef-tod">
                         <option value="day">Day</option>
@@ -53,14 +60,30 @@ export default function initEFHW(root) {
                         <option value="dusk">Dusk</option>
                     </select>
                 </label>
+
+                <label><input id="ef-seaside" type="checkbox"> Seaside (+10 dB)</label>
+                <label><input id="ef-groundscreen" type="checkbox"> Ground Screen / Faraday Cloth</label>
+                <label><input id="ef-elevated" type="checkbox"> Elevated Feed / Supports</label>
+
+                <label>Feedline family
+                    <select id="ef-feed-family">
+                        <option value="coax">Coax</option>
+                        <option value="ladder">Ladder line</option>
+                    </select>
+                </label>
+
                 <label>Feedline type
                     <select id="ef-feed-type">
                         <option value="RG-213">RG-213</option>
                         <option value="LMR-400">LMR-400</option>
                         <option value="RG-8X">RG-8X</option>
                         <option value="RG-58">RG-58</option>
+                        <option value="450Ω">450Ω window line</option>
+                        <option value="300Ω">300Ω twin-lead</option>
+                        <option value="600Ω">600Ω open wire</option>
                     </select>
                 </label>
+
                 <label>Feedline length (ft)
                     <input id="ef-feed-length" type="number" step="5" value="75">
                 </label>
@@ -75,8 +98,14 @@ export default function initEFHW(root) {
     const freqInput = document.getElementById("ef-freq");
     const lengthInput = document.getElementById("ef-length");
     const heightInput = document.getElementById("ef-height");
-    const ratioInput = document.getElementById("ef-ratio");
+    const configInput = document.getElementById("ef-config");
+
     const todInput = document.getElementById("ef-tod");
+    const seasideInput = document.getElementById("ef-seaside");
+    const groundScreenInput = document.getElementById("ef-groundscreen");
+    const elevatedInput = document.getElementById("ef-elevated");
+
+    const feedFamilyInput = document.getElementById("ef-feed-family");
     const feedTypeInput = document.getElementById("ef-feed-type");
     const feedLenInput = document.getElementById("ef-feed-length");
 
@@ -87,11 +116,12 @@ export default function initEFHW(root) {
         const errors = [];
 
         const freq = toNumber(freqInput.value);
-        const length = toNumber(lengthInput.value);
+        const totalLen = toNumber(lengthInput.value);
         const height = toNumber(heightInput.value);
+        const config = configInput.value;
 
         requireFrequency(freq, errors);
-        requirePositive(length, "Wire length", errors);
+        requirePositive(totalLen, "Total wire length", errors);
         requirePositive(height, "Average height", errors);
 
         if (errors.length) {
@@ -101,24 +131,38 @@ export default function initEFHW(root) {
 
         const band = findBand(freq);
 
-        const baseGain = efhwBaseGain(freq, length);
+        const geom = GeometryEngine.computeGeometry({
+            freqMHz: freq,
+            heightM: height,
+            spanM: totalLen
+        });
+
+        const baseGain = baseEFHWGain(geom.frac);
+
+        const feedFamily = feedFamilyInput.value === "ladder" ? "ladder" : "coax";
 
         const boost = BoostEngine.computeBoost({
             reflectorCount: 0,
             directorCount: 0,
             timeOfDay: todInput.value,
-            seaside: false,
-            groundScreen: false,
-            elevatedRadials: false,
+            seaside: seasideInput.checked,
+            groundScreen: groundScreenInput.checked,
+            elevatedRadials: elevatedInput.checked,
             nvisReflector: false,
-            feedlineFamily: "coax",
+            feedlineFamily: feedFamily,
             feedlineType: feedTypeInput.value,
             feedlineLengthFt: toNumber(feedLenInput.value),
             dxTurboPatternBonus: false
         });
 
-        const totalGain = baseGain + boost.totalBoost;
-        const finalToa = Math.max(20, Math.min(80, 90 - (height / (300 / freq)) * 120));
+        const totalGain = baseGain + geom.totalGeomGainDelta + boost.totalBoost;
+        const finalToa = Math.max(20, Math.min(80, geom.toa + boost.toaShift));
+
+        const geomLines = [
+            `Total wire length: ${totalLen.toFixed(1)} m`,
+            `Configuration: ${config}`,
+            ...(geom.components.length ? geom.components.map(c => c.note ?? "") : [])
+        ].join("<br>");
 
         const boostLines = boost.components.length
             ? boost.components.map(d => {
@@ -130,29 +174,38 @@ export default function initEFHW(root) {
             }).join("<br>")
             : "No boost options enabled.";
 
-        const ratio = ratioInput.value;
-        const transformerHtml = TransformerEngine.getTransformerNote("efhw", "coax", { efhwRatio: ratio });
+        const transformerHtml = TransformerEngine.getTransformerNote("efhw", feedFamily);
 
         log("EFHW", {
             freq,
-            length,
+            totalLen,
             height,
+            config,
+            geom,
             baseGain,
             boost,
             totalGain,
-            finalToa,
-            ratio
+            finalToa
         });
 
         summaryDiv.innerHTML = infoBox(`
             <p><strong>Design frequency:</strong> ${freq.toFixed(2)} MHz (${band?.label ?? "Unknown band"})</p>
-            <p><strong>Wire length:</strong> ${length.toFixed(1)} m</p>
-            <p><strong>Average height:</strong> ${height.toFixed(1)} m</p>
-            <p><strong>Transformer ratio:</strong> ${ratio}</p>
-            <p><strong>Base Gain:</strong> ${baseGain.toFixed(1)} dBi</p>
-            <p><strong>Boost Breakdown:</strong><br>${boostLines}</p>
-            <p><strong>Total Gain:</strong> ${totalGain.toFixed(1)} dBi</p>
+
+            <p><strong>Electrical height (feed region):</strong> 
+                ${geom.effectiveHeight.toFixed(2)} m 
+                (${(geom.frac * 100).toFixed(1)}% of λ)
+            </p>
+
+            <p><strong>Base EFHW Gain:</strong> ${baseGain.toFixed(1)} dBi</p>
+
+            <p><strong>Geometry details:</strong><br>${geomLines}</p>
+
+            <p><strong>Boost breakdown:</strong><br>${boostLines}</p>
+
+            <p><strong>Total estimated gain:</strong> ${totalGain.toFixed(1)} dBi</p>
+
             <p><strong>Estimated TOA:</strong> ${finalToa.toFixed(0)}°</p>
+
             ${transformerHtml}
         `);
     });
