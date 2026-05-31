@@ -10,19 +10,16 @@ import { findBand } from "../constants.js";
 import { log } from "../log.js";
 import { BoostEngine } from "../boost-engine.js";
 
-function $(root, sel) { return root.querySelector(sel); }
-
 function computePerformer(freqMHz, heightM, baseLoadingUh, radialCount, groundType) {
     const lambda = wavelength(freqMHz);
     const frac = heightM / lambda;
 
-    let baseGain = 2.0; // slightly better than plain 1/4λ
+    let baseGain = 2.0;
 
     if (groundType === "good") baseGain += 0.8;
     if (groundType === "poor") baseGain -= 0.8;
     if (groundType === "saltwater") baseGain += 2.0;
 
-    // loading penalty if heavily loaded
     const loadingPenalty = Math.log10(Math.max(1, baseLoadingUh)) * 0.7;
     baseGain -= loadingPenalty;
 
@@ -38,9 +35,10 @@ function computePerformer(freqMHz, heightM, baseLoadingUh, radialCount, groundTy
    EXPORT DEFAULT
 --------------------------------------------------------- */
 export default function initPerformer(root) {
-    if (!root) return;
+    const container = document.querySelector("#content") || root;
+    if (!container) return;
 
-    root.innerHTML = `
+    container.innerHTML = `
         <section class="tool">
             <h2>Performer Vertical</h2>
 
@@ -85,19 +83,21 @@ export default function initPerformer(root) {
         </section>
     `;
 
-    const freqInput = $("#perf-freq");
-    const heightInput = $("#perf-height");
-    const loadInput = $("#perf-load");
-    const radialsInput = $("#perf-radials");
-    const groundSelect = $("#perf-ground");
+    const freqInput = document.getElementById("perf-freq");
+    const heightInput = document.getElementById("perf-height");
+    const loadInput = document.getElementById("perf-load");
+    const radialsInput = document.getElementById("perf-radials");
+    const groundSelect = document.getElementById("perf-ground");
 
-    const boostGroundScreen = $("#perf-boost-groundscreen");
-    const boostElevated = $("#perf-boost-elevated");
-    const boostSaltwater = $("#perf-boost-saltwater");
-    const boostDxTurbo = $("#perf-boost-dxturbo");
+    const boostGroundScreen = document.getElementById("perf-boost-groundscreen");
+    const boostElevated = document.getElementById("perf-boost-elevated");
+    const boostSaltwater = document.getElementById("perf-boost-saltwater");
+    const boostDxTurbo = document.getElementById("perf-boost-dxturbo");
 
-    const summaryDiv = $("#perf-summary");
-    const button = $("#perf-compute");
+    const summaryDiv = document.getElementById("perf-summary");
+    const button = document.getElementById("perf-compute");
+
+    if (!button || !summaryDiv) return;
 
     button.addEventListener("click", () => {
         const errors = [];
