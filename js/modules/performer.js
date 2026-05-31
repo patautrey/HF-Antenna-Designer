@@ -3,15 +3,18 @@
    High-efficiency single-element vertical + boost controls
 --------------------------------------------------------- */
 
-import { wavelength } from "../utils.js";
 import { requireFrequency, requirePositive, toNumber } from "../validators.js";
 import { infoBox, warnBox } from "../dom.js";
 import { findBand } from "../constants.js";
 import { log } from "../log.js";
 import { BoostEngine } from "../boost-engine.js";
 
+function wavelengthMeters(freqMHz) {
+    return 300 / freqMHz;
+}
+
 function computePerformer(freqMHz, heightM, baseLoadingUh, radialCount, groundType) {
-    const lambda = wavelength(freqMHz);
+    const lambda = wavelengthMeters(freqMHz);
     const frac = heightM / lambda;
 
     let baseGain = 2.0;
