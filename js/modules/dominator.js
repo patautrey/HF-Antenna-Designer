@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------
-   Antenna Workbench — Dominator Array
-   Multi-element phased vertical array + boost controls
+   HF Workbench — Dominator Array
+   Multi-element phased vertical array + DX Turbo override
 --------------------------------------------------------- */
 
 import { requireFrequency, requirePositive, toNumber } from "../validators.js";
@@ -9,10 +9,12 @@ import { findBand } from "../constants.js";
 import { log } from "../log.js";
 import { BoostEngine } from "../boost-engine.js";
 
+/* Wavelength (meters) */
 function wavelengthMeters(freqMHz) {
     return 300 / freqMHz;
 }
 
+/* Core array model */
 function computeArrayGain(freqMHz, elements, spacingM, phaseDeg, heightM, radialCount, groundType) {
     const lambda = wavelengthMeters(freqMHz);
     const frac = heightM / lambda;
@@ -145,7 +147,7 @@ export default function initDominator(root) {
 
         const lambda = wavelengthMeters(freq);
 
-        // DX Turbo: force height to 0.70 λ and lock field
+        /* DX TURBO — force height = 0.70λ */
         let turboNote = "";
         if (boostDxTurbo.checked) {
             const turboHeight = 0.70 * lambda;
