@@ -1,83 +1,70 @@
-// /HF-Workbench/js/modules/verticals.js
-// Verticals Designer with BoostEngine + PlotEngine
+/* ---------------------------------------------------------
+   HF Workbench — Verticals Menu Router
+   Loads the correct vertical module into #content
+--------------------------------------------------------- */
 
-import { BoostEngine } from "../boost-engine.js";
-import { PlotEngine } from "../plot-engine.js";
+import initVerticalDX from "./vertical-dx-designer.js";
+import initVerticalNVIS from "./vertical-nvis.js";
+import initVerticalNVISDesigner from "./vertical-nvis-designer.js";
+import initPerformer from "./performer.js";
+import initDominator from "./dominator.js";
 
-export function loadVerticalsDesigner() {
-    const container = document.querySelector("#content");
+export default function initVerticals(root) {
+    const container = document.querySelector("#content") || root;
     if (!container) return;
 
     container.innerHTML = `
-        <section class="designer-wrapper">
-            <h1>Verticals Designer</h1>
+        <section class="tool">
+            <h2>Vertical Antenna Tools</h2>
 
-            <div class="designer-layout">
-                <div class="designer-inputs">
-                    <h2>Inputs</h2>
-
-                    <label>
-                        Frequency (MHz)
-                        <input id="vert-freq" type="number" value="7.1" step="0.1">
-                    </label>
-
-                    <label>
-                        Height (m)
-                        <input id="vert-height" type="number" value="10" step="0.5">
-                    </label>
-
-                    <label>
-                        Number of Elements
-                        <input id="vert-elements" type="number" value="1" min="1" max="8">
-                    </label>
-
-                    <label>
-                        Spacing (m)
-                        <input id="vert-spacing" type="number" value="5" step="0.5">
-                    </label>
-
-                    <button id="vert-compute">Compute Vertical</button>
-                </div>
-
-                <div class="designer-plots">
-                    <h2>Radiation Patterns</h2>
-                    <canvas id="vert-elev" width="400" height="400"></canvas>
-                    <canvas id="vert-az" width="400" height="400"></canvas>
-
-                    <h2>Band Performance</h2>
-                    <canvas id="vert-swr" width="400" height="250"></canvas>
-                    <canvas id="vert-gain" width="400" height="250"></canvas>
-                    <canvas id="vert-erp" width="400" height="250"></canvas>
-                </div>
+            <div class="menu-list">
+                <button class="vbtn" data-view="vertical-dx">Vertical DX Designer</button>
+                <button class="vbtn" data-view="vertical-nvis">Vertical NVIS</button>
+                <button class="vbtn" data-view="vertical-nvis-designer">Vertical NVIS Designer</button>
+                <button class="vbtn" data-view="performer">Performer Vertical</button>
+                <button class="vbtn" data-view="dominator">Dominator Array</button>
             </div>
+
+            <div id="vertical-output" style="margin-top:1rem;"></div>
         </section>
     `;
 
-    const compute = async () => {
-        const freq = parseFloat(document.getElementById("vert-freq").value);
-        const height = parseFloat(document.getElementById("vert-height").value);
-        const elements = parseInt(document.getElementById("vert-elements").value);
-        const spacing = parseFloat(document.getElementById("vert-spacing").value);
+    const output = document.getElementById("vertical-output");
 
-        const geometry = {
-            type: "vertical",
-            frequencyMHz: freq,
-            heightMeters: height,
-            elements: elements,
-            spacingMeters: spacing
-        };
+    function loadModule(name) {
+        output.innerHTML = ""; // clear previous module
 
-        const result = await BoostEngine.solve(geometry, {});
+        switch (name) {
+            case "vertical-dx":
+                initVerticalDX(output);
+                break;
 
-        PlotEngine.renderElevation("vert-elev", result.elevation);
-        PlotEngine.renderAzimuth("vert-az", result.azimuth);
-        PlotEngine.renderSWR("vert-swr", result.swr);
-        PlotEngine.renderGain("vert-gain", result.gain);
-        PlotEngine.renderERP("vert-erp", result.erp);
-    };
+            case "vertical-nvis":
+                initVerticalNVIS(output);
+                break;
 
-    document.getElementById("vert-compute").addEventListener("click", compute);
+            case "vertical-nvis-designer":
+                initVerticalNVISDesigner(output);
+                break;
 
-    // Auto-run once on load
-    compute();
+            case "performer":
+                initPerformer(output);
+                break;
+
+            case "dominator":
+                initDominator(output);
+                break;
+
+            default:
+                output.innerHTML = `<p>Unknown module: ${name}</p>`;
+        }
+    }
+
+    // Attach handlers
+    document.querySelectorAll(".vbtn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const view = btn.getAttribute("data-view");
+            loadModule(view);
+        });
+    });
 }
