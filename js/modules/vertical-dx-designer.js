@@ -10,8 +10,6 @@ import { findBand } from "../constants.js";
 import { log } from "../log.js";
 import { BoostEngine } from "../boost-engine.js";
 
-function $(root, sel) { return root.querySelector(sel); }
-
 /* BASE MODEL */
 function computeVerticalDX(freqMHz, heightM, radialCount, radialLengthM, groundType) {
     const lambda = wavelength(freqMHz);
@@ -33,12 +31,14 @@ function computeVerticalDX(freqMHz, heightM, radialCount, radialLengthM, groundT
 }
 
 /* ---------------------------------------------------------
-   EXPORT DEFAULT — REQUIRED BY YOUR LOADER
+   EXPORT DEFAULT
 --------------------------------------------------------- */
 export default function initVerticalDX(root) {
-    if (!root) return;
+    // root may be anything; we only trust the DOM
+    const container = document.querySelector("#content") || root;
+    if (!container) return;
 
-    root.innerHTML = `
+    container.innerHTML = `
         <section class="tool">
             <h2>Vertical DX Designer</h2>
 
@@ -83,19 +83,21 @@ export default function initVerticalDX(root) {
         </section>
     `;
 
-    const freqInput = $("#vdx-freq");
-    const heightInput = $("#vdx-height");
-    const radialsInput = $("#vdx-radials");
-    const radialLenInput = $("#vdx-radial-length");
-    const groundSelect = $("#vdx-ground");
+    const freqInput = document.getElementById("vdx-freq");
+    const heightInput = document.getElementById("vdx-height");
+    const radialsInput = document.getElementById("vdx-radials");
+    const radialLenInput = document.getElementById("vdx-radial-length");
+    const groundSelect = document.getElementById("vdx-ground");
 
-    const boostGroundScreen = $("#vdx-boost-groundscreen");
-    const boostElevated = $("#vdx-boost-elevated");
-    const boostSaltwater = $("#vdx-boost-saltwater");
-    const boostDxTurbo = $("#vdx-boost-dxturbo");
+    const boostGroundScreen = document.getElementById("vdx-boost-groundscreen");
+    const boostElevated = document.getElementById("vdx-boost-elevated");
+    const boostSaltwater = document.getElementById("vdx-boost-saltwater");
+    const boostDxTurbo = document.getElementById("vdx-boost-dxturbo");
 
-    const summaryDiv = $("#vdx-summary");
-    const button = $("#vdx-compute");
+    const summaryDiv = document.getElementById("vdx-summary");
+    const button = document.getElementById("vdx-compute");
+
+    if (!button || !summaryDiv) return;
 
     button.addEventListener("click", () => {
         const errors = [];
@@ -127,6 +129,16 @@ export default function initVerticalDX(root) {
         });
 
         const totalGain = base.baseGain + boost.totalBoost;
+
+        log("Vertical DX", {
+            freq,
+            height,
+            radials,
+            radialLen,
+            ground,
+            base,
+            boost
+        });
 
         const boostLines = boost.details.length
             ? boost.details.map(d => `+${d.boost.toFixed(1)} dB from ${d.label}`).join("<br>")
