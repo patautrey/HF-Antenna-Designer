@@ -1,176 +1,143 @@
-// /HF-Workbench/js/plot-engine.js
-// High-Resolution Plot Engine for HF Workbench
+// js/plot-engine.js
+// HF Antenna Designer — Plot Engine
+// Centralized plotting utilities (SWR, gain, TOA, etc.)
 
-export const PlotEngine = {
-
-    // ------------------------------------------------------------
-    // PUBLIC API
-    // ------------------------------------------------------------
-    renderElevation(canvasId, data) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return;
-        this._drawPolar(canvas, data.angles, data.gain, "Elevation Pattern");
-    },
-
-    renderAzimuth(canvasId, data) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return;
-        this._drawPolar(canvas, data.angles, data.gain, "Azimuth Pattern");
-    },
-
-    renderSWR(canvasId, data) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return;
-        this._drawCartesian(canvas, data.freq, data.swr, "SWR", "SWR");
-    },
-
-    renderGain(canvasId, data) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return;
-        this._drawCartesian(canvas, data.freq, data.gain, "Gain (dBi)", "Gain");
-    },
-
-    renderERP(canvasId, data) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return;
-        this._drawCartesian(canvas, data.freq, data.erp, "ERP (W)", "ERP");
-    },
-
-    // ------------------------------------------------------------
-    // POLAR PLOT (Elevation / Azimuth)
-    // ------------------------------------------------------------
-    _drawPolar(canvas, angles, gain, title) {
-        const ctx = canvas.getContext("2d");
-        const w = canvas.width;
-        const h = canvas.height;
-        const cx = w / 2;
-        const cy = h / 2;
-        const radius = Math.min(w, h) * 0.42;
-
-        ctx.clearRect(0, 0, w, h);
-        ctx.lineWidth = 1.2;
-        ctx.strokeStyle = "#ccc";
-        ctx.fillStyle = "#fff";
-        ctx.font = "14px sans-serif";
-
-        // Title
-        ctx.fillText(title, 10, 20);
-
-        // dB scaling
-        const maxGain = Math.max(...gain);
-        const minGain = maxGain - 40;
-
-        // Draw radial gridlines
-        for (let db = 0; db >= -40; db -= 10) {
-            const r = radius * (1 - (maxGain - (maxGain + db)) / 40);
-            ctx.beginPath();
-            ctx.arc(cx, cy, r, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.fillText(`${db} dB`, cx + r + 5, cy);
+export const PlotEngine = (() => {
+    function ensureCanvas(containerId = "plot-area") {
+        let container = document.getElementById(containerId);
+        if (!container) {
+            container = document.createElement("div");
+            container.id = containerId;
+            container.style.marginTop = "1rem";
+            document.getElementById("content")?.appendChild(container);
         }
 
-        // Draw angle spokes
-        ctx.strokeStyle = "#bbb";
-        for (let a = 0; a < 360; a += 30) {
-            const rad = a * Math.PI / 180;
-            const x = cx + radius * Math.cos(rad);
-            const y = cy + radius * Math.sin(rad);
-            ctx.beginPath();
-            ctx.moveTo(cx, cy);
-            ctx.lineTo(x, y);
-            ctx.stroke();
+        let canvas = container.querySelector("canvas");
+        if (!canvas) {
+            canvas = document.createElement("canvas");
+            canvas.width = 800;
+            canvas.height = 300;
+            canvas.style.width = "100%";
+            canvas.style.border = "1px solid #333";
+            canvas.style.background = "#000";
+            container.innerHTML = "";
+            container.appendChild(canvas);
         }
+        return canvas.getContext("2d");
+    }
 
-        // Plot pattern
-        ctx.strokeStyle = "#00aaff";
-        ctx.lineWidth = 2;
-        ctx.beginPath();
+    function clearPlot(containerId = "plot-area") {
+        const container = document.getElementById(containerId);
+        if (container) container.innerHTML = "";
+    }
 
-        angles.forEach((deg, i) => {
-            const rad = deg * Math.PI / 180;
-            const g = gain[i];
-            const norm = (g - minGain) / (maxGain - minGain);
-            const r = radius * norm;
+    function drawLinePlot({ containerId = "plot-area", title, xLabel, yLabel, data }) {
+        const ctx = ensureCanvas(containerId);
+        const canvas = ctx.canvas;
 
-            const x = cx + r * Math.cos(rad);
-            const y = cy + r * Math.sin(rad);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-        });
-
-        ctx.closePath();
-        ctx.stroke();
-    },
-
-    // ------------------------------------------------------------
-    // CARTESIAN PLOT (SWR, Gain, ERP)
-    // ------------------------------------------------------------
-    _drawCartesian(canvas, xData, yData, yLabel, title) {
-        const ctx = canvas.getContext("2d");
-        const w = canvas.width;
-        const h = canvas.height;
-
-        ctx.clearRect(0, 0, w, h);
-        ctx.font = "14px sans-serif";
-        ctx.fillStyle = "#fff";
-        ctx.strokeStyle = "#ccc";
-
-        // Title
-        ctx.fillText(title, 10, 20);
-
-        // Plot area
-        const left = 50;
-        const right = w - 20;
-        const top = 40;
-        const bottom = h - 40;
+        // Background
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Axes
+        const padding = 50;
+        const left = padding;
+        const right = canvas.width - padding;
+        const top = padding;
+        const bottom = canvas.height - padding;
+
+        ctx.strokeStyle = "#666";
+        ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(left, top);
         ctx.lineTo(left, bottom);
         ctx.lineTo(right, bottom);
         ctx.stroke();
 
-        // Scaling
-        const xMin = Math.min(...xData);
-        const xMax = Math.max(...xData);
-        const yMin = Math.min(...yData);
-        const yMax = Math.max(...yData);
+        // Labels
+        ctx.fillStyle = "#fff";
+        ctx.font = "14px Arial";
+        if (title) ctx.fillText(title, left, top - 20);
+        if (xLabel) ctx.fillText(xLabel, (left + right) / 2 - 20, bottom + 30);
+        if (yLabel) ctx.fillText(yLabel, left - 40, (top + bottom) / 2);
 
-        const xScale = (right - left) / (xMax - xMin);
-        const yScale = (bottom - top) / (yMax - yMin);
+        if (!data || data.length === 0) return;
 
-        // Gridlines
-        ctx.strokeStyle = "#444";
-        ctx.lineWidth = 0.8;
+        const xs = data.map(p => p.x);
+        const ys = data.map(p => p.y);
+        const minX = Math.min(...xs);
+        const maxX = Math.max(...xs);
+        const minY = Math.min(...ys);
+        const maxY = Math.max(...ys);
 
-        for (let i = 0; i <= 5; i++) {
-            const y = bottom - i * (bottom - top) / 5;
-            ctx.beginPath();
-            ctx.moveTo(left, y);
-            ctx.lineTo(right, y);
-            ctx.stroke();
+        const spanX = maxX - minX || 1;
+        const spanY = maxY - minY || 1;
+
+        function mapX(x) {
+            return left + ((x - minX) / spanX) * (right - left);
+        }
+        function mapY(y) {
+            return bottom - ((y - minY) / spanY) * (bottom - top);
         }
 
-        // Plot curve
-        ctx.strokeStyle = "#00aaff";
+        ctx.strokeStyle = "#00ff88";
         ctx.lineWidth = 2;
         ctx.beginPath();
-
-        xData.forEach((x, i) => {
-            const px = left + (x - xMin) * xScale;
-            const py = bottom - (yData[i] - yMin) * yScale;
-
+        data.forEach((p, i) => {
+            const px = mapX(p.x);
+            const py = mapY(p.y);
             if (i === 0) ctx.moveTo(px, py);
             else ctx.lineTo(px, py);
         });
-
         ctx.stroke();
-
-        // Labels
-        ctx.fillText(yLabel, 10, h / 2);
-        ctx.fillText(`${xMin.toFixed(2)} MHz`, left, bottom + 20);
-        ctx.fillText(`${xMax.toFixed(2)} MHz`, right - 40, bottom + 20);
     }
-};
+
+    // Convenience wrappers
+
+    function drawSWRPlot(points) {
+        drawLinePlot({
+            title: "SWR vs Frequency",
+            xLabel: "Frequency (MHz)",
+            yLabel: "SWR",
+            data: points
+        });
+    }
+
+    function drawGainPlot(points) {
+        drawLinePlot({
+            title: "Gain vs Frequency",
+            xLabel: "Frequency (MHz)",
+            yLabel: "Gain (dBi)",
+            data: points
+        });
+    }
+
+    function drawTOAPlot(points) {
+        drawLinePlot({
+            title: "Take-Off Angle vs Height",
+            xLabel: "Height (m)",
+            yLabel: "TOA (degrees)",
+            data: points
+        });
+    }
+
+    function drawLossPlot(points) {
+        drawLinePlot({
+            title: "Feedline Loss vs Frequency",
+            xLabel: "Frequency (MHz)",
+            yLabel: "Loss (dB)",
+            data: points
+        });
+    }
+
+    return {
+        clearPlot,
+        drawLinePlot,
+        drawSWRPlot,
+        drawGainPlot,
+        drawTOAPlot,
+        drawLossPlot
+    };
+})();
