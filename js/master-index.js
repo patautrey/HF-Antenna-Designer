@@ -1,20 +1,17 @@
 // js/master-index.js
-// HF Antenna Designer — Static Path Router (Corrected for GitHub Pages)
-// Loads ALL modules from: js/modules/<filename>.js
+// HF Antenna Designer — Correct GitHub Pages Router
+// Loads ALL modules from: /HF-Antenna-Designer/js/modules/<filename>.js
 
 import { PlotEngine } from "./plot-engine.js";
 
-let MODULES = [];
 let ACTIVE_ITEM = null;
 
 // ---------------------------------------------------------------------------
-// STATIC DISCOVERY (GitHub Pages cannot list directories)
+// STATIC MODULE LIST (from your PDF)
 // ---------------------------------------------------------------------------
-// We embed the list of modules directly from your PDF.
-// This guarantees 100% correct loading.
 
-MODULES = [
-    // --- Designers ---
+const MODULES = [
+    // Designers
     { file: "58wave-designer.js", label: "58 Wave Vertical", category: "Designers" },
     { file: "doublet-designer.js", label: "Doublet Designer", category: "Designers" },
     { file: "skyloop-designer.js", label: "Skyloop Designer", category: "Designers" },
@@ -42,7 +39,7 @@ MODULES = [
     { file: "bobtail-designer.js", label: "Bobtail Curtain Designer", category: "Designers" },
     { file: "jpole-designer.js", label: "J-Pole Designer", category: "Designers" },
 
-    // --- HF Antennas ---
+    // HF Antennas
     { file: "hf-longwire.js", label: "HF Longwire", category: "HF Antennas" },
     { file: "hf-beverage.js", label: "HF Beverage", category: "HF Antennas" },
     { file: "hf-beverage-reverse-fed.js", label: "HF Beverage Reverse-fed", category: "HF Antennas" },
@@ -75,7 +72,7 @@ MODULES = [
     { file: "hf-vertical-array-2el.js", label: "HF Vertical Array 2el", category: "HF Antennas" },
     { file: "hf-vertical-delta-loop.js", label: "HF Vertical Delta Loop", category: "HF Antennas" },
 
-    // --- Labs ---
+    // Labs
     { file: "coax-lab.js", label: "Coax Lab", category: "Labs" },
     { file: "ground-lab.js", label: "Ground Lab", category: "Labs" },
     { file: "ground-loss-lab.js", label: "Ground Loss Lab", category: "Labs" },
@@ -100,7 +97,7 @@ MODULES = [
     { file: "trap-lab.js", label: "Trap Lab", category: "Labs" },
     { file: "tuner-lab.js", label: "Tuner Lab", category: "Labs" },
 
-    // --- Tools ---
+    // Tools
     { file: "link-budget.js", label: "Link Budget", category: "Tools" },
     { file: "loss-budget.js", label: "Loss Budget", category: "Tools" },
     { file: "system-gain.js", label: "System Gain", category: "Tools" },
@@ -115,14 +112,14 @@ MODULES = [
     { file: "q-factor-analyzer.js", label: "Q Factor Analyzer", category: "Tools" },
     { file: "nec-synth.js", label: "NEC Synth", category: "Tools" },
 
-    // --- Docs ---
+    // Docs
     { file: "quick-start.js", label: "Quick Start", category: "Docs" },
     { file: "user-manual.js", label: "User Manual", category: "Docs" },
     { file: "glossary.js", label: "Glossary", category: "Docs" }
 ];
 
 // ---------------------------------------------------------------------------
-// SIDEBAR + LOADING
+// SIDEBAR
 // ---------------------------------------------------------------------------
 
 function $(id) { return document.getElementById(id); }
@@ -139,9 +136,6 @@ function groupByCategory(list) {
 function renderSidebar() {
     const sidebar = $("sidebar");
     sidebar.innerHTML = "";
-
-    const list = document.createElement("div");
-    list.id = "module-list";
 
     const grouped = groupByCategory(MODULES);
 
@@ -161,7 +155,7 @@ function renderSidebar() {
 }
 
 // ---------------------------------------------------------------------------
-// MODULE LOADING
+// MODULE LOADING (FINAL, CORRECTED PATH)
 // ---------------------------------------------------------------------------
 
 async function loadModule(mod) {
@@ -169,7 +163,7 @@ async function loadModule(mod) {
     content.innerHTML = `<h2>${mod.label}</h2><p>Loading...</p>`;
 
     try {
-        const module = await import(`/js/modules/${mod.file}`);
+        const module = await import(`/HF-Antenna-Designer/js/modules/${mod.file}`);
 
         PlotEngine.clearPlot();
 
@@ -183,7 +177,7 @@ async function loadModule(mod) {
     } catch (err) {
         content.innerHTML = `
             <h2>Error</h2>
-            <p>Failed to load: <code>/js/modules/${mod.file}</code></p>
+            <p>Failed to load: <code>/HF-Antenna-Designer/js/modules/${mod.file}</code></p>
             <pre>${err}</pre>
         `;
     }
