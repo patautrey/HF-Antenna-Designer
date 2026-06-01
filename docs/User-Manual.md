@@ -1,200 +1,50 @@
-# Antenna Workbench — User Manual
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Manual — Antenna Workbench</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: sans-serif; max-width: 900px; margin: auto; line-height: 1.6; }
+        h1, h2, h3 { color: #003366; }
+    </style>
+</head>
+<body>
 
-This manual explains how the Workbench models antennas, what each control does, and how to interpret the results.
+<h1>Antenna Workbench — User Manual</h1>
 
----
+<p>This manual explains how each tool works, what the controls mean, and how to interpret the results.</p>
 
-# 1. Core Concepts
+<h2>1. Core Concepts</h2>
+<p><strong>Geometry Engine</strong> models physical antenna dimensions, loading, radials, and ground interaction.</p>
+<p><strong>Boost Engine</strong> models environmental and system factors such as time of day, ground screen, seaside, and feedline losses.</p>
+<p><strong>NVIS Reflector Engine</strong> models reflector grids for high-angle radiation.</p>
+<p><strong>Transformer Engine</strong> provides matching notes and impedance guidance.</p>
 
-## 1.1 Frequency and Wavelength
-- You enter frequency in MHz.
-- The Workbench computes wavelength λ.
-- Electrical height/length = physical dimension ÷ λ.
+<h2>2. Vertical DX Designer</h2>
+<p>Models a low-angle DX vertical with radials and ground interaction.</p>
+<ul>
+    <li>Inputs: frequency, height, radials, ground type</li>
+    <li>Boosts: seaside, ground screen, elevated radials, feedline</li>
+    <li>Outputs: gain, TOA, geometry adjustments, transformer notes</li>
+</ul>
 
-## 1.2 Geometry Engine
-Handles:
-- Height
-- Length / perimeter
-- Loading (top hats, coils)
-- Radials
-- Ground interaction
-- Effective height
-- Geometry gain adjustments
+<h2>3. Vertical NVIS Designer</h2>
+<p>Models a short vertical optimized for high-angle NVIS coverage.</p>
 
-## 1.3 Boost Engine
-Models:
-- Time of day
-- Ground screen
-- Elevated radials
-- Seaside / saltwater
-- Feedline losses
-- NVIS reflector flag
+<h2>4. Doublet Designer</h2>
+<p>Models a multiband center-fed doublet with ladder line.</p>
 
-## 1.4 NVIS Reflector Engine
-Models:
-- Wire count
-- Spacing
-- Height
-- Gain contribution
-- TOA shift
+<h2>5. Skyloop Designer</h2>
+<p>Models a full-wave horizontal loop with optional NVIS reflector.</p>
 
-## 1.5 Transformer Engine
-Provides:
-- Matching notes
-- Expected impedance ranges
-- Tuner/transformer guidance
+<h2>6. Interpreting Results</h2>
+<ul>
+    <li><strong>Gain (dBi)</strong> — signal strength</li>
+    <li><strong>TOA</strong> — DX (low), NVIS (high)</li>
+    <li><strong>Geometry adjustments</strong> — physical effects</li>
+    <li><strong>Boost breakdown</strong> — environmental/system effects</li>
+    <li><strong>Transformer notes</strong> — matching difficulty</li>
+</ul>
 
----
-
-# 2. Tool Reference
-
-## 2.1 Vertical DX Designer
-Purpose: Low‑angle DX vertical.
-
-Inputs:
-- Frequency
-- Radiator height
-- Radial count/length
-- Ground type
-- DX Turbo height override
-
-Boost:
-- Time of day
-- Seaside
-- Ground screen
-- Elevated radials
-- Saltwater enhancement
-- Feedline type/length
-- DX Turbo pattern bonus
-
-Outputs:
-- Base gain
-- Geometry adjustments
-- Boost breakdown
-- Total gain
-- DX TOA
-- Transformer notes
-
----
-
-## 2.2 Vertical NVIS Designer
-Purpose: High‑angle regional NVIS.
-
-Inputs:
-- Frequency
-- Radiator height
-- Top hat
-- Ground loss
-- Radials
-
-NVIS Reflector:
-- Wires
-- Spacing
-- Height
-
-Boost:
-- Time of day
-- Seaside
-- Ground screen
-- Elevated radials
-- Feedline type/length
-
-Outputs:
-- Base gain
-- Geometry adjustments
-- Reflector contribution
-- Boost breakdown
-- Total gain
-- NVIS TOA
-- Transformer notes
-
----
-
-## 2.3 Doublet Designer
-Purpose: Multiband center‑fed doublet.
-
-Inputs:
-- Frequency
-- Total wire length
-- Height
-- Ladder line type/length
-
-NVIS Reflector:
-- Wires
-- Spacing
-- Height
-
-Boost:
-- Time of day
-- Seaside
-- Ground screen
-- Coax jumper type/length
-
-Outputs:
-- Electrical length
-- Base gain
-- Geometry adjustments
-- Boost breakdown
-- Reflector contribution
-- Total gain
-- TOA
-- Transformer notes
-
----
-
-## 2.4 Skyloop Designer
-Purpose: Full‑wave horizontal loop.
-
-Inputs:
-- Frequency
-- Loop perimeter
-- Height
-
-NVIS Reflector:
-- Wires
-- Spacing
-- Height
-
-Boost:
-- Time of day
-- Seaside
-- Ground screen
-- Ladder line type/length
-
-Outputs:
-- Electrical length
-- Base gain
-- Geometry adjustments
-- Boost breakdown
-- Reflector contribution
-- Total gain
-- NVIS TOA
-- Transformer notes
-
----
-
-# 3. Interpreting Results
-
-## 3.1 Gain (dBi)
-Higher = stronger signal in the favored direction.
-
-## 3.2 TOA (degrees)
-- Low (5–20°): DX
-- Medium (20–40°): mid‑range
-- High (60–90°): NVIS
-
-## 3.3 Geometry Adjustments
-Shows how physical design affects performance.
-
-## 3.4 Boost Breakdown
-Shows environmental/system contributions.
-
-## 3.5 Transformer Notes
-Indicates matching difficulty and hardware needs.
-
----
-
-# 4. Limitations
-- Engineering approximations, not NEC‑2/NEC‑4.
-- Ground models simplified.
-- Use results as guidance, not absolute prediction.
+</body>
+</html>
