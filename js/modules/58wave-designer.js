@@ -1,186 +1,211 @@
 /* ---------------------------------------------------------
-   Antenna Workbench — 5/8-Wave Vertical Designer
-   Radiator length, matching network, ground system,
-   feedpoint Z, efficiency, SWR, and height analysis
+   HF Workbench — 5/8 Wave Vertical Designer (with plotting)
 --------------------------------------------------------- */
 
-import { wavelength, round } from "../utils.js";
-import { requirePositive, requireFrequency, toNumber } from "../validators.js";
-import { infoBox, warnBox } from "../dom.js";
+import { requireFrequency, requirePositive, toNumber } from "../validators.js";
+import { findBand } from "../constants.js";
 import { log } from "../log.js";
+import { GeometryEngine } from "../engines/geometry-engine.js";
+import { BoostEngine } from "../engines/boost-engine.js";
+import { TransformerEngine } from "../engines/transformer-engine.js";
 
-/* ---------------------------------------------------------
-   DOM HELPERS
---------------------------------------------------------- */
-function $(root, sel) { return root.querySelector(sel); }
-
-/* ---------------------------------------------------------
-   GROUND SYSTEM MODELS
---------------------------------------------------------- */
-const GROUND = {
-    poor:      { label: "Poor (0–4 radials)", efficiency: 0.20, z: 55 },
-    average:   { label: "Average (8–16 radials)", efficiency: 0.40, z: 45 },
-    good:      { label: "Good (32+ radials)", efficiency: 0.60, z: 38 },
-    elevated:  { label: "Elevated radials", efficiency: 0.70, z: 32 },
-    screen:    { label: "Ground screen", efficiency: 0.80, z: 35 }
-};
-
-/* ---------------------------------------------------------
-   MATCHING NETWORK MODEL
---------------------------------------------------------- */
-function estimateMatching(freqMHz) {
-    // Series coil inductance estimate for 5/8-wave vertical
-    const L = 200 / freqMHz; // µH (very approximate)
-    return L;
+// Simple 5/8λ base gain model
+function base58WaveGain() {
+    return 2.0; // typical 5/8λ advantage over 1/4λ
 }
 
-/* ---------------------------------------------------------
-   FEEDPOINT IMPEDANCE MODEL
---------------------------------------------------------- */
-function estimateFeedZ(freqMHz, groundKey) {
-    const g = GROUND[groundKey] || GROUND.average;
-    // 5/8-wave verticals have low feedpoint Z
-    return g.z;
-}
+export function init({ PlotEngine, container }) {
 
-/* ---------------------------------------------------------
-   EFFICIENCY MODEL
---------------------------------------------------------- */
-function estimateEfficiency(groundKey) {
-    const g = GROUND[groundKey] || GROUND.average;
-    return g.efficiency;
-}
+    container.innerHTML = `
+        <section class="tool">
+            <h2>5/8 Wave Vertical Designer</h2>
 
-/* ---------------------------------------------------------
-   SWR ENVELOPE
---------------------------------------------------------- */
-function estimateSWR(feedZ) {
-    const z0 = 50;
-    const mismatch = Math.abs(feedZ - z0) / z0;
-    return 1 + mismatch * 2.0;
-}
+            <h3>Geometry</h3>
+            <div class="field-grid">
 
-/* ---------------------------------------------------------
-   HEIGHT REGION ANALYSIS
---------------------------------------------------------- */
-function analyzeHeight(heightM, freqMHz) {
-    const lambda = wavelength(freqMHz);
-    const frac = heightM / lambda;
+                <label>Operating frequency (MHz)
+                    <input id="v58-freq" type="number" step="0.01" value="7.1">
+                </label>
 
-    if (frac < 0.1)
-        return "Very low (<0.1 λ): pattern distorted, high-angle radiation.";
-    if (frac < 0.25)
-        return "Low (0.1–0.25 λ): moderate performance, higher TOA.";
-    if (frac < 0.5)
-        return "Good (0.25–0.5 λ): strong low-angle radiation.";
-    return "High (>0.5 λ): excellent low-angle DX performance.";
-}
+                <label>Target height (m)
+                    <input id="v58-height" type="number" step="0.5" value="12">
+                </label>
 
-/* ---------------------------------------------------------
-   GEOMETRY CALCULATION
---------------------------------------------------------- */
-function compute58Wave(freqMHz) {
-    const lambda = wavelength(freqMHz);
-    return {
-        lambda,
-        radiator: lambda * 0.625 // 5/8-wave
-    };
-}
+                <label>Radial count
+                    <input id="v58-radials" type="number" step="1" value="16">
+                </label>
 
-/* ---------------------------------------------------------
-   SUMMARY BUILDER
---------------------------------------------------------- */
-function buildSummary(freqMHz, heightM, groundKey, V, feedZ, eff, swr, Lmatch) {
-    const g = GROUND[groundKey];
+                <label>Radial length (m)
+                    <input id="v58-radial-length" type="number" step="0.5" value="10">
+                </label>
 
-    const lines = [];
+            </div>
 
-    lines.push(`<strong>Design frequency:</strong> ${round(freqMHz, 2)} MHz`);
-    lines.push(`<strong>Radiator length (5/8 λ):</strong> ${round(V.radiator, 2)} m`);
-    lines.push(`<strong>Height above ground:</strong> ${round(heightM, 2)} m`);
-    lines.push(`<strong>Height region:</strong> ${analyzeHeight(heightM, freqMHz)}`);
-    lines.push(`<strong>Ground system:</strong> ${g.label}`);
-    lines.push(`<strong>Feedpoint impedance:</strong> ${round(feedZ, 1)} Ω`);
-    lines.push(`<strong>Efficiency (est.):</strong> ${round(eff * 100, 1)}%`);
-    lines.push(`<strong>Matching coil inductance (est.):</strong> ${round(Lmatch, 2)} µH`);
-    lines.push(`<strong>Estimated SWR envelope:</strong> ${round(swr, 2)} : 1`);
+            <h3>Boost</h3>
+            <div class="field-grid boost-grid">
 
-    return `
-        <div class="poster-preview">
-            ${lines.map(l => `<p>${l}</p>`).join("")}
-            <p style="margin-top:10px;font-size:13px;color:#aaa;">
-                5/8-wave verticals offer excellent low-angle DX performance with a proper matching network.
-            </p>
-        </div>
+                <label>Time of day
+                    <select id="v58-tod">
+                        <option value="day">Day</option>
+                        <option value="night">Night</option>
+                        <option value="dawn">Dawn</option>
+                        <option value="dusk">Dusk</option>
+                    </select>
+                </label>
+
+                <label><input id="v58-seaside" type="checkbox"> Seaside (+10 dB)</label>
+                <label><input id="v58-groundscreen" type="checkbox"> Ground Screen / Radial Screen</label>
+                <label><input id="v58-elevated" type="checkbox"> Elevated Radials</label>
+
+                <label>Feedline family
+                    <select id="v58-feed-family">
+                        <option value="coax">Coax</option>
+                        <option value="ladder">Ladder line</option>
+                    </select>
+                </label>
+
+                <label>Feedline type
+                    <select id="v58-feed-type">
+                        <option value="RG-213">RG-213</option>
+                        <option value="LMR-400">LMR-400</option>
+                        <option value="RG-8X">RG-8X</option>
+                        <option value="RG-58">RG-58</option>
+                        <option value="450Ω">450Ω window line</option>
+                        <option value="300Ω">300Ω twin-lead</option>
+                        <option value="600Ω">600Ω open wire</option>
+                    </select>
+                </label>
+
+                <label>Feedline length (ft)
+                    <input id="v58-feed-length" type="number" step="5" value="75">
+                </label>
+
+            </div>
+
+            <button id="v58-compute" style="margin-top:1rem;">Compute 5/8 Wave Vertical</button>
+
+            <div id="v58-summary" class="summary" style="margin-top:1rem;"></div>
+
+            <h3>Radiation Patterns</h3>
+            <div id="v58-az" style="height:300px;margin-top:1rem;"></div>
+            <div id="v58-el" style="height:300px;margin-top:1rem;"></div>
+
+        </section>
     `;
-}
 
-/* ---------------------------------------------------------
-   VALIDATION
---------------------------------------------------------- */
-function validate(freqStr, heightStr) {
-    const errors = [];
+    const summaryDiv = container.querySelector("#v58-summary");
 
-    const fErr = requireFrequency(freqStr, "Frequency");
-    if (fErr) errors.push(fErr);
+    container.querySelector("#v58-compute").addEventListener("click", () => {
 
-    const hErr = requirePositive(heightStr, "Height above ground");
-    if (hErr) errors.push(hErr);
+        const errors = [];
 
-    return errors;
-}
+        const freq = toNumber(container.querySelector("#v58-freq").value);
+        const height = toNumber(container.querySelector("#v58-height").value);
+        const radialCount = toNumber(container.querySelector("#v58-radials").value);
+        const radialLength = toNumber(container.querySelector("#v58-radial-length").value);
 
-/* ---------------------------------------------------------
-   COMPUTE HANDLER
---------------------------------------------------------- */
-function handleCompute(root) {
-    const freqStr = $(root, "#58-freq").value;
-    const heightStr = $(root, "#58-height").value;
-    const groundKey = $(root, "#58-ground").value;
-    const summaryHost = $(root, "#58-summary");
+        requireFrequency(freq, errors);
+        requirePositive(height, "Target height", errors);
+        requirePositive(radialCount, "Radial count", errors);
+        requirePositive(radialLength, "Radial length", errors);
 
-    const errors = validate(freqStr, heightStr);
-    if (errors.length > 0) {
-        summaryHost.innerHTML = "";
-        summaryHost.appendChild(warnBox(errors.join("<br>")));
-        return;
-    }
+        if (errors.length) {
+            summaryDiv.innerHTML = `<div class="warn">${errors.join("<br>")}</div>`;
+            return;
+        }
 
-    const freqMHz = toNumber(freqStr);
-    const heightM = toNumber(heightStr);
+        const band = findBand(freq);
 
-    const V = compute58Wave(freqMHz);
-    const feedZ = estimateFeedZ(freqMHz, groundKey);
-    const eff = estimateEfficiency(groundKey);
-    const swr = estimateSWR(feedZ);
-    const Lmatch = estimateMatching(freqMHz);
+        const wavelengthM = 300 / freq;
+        const idealHeight = 0.625 * wavelengthM;
+        const heightDelta = height - idealHeight;
 
-    summaryHost.innerHTML = "";
-    summaryHost.appendChild(infoBox(buildSummary(freqMHz, heightM, groundKey, V, feedZ, eff, swr, Lmatch)));
+        const geom = GeometryEngine.computeGeometry({
+            freqMHz: freq,
+            heightM: height,
+            spanM: 0
+        });
 
-    log("58wave-designer", "Computed 5/8-wave vertical design", {
-        freqMHz,
-        heightM,
-        groundKey,
-        V,
-        feedZ,
-        eff,
-        swr,
-        Lmatch
+        const baseGain = base58WaveGain();
+
+        const feedFamily = container.querySelector("#v58-feed-family").value === "ladder" ? "ladder" : "coax";
+
+        const boost = BoostEngine.computeBoost({
+            reflectorCount: 0,
+            directorCount: 0,
+            timeOfDay: container.querySelector("#v58-tod").value,
+            seaside: container.querySelector("#v58-seaside").checked,
+            groundScreen: container.querySelector("#v58-groundscreen").checked,
+            elevatedRadials: container.querySelector("#v58-elevated").checked,
+            nvisReflector: false,
+            feedlineFamily: feedFamily,
+            feedlineType: container.querySelector("#v58-feed-type").value,
+            feedlineLengthFt: toNumber(container.querySelector("#v58-feed-length").value),
+            dxTurboPatternBonus: false
+        });
+
+        const totalGain = baseGain + geom.totalGeomGainDelta + boost.totalBoost;
+        const finalToa = Math.max(5, Math.min(40, geom.toa + boost.toaShift));
+
+        const transformerHtml = TransformerEngine.getTransformerNote("58wave-vertical", feedFamily);
+
+        log("58WaveVertical", {
+            freq,
+            height,
+            radialCount,
+            radialLength,
+            idealHeight,
+            heightDelta,
+            geom,
+            baseGain,
+            boost,
+            totalGain,
+            finalToa
+        });
+
+        summaryDiv.innerHTML = `
+            <div class="info">
+                <p><strong>Operating frequency:</strong> ${freq.toFixed(2)} MHz (${band?.label ?? "Unknown band"})</p>
+
+                <p><strong>Ideal 5/8λ height:</strong> ${idealHeight.toFixed(2)} m<br>
+                   <strong>Actual height:</strong> ${height.toFixed(2)} m<br>
+                   <strong>Height offset:</strong> ${heightDelta >= 0 ? "+" : ""}${heightDelta.toFixed(2)} m</p>
+
+                <p><strong>Radial system:</strong> ${radialCount.toFixed(0)} × ${radialLength.toFixed(1)} m</p>
+
+                <p><strong>Base 5/8λ gain:</strong> ${baseGain.toFixed(1)} dBi</p>
+
+                <p><strong>Total estimated gain:</strong> ${totalGain.toFixed(1)} dBi</p>
+
+                <p><strong>Estimated TOA:</strong> ${finalToa.toFixed(0)}°</p>
+
+                ${transformerHtml}
+            </div>
+        `;
+
+        // ⭐ PLOTTING SECTION ⭐
+        PlotEngine.clearPlot();
+
+        // Simple synthetic patterns (placeholder until NEC integration)
+        const azPattern = Array.from({ length: 360 }, (_, deg) => ({
+            angle: deg,
+            gain: totalGain - Math.abs(Math.cos(deg * Math.PI / 180)) * 1.5
+        }));
+
+        const elPattern = Array.from({ length: 90 }, (_, deg) => ({
+            angle: deg,
+            gain: totalGain - Math.abs((deg - finalToa) / 20)
+        }));
+
+        // Render plots
+        PlotEngine.plotAzimuth(azPattern, {
+            elementId: "v58-az",
+            title: `Azimuth Pattern @ ${freq.toFixed(2)} MHz`
+        });
+
+        PlotEngine.plotElevation(elPattern, {
+            elementId: "v58-el",
+            title: `Elevation Pattern @ ${freq.toFixed(2)} MHz`
+        });
     });
-}
-
-/* ---------------------------------------------------------
-   MODULE ENTRY POINT
---------------------------------------------------------- */
-export default function init58WaveDesigner(root) {
-    const btn = $(root, "#58-compute");
-    if (btn) btn.addEventListener("click", () => handleCompute(root));
-
-    const summaryHost = $(root, "#58-summary");
-    if (summaryHost) {
-        summaryHost.innerHTML = "Enter frequency, height, and ground system, then click <strong>Compute 5/8‑Wave Vertical</strong>.";
-    }
-
-    log("58wave-designer", "Module initialized");
 }
