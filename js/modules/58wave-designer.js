@@ -1,6 +1,5 @@
 /* ---------------------------------------------------------
-   HF Workbench — 5/8 Wave Vertical Designer (with plotting)
-   Full drop‑in module — compatible with your router + PlotEngine
+   HF Workbench — 5/8 Wave Vertical Designer (with polar plots)
 --------------------------------------------------------- */
 
 import { requireFrequency, requirePositive, toNumber } from "../validators.js";
@@ -10,9 +9,8 @@ import { GeometryEngine } from "../engines/geometry-engine.js";
 import { BoostEngine } from "../engines/boost-engine.js";
 import { TransformerEngine } from "../engines/transformer-engine.js";
 
-// Simple 5/8λ base gain model
 function base58WaveGain() {
-    return 2.0; // typical 5/8λ advantage over 1/4λ
+    return 2.0;
 }
 
 export function init({ PlotEngine, container }) {
@@ -88,8 +86,8 @@ export function init({ PlotEngine, container }) {
             <div id="v58-summary" class="summary" style="margin-top:1rem;"></div>
 
             <h3>Radiation Patterns</h3>
-            <div id="v58-az" style="height:300px;margin-top:1rem;"></div>
-            <div id="v58-el" style="height:300px;margin-top:1rem;"></div>
+            <div id="v58-az" style="height:320px;margin-top:1rem;"></div>
+            <div id="v58-el" style="height:320px;margin-top:1rem;"></div>
 
         </section>
     `;
@@ -184,46 +182,34 @@ export function init({ PlotEngine, container }) {
             </div>
         `;
 
-        /* ---------------------------------------------------------
-           ⭐ PLOTTING SECTION — using your actual PlotEngine API ⭐
-           PlotEngine.drawLinePlot({
-               containerId,
-               title,
-               xLabel,
-               yLabel,
-               data: [{ x, y }]
-           })
-        --------------------------------------------------------- */
-
         PlotEngine.clearPlot("v58-az");
         PlotEngine.clearPlot("v58-el");
 
-        // Synthetic azimuth pattern (line plot)
-        const azData = Array.from({ length: 360 }, (_, deg) => ({
-            x: deg,
-            y: totalGain - Math.abs(Math.cos(deg * Math.PI / 180)) * 1.5
+        const azPattern = Array.from({ length: 360 }, (_, deg) => ({
+            angle: deg,
+            gain: totalGain - Math.abs(Math.cos(deg * Math.PI / 180)) * 1.5
         }));
 
-        // Synthetic elevation pattern (line plot)
-        const elData = Array.from({ length: 90 }, (_, deg) => ({
-            x: deg,
-            y: totalGain - Math.abs((deg - finalToa) / 20)
-        }));
-
-        PlotEngine.drawLinePlot({
-            containerId: "v58-az",
-            title: `Azimuth Pattern @ ${freq.toFixed(2)} MHz`,
-            xLabel: "Degrees",
-            yLabel: "Gain (dBi)",
-            data: azData
+        const elPattern = Array.from({ length: 360 }, (_, deg) => {
+            const elev = (deg + 360) % 360;
+            const delta = Math.min(
+                Math.abs(elev - finalToa),
+                Math.abs(elev - (360 - finalToa))
+            );
+            return {
+                angle: elev,
+                gain: totalGain - (delta / 20)
+            };
         });
 
-        PlotEngine.drawLinePlot({
-            containerId: "v58-el",
-            title: `Elevation Pattern @ ${freq.toFixed(2)} MHz`,
-            xLabel: "Degrees",
-            yLabel: "Gain (dBi)",
-            data: elData
+        PlotEngine.plotAzimuth(azPattern, {
+            elementId: "v58-az",
+            title: `Azimuth Pattern @ ${freq.toFixed(2)} MHz`
+        });
+
+        PlotEngine.plotElevation(elPattern, {
+            elementId: "v58-el",
+            title: `Elevation Pattern @ ${freq.toFixed(2)} MHz`
         });
     });
 }
