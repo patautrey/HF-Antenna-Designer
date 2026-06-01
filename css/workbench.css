@@ -1,36 +1,59 @@
-/* Top bar layout improvements */
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 1rem;       /* more vertical + horizontal space */
-    gap: 1rem;                   /* spacing between left and right groups */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
-/* Left and right link groups */
-.topbar .left-links,
-.topbar .right-links {
+.topnav {
+    background: #e8e8e8;
+    padding: 10px;
     display: flex;
+    gap: 15px;
     align-items: center;
-    gap: 1rem;                   /* spacing between items */
 }
 
-/* All header links */
-.topbar a {
+.nav-item {
     text-decoration: none;
-    color: #0077cc;
-    font-size: 1rem;
-    padding: 0.25rem 0.5rem;     /* breathing room around text */
+    color: #004080;
+    font-weight: bold;
 }
 
-/* Dropdown buttons */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
 .dropdown-btn {
-    padding: 0.35rem 0.75rem;
-    margin-right: 0.5rem;
+    cursor: pointer;
+    padding: 6px 10px;
+    background: #ddd;
+    border-radius: 4px;
 }
 
-/* Dropdown content spacing */
-.dropdown-content a {
-    padding: 0.5rem 0.75rem;
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    min-width: 180px;
+    z-index: 9999;
+}
+
+.dropdown:hover .dropdown-content {
     display: block;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: black;
+}
+
+.dropdown-content a:hover {
+    background: #f0f0f0;
+}
+
+#content {
+    padding: 20px;
 }
