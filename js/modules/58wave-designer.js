@@ -1,5 +1,6 @@
 /* ---------------------------------------------------------
    HF Workbench — 5/8 Wave Vertical Designer (with plotting)
+   Full drop‑in module — compatible with your router + PlotEngine
 --------------------------------------------------------- */
 
 import { requireFrequency, requirePositive, toNumber } from "../validators.js";
@@ -183,29 +184,46 @@ export function init({ PlotEngine, container }) {
             </div>
         `;
 
-        // ⭐ PLOTTING SECTION ⭐
-        PlotEngine.clearPlot();
+        /* ---------------------------------------------------------
+           ⭐ PLOTTING SECTION — using your actual PlotEngine API ⭐
+           PlotEngine.drawLinePlot({
+               containerId,
+               title,
+               xLabel,
+               yLabel,
+               data: [{ x, y }]
+           })
+        --------------------------------------------------------- */
 
-        // Simple synthetic patterns (placeholder until NEC integration)
-        const azPattern = Array.from({ length: 360 }, (_, deg) => ({
-            angle: deg,
-            gain: totalGain - Math.abs(Math.cos(deg * Math.PI / 180)) * 1.5
+        PlotEngine.clearPlot("v58-az");
+        PlotEngine.clearPlot("v58-el");
+
+        // Synthetic azimuth pattern (line plot)
+        const azData = Array.from({ length: 360 }, (_, deg) => ({
+            x: deg,
+            y: totalGain - Math.abs(Math.cos(deg * Math.PI / 180)) * 1.5
         }));
 
-        const elPattern = Array.from({ length: 90 }, (_, deg) => ({
-            angle: deg,
-            gain: totalGain - Math.abs((deg - finalToa) / 20)
+        // Synthetic elevation pattern (line plot)
+        const elData = Array.from({ length: 90 }, (_, deg) => ({
+            x: deg,
+            y: totalGain - Math.abs((deg - finalToa) / 20)
         }));
 
-        // Render plots
-        PlotEngine.plotAzimuth(azPattern, {
-            elementId: "v58-az",
-            title: `Azimuth Pattern @ ${freq.toFixed(2)} MHz`
+        PlotEngine.drawLinePlot({
+            containerId: "v58-az",
+            title: `Azimuth Pattern @ ${freq.toFixed(2)} MHz`,
+            xLabel: "Degrees",
+            yLabel: "Gain (dBi)",
+            data: azData
         });
 
-        PlotEngine.plotElevation(elPattern, {
-            elementId: "v58-el",
-            title: `Elevation Pattern @ ${freq.toFixed(2)} MHz`
+        PlotEngine.drawLinePlot({
+            containerId: "v58-el",
+            title: `Elevation Pattern @ ${freq.toFixed(2)} MHz`,
+            xLabel: "Degrees",
+            yLabel: "Gain (dBi)",
+            data: elData
         });
     });
 }
