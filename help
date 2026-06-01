@@ -1,0 +1,9 @@
+<!-- Help Dropdown -->
+<div class="dropdown">
+    <button class="dropdown-btn">Help ▼</button>
+    <div class="dropdown-content">
+        <a href="help/user-manual.html" target="_blank">User Manual</a>
+        <a href="help/quick-start.html" target="_blank">Quick Start</a>
+        <a href="help/glossary.html" target="_blank">Glossary</a>
+    </div>
+</div>
