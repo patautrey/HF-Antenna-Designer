@@ -1,0 +1,124 @@
+/* ---------------------------------------------------------
+   HF Workbench — Global UI Scale (3× Larger Inputs)
+   Applies to ALL antenna modules
+--------------------------------------------------------- */
+
+:root {
+    --ui-scale: 3;
+    --font-base: calc(1rem * var(--ui-scale));
+    --font-small: calc(0.8rem * var(--ui-scale));
+    --font-large: calc(1.4rem * var(--ui-scale));
+    --pad-base: calc(0.5rem * var(--ui-scale));
+    --pad-large: calc(1rem * var(--ui-scale));
+}
+
+/* ------------------------------
+   Section Headers
+------------------------------ */
+
+.tool h2 {
+    font-size: calc(2rem * var(--ui-scale));
+    margin-bottom: calc(1rem * var(--ui-scale));
+}
+
+.tool h3 {
+    font-size: calc(1.4rem * var(--ui-scale));
+    margin-top: calc(1rem * var(--ui-scale));
+    margin-bottom: calc(0.5rem * var(--ui-scale));
+}
+
+/* ------------------------------
+   Labels + Inputs
+------------------------------ */
+
+.tool label {
+    font-size: var(--font-base);
+    display: flex;
+    flex-direction: column;
+    gap: calc(0.3rem * var(--ui-scale));
+}
+
+.tool input,
+.tool select {
+    font-size: var(--font-base);
+    padding: var(--pad-large);
+    border-radius: calc(0.5rem * var(--ui-scale));
+    border: 2px solid #666;
+    background: #111;
+    color: #fff;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ------------------------------
+   Checkboxes
+------------------------------ */
+
+.tool input[type="checkbox"] {
+    width: calc(1.2rem * var(--ui-scale));
+    height: calc(1.2rem * var(--ui-scale));
+    transform: scale(1.8);
+    margin-right: calc(0.5rem * var(--ui-scale));
+}
+
+.tool label input[type="checkbox"] + span,
+.tool label input[type="checkbox"] {
+    font-size: var(--font-base);
+}
+
+/* ------------------------------
+   Field Grid Layout
+------------------------------ */
+
+.field-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: calc(1.2rem * var(--ui-scale));
+    margin-bottom: calc(1.5rem * var(--ui-scale));
+}
+
+/* ------------------------------
+   Buttons
+------------------------------ */
+
+button {
+    font-size: var(--font-large);
+    padding: calc(0.8rem * var(--ui-scale)) calc(1.6rem * var(--ui-scale));
+    border-radius: calc(0.6rem * var(--ui-scale));
+    background: #0044aa;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0066dd;
+}
+
+/* ------------------------------
+   Summary Output
+------------------------------ */
+
+.summary {
+    font-size: var(--font-base);
+    line-height: 1.6;
+    padding: var(--pad-large);
+    background: #111;
+    border-left: 4px solid #0af;
+    border-radius: calc(0.5rem * var(--ui-scale));
+    margin-top: calc(1rem * var(--ui-scale));
+}
+
+/* ------------------------------
+   Info + Warning Blocks
+------------------------------ */
+
+.info {
+    font-size: var(--font-base);
+}
+
+.warn {
+    font-size: var(--font-base);
+    color: #ff4444;
+    font-weight: bold;
+}
