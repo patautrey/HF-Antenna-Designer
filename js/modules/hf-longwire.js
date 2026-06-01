@@ -22,11 +22,13 @@ function baseLongwireGain(frac) {
     return 0.5;
 }
 
-export default function initLongwire(root) {
-    const container = document.querySelector("#content") || root;
-    if (!container) return;
+// ✅ Standardized init signature for the router
+export function init({ PlotEngine, container }) {
+    // Use the provided container instead of querying #content directly
+    const host = container || document.querySelector("#content");
+    if (!host) return;
 
-    container.innerHTML = `
+    host.innerHTML = `
         <section class="tool">
             <h2>Longwire Antenna (Random Wire)</h2>
 
@@ -97,27 +99,26 @@ export default function initLongwire(root) {
             <div id="lw-summary" class="summary" style="margin-top:1rem;"></div>
 
         </section>
-    `;
+    ";
 
-    const freqInput = document.getElementById("lw-freq");
-    const lengthInput = document.getElementById("lw-length");
-    const heightInput = document.getElementById("lw-height");
-    const counterInput = document.getElementById("lw-counter");
+    const freqInput = host.querySelector("#lw-freq");
+    const lengthInput = host.querySelector("#lw-length");
+    const heightInput = host.querySelector("#lw-height");
+    const counterInput = host.querySelector("#lw-counter");
 
-    const todInput = document.getElementById("lw-tod");
-    const seasideInput = document.getElementById("lw-seaside");
-    const groundScreenInput = document.getElementById("lw-groundscreen");
-    const elevatedInput = document.getElementById("lw-elevated");
+    const todInput = host.querySelector("#lw-tod");
+    const seasideInput = host.querySelector("#lw-seaside");
+    const groundScreenInput = host.querySelector("#lw-groundscreen");
+    const elevatedInput = host.querySelector("#lw-elevated");
 
-    const feedFamilyInput = document.getElementById("lw-feed-family");
-    const feedTypeInput = document.getElementById("lw-feed-type");
-    const feedLenInput = document.getElementById("lw-feed-length");
+    const feedFamilyInput = host.querySelector("#lw-feed-family");
+    const feedTypeInput = host.querySelector("#lw-feed-type");
+    const feedLenInput = host.querySelector("#lw-feed-length");
 
-    const summaryDiv = document.getElementById("lw-summary");
-    const button = document.getElementById("lw-compute");
+    const summaryDiv = host.querySelector("#lw-summary");
+    const button = host.querySelector("#lw-compute");
 
     button.addEventListener("click", () => {
-
         const errors = [];
 
         const freq = toNumber(freqInput.value);
@@ -210,5 +211,9 @@ export default function initLongwire(root) {
 
             ${transformerHtml}
         `);
+
+        // Optional: hook into PlotEngine later if you want patterns/SWR
+        // PlotEngine.clearPlot();
+        // PlotEngine.plotText(`Longwire @ ${freq.toFixed(2)} MHz — ${totalGain.toFixed(1)} dBi, TOA ${finalToa.toFixed(0)}°`);
     });
 }
