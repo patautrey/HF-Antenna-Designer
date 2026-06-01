@@ -158,18 +158,24 @@ export default function initLoop(root) {
         const totalGain = baseGain + geom.totalGeomGainDelta + boost.totalBoost;
         const finalToa = Math.max(30, Math.min(85, geom.toa + boost.toaShift));
 
-        const geomLines = [
-            `Perimeter: ${perim.toFixed(1)} m`,
-            `Shape: ${shape}`,
-            ...(geom.components.length ? geom.components.map(c => c.note ?? "") : [])
-        ].join("<br>");
+        const geomAdjustLines = (geom.components && geom.components.length)
+            ? geom.components
+                .map(c => c.note ?? "")
+                .filter(Boolean)
+                .join("<br>")
+            : "No additional geometry modifiers.";
 
         const boostLines = boost.components.length
             ? boost.components.map(d => {
                 const parts = [];
-                if (d.boost) parts.push(`${d.boost.toFixed(1)} dB from ${d.label}`);
-                else parts.push(d.label);
-                if (d.toaShift) parts.push(`TOA shift ${d.toaShift > 0 ? "+" : ""}${d.toaShift}°`);
+                if (typeof d.boost === "number") {
+                    parts.push(`${d.boost.toFixed(1)} dB from ${d.label}`);
+                } else {
+                    parts.push(d.label);
+                }
+                if (d.toaShift) {
+                    parts.push(`TOA shift ${d.toaShift > 0 ? "+" : ""}${d.toaShift}°`);
+                }
                 return parts.join(" — ");
             }).join("<br>")
             : "No boost options enabled.";
@@ -191,16 +197,22 @@ export default function initLoop(root) {
         summaryDiv.innerHTML = infoBox(`
             <p><strong>Design frequency:</strong> ${freq.toFixed(2)} MHz (${band?.label ?? "Unknown band"})</p>
 
-            <p><strong>Electrical height:</strong> 
-                ${geom.effectiveHeight.toFixed(2)} m 
+            <p><strong>Perimeter:</strong> ${perim.toFixed(1)} m<br>
+               <strong>Average height:</strong> ${height.toFixed(1)} m<br>
+               <strong>Shape:</strong> ${shape}</p>
+
+            <p><strong>Electrical height:</strong>
+                ${geom.effectiveHeight.toFixed(2)} m
                 (${(geom.frac * 100).toFixed(1)}% of λ)
             </p>
 
-            <p><strong>Base Loop Gain:</strong> ${baseGain.toFixed(1)} dBi</p>
+            <p><strong>Base Loop Gain (no boosts):</strong> ${baseGain.toFixed(1)} dBi</p>
 
-            <p><strong>Geometry details:</strong><br>${geomLines}</p>
+            <p><strong>Geometry adjustments:</strong><br>${geomAdjustLines}</p>
 
             <p><strong>Boost breakdown:</strong><br>${boostLines}</p>
+
+            <p><strong>NVIS reflector:</strong> No NVIS reflector enabled.</p>
 
             <p><strong>Total estimated gain:</strong> ${totalGain.toFixed(1)} dBi</p>
 
