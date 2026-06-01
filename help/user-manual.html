@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { font-family: Arial, sans-serif; line-height: 1.5; padding: 20px; max-width: 900px; margin: 0 auto; }
-        h1, h2, h3 { color: #003366; }
+        h1, h2, h3, h4 { color: #003366; }
         h1 { border-bottom: 2px solid #003366; padding-bottom: 0.3rem; }
         h2 { margin-top: 1.8rem; }
         h3 { margin-top: 1.2rem; }
         ul, ol { margin-left: 1.4rem; }
         code { background: #f4f4f4; padding: 2px 4px; border-radius: 3px; }
         .note { background: #fff8d5; border-left: 4px solid #e0c200; padding: 0.6rem 0.8rem; margin: 1rem 0; }
-        .section { margin-bottom: 1.8rem; }
+        .section { margin-bottom: 2rem; }
     </style>
 </head>
 <body>
@@ -23,28 +23,29 @@
 <div class="section">
     <h2>1. Introduction</h2>
     <p>
-        HF Workbench is a browser-based collection of antenna design tools focused on practical HF operation.
-        It is designed for operators who want to explore “what if” scenarios, plan new antennas, and understand
-        how geometry, height, and band choice affect performance.
+        HF Workbench is a browser-based suite of antenna design tools for HF operators. It provides
+        fast, practical modeling guidance without requiring NEC software, installation, or complex
+        configuration. Each tool focuses on real-world operator needs: band coverage, height effects,
+        feedline behavior, and expected performance.
     </p>
     <p>
-        This manual describes the overall layout, common concepts, and each tool in the suite:
+        This manual covers the layout, shared concepts, and each tool in detail:
         Doublet, Loop, Skyloop, Vertical DX Designer, Vertical NVIS Designer, Performer Vertical,
         and Dominator Array.
     </p>
 </div>
 
 <div class="section">
-    <h2>2. Layout and Navigation</h2>
+    <h2>2. Navigation and Layout</h2>
 
     <h3>2.1 Top Navigation Bar</h3>
-    <p>The top navigation bar provides access to all tools and help pages:</p>
+    <p>The navigation bar provides access to all tools:</p>
     <ul>
-        <li><strong>Home</strong> – Returns to the HF Workbench welcome screen.</li>
-        <li><strong>Doublet</strong> – Opens the Doublet Designer module.</li>
-        <li><strong>Loop</strong> – Opens the Loop Designer module.</li>
-        <li><strong>Skyloop</strong> – Opens the Skyloop Designer module.</li>
-        <li><strong>Verticals ▼</strong> – Dropdown with:
+        <li><strong>Home</strong> – Returns to the welcome screen.</li>
+        <li><strong>Doublet</strong> – Multi-band center-fed wire designer.</li>
+        <li><strong>Loop</strong> – Small/medium loop designer.</li>
+        <li><strong>Skyloop</strong> – Large horizontal loop designer.</li>
+        <li><strong>Verticals ▼</strong> – Dropdown containing:
             <ul>
                 <li>Vertical DX Designer</li>
                 <li>Vertical NVIS Designer</li>
@@ -52,56 +53,50 @@
                 <li>Dominator Array</li>
             </ul>
         </li>
-        <li><strong>Help ▼</strong> – Dropdown with:
-            <ul>
-                <li>User Manual (this page)</li>
-                <li>Quick Start</li>
-                <li>Glossary</li>
-            </ul>
-        </li>
+        <li><strong>Help ▼</strong> – User Manual, Quick Start, Glossary.</li>
     </ul>
 
     <h3>2.2 Main Content Area</h3>
     <p>
-        The main content area is where each tool’s interface appears. When you click a tool in the navigation bar,
-        HF Workbench loads that module into the content area without reloading the entire site.
+        When you select a tool, HF Workbench loads the module into the main content area without
+        reloading the entire page. This keeps navigation fast and responsive.
     </p>
 
     <div class="note">
-        <strong>Tip:</strong> If the interface looks “stuck” or outdated after a code change, use a hard refresh
-        (<code>Ctrl+F5</code> or equivalent) to clear cached scripts.
+        <strong>Tip:</strong> If the interface looks outdated after an update, use <code>Ctrl+F5</code>
+        to clear cached scripts.
     </div>
 </div>
 
 <div class="section">
-    <h2>3. Common Concepts Across Tools</h2>
+    <h2>3. Shared Concepts</h2>
 
     <h3>3.1 Frequency and Bands</h3>
     <ul>
-        <li><strong>Design Frequency:</strong> The primary frequency or band used for calculations.</li>
-        <li><strong>Multi-band Behavior:</strong> Many tools show how a single geometry behaves across multiple HF bands.</li>
+        <li><strong>Design Frequency:</strong> The primary band used for calculations.</li>
+        <li><strong>Multi-band Behavior:</strong> Many tools show how a geometry behaves across HF bands.</li>
     </ul>
 
-    <h3>3.2 Geometry and Dimensions</h3>
+    <h3>3.2 Geometry</h3>
     <ul>
-        <li><strong>Total Length:</strong> Overall wire length (e.g., total doublet length or loop perimeter).</li>
-        <li><strong>Leg Length:</strong> Length of each side of a center-fed antenna.</li>
+        <li><strong>Total Length:</strong> Overall wire length.</li>
+        <li><strong>Leg Length:</strong> For center-fed antennas.</li>
         <li><strong>Height:</strong> Average or maximum height above ground.</li>
-        <li><strong>Shape:</strong> Straight wire, loop, skyloop, or vertical arrangement.</li>
+        <li><strong>Shape:</strong> Straight, loop, skyloop, or vertical.</li>
     </ul>
 
     <h3>3.3 Feedline and Matching</h3>
     <ul>
-        <li><strong>Feedpoint Impedance:</strong> Modeled impedance at the antenna feedpoint.</li>
-        <li><strong>Feedline Type:</strong> Coax, ladder line, or other transmission line.</li>
-        <li><strong>Matching Network:</strong> Tuner or matching system used to achieve a good match at the rig.</li>
+        <li><strong>Feedpoint Impedance:</strong> Modeled impedance at the feedpoint.</li>
+        <li><strong>Feedline Type:</strong> Coax, ladder line, etc.</li>
+        <li><strong>Matching:</strong> Tuner or matching network expectations.</li>
     </ul>
 
     <h3>3.4 Performance Indicators</h3>
     <ul>
-        <li><strong>Takeoff Angle:</strong> Elevation angle where most energy is radiated.</li>
-        <li><strong>Efficiency:</strong> How much power is radiated vs. lost as heat.</li>
-        <li><strong>Pattern Hints:</strong> Qualitative notes about lobes, nulls, and coverage.</li>
+        <li><strong>Takeoff Angle:</strong> Low = DX, High = NVIS.</li>
+        <li><strong>Efficiency:</strong> Radiated vs. lost power.</li>
+        <li><strong>Pattern Hints:</strong> Lobes, nulls, and directional tendencies.</li>
     </ul>
 </div>
 
@@ -110,184 +105,172 @@
 
     <h3>4.1 Doublet Designer</h3>
     <p>
-        The Doublet Designer is for planning multi-band center-fed wire antennas, typically used with
-        balanced feedline and a tuner. It is ideal for 80–10m coverage from a single wire.
+        The Doublet Designer helps plan multi-band center-fed wire antennas using balanced feedline
+        and a tuner. Ideal for 80–10m coverage.
     </p>
     <h4>Inputs</h4>
     <ul>
-        <li>Primary band (e.g., 80m, 40m).</li>
-        <li>Total length or leg length.</li>
-        <li>Average height above ground.</li>
-        <li>Feedline type (ladder line, coax, etc.).</li>
+        <li>Primary band</li>
+        <li>Total length or leg length</li>
+        <li>Height</li>
+        <li>Feedline type</li>
     </ul>
     <h4>Outputs</h4>
     <ul>
-        <li>Approximate feedpoint impedance by band.</li>
-        <li>Qualitative pattern behavior (NVIS vs. DX tendencies).</li>
-        <li>Guidance on tuner expectations and likely “easy” vs “difficult” bands.</li>
+        <li>Impedance by band</li>
+        <li>Pattern tendencies</li>
+        <li>Tuner difficulty estimates</li>
     </ul>
-    <div class="note">
-        <strong>Use case:</strong> “I want one wire that covers many bands with a tuner and ladder line.”
-    </div>
 
     <h3>4.2 Loop Designer</h3>
     <p>
-        The Loop Designer focuses on small or medium-sized loops, often used where space is limited or
-        where noise rejection is important.
+        For small/medium loops used in limited spaces or for noise reduction.
     </p>
     <h4>Inputs</h4>
     <ul>
-        <li>Loop circumference (total wire length).</li>
-        <li>Loop shape (square, rectangle, etc.).</li>
-        <li>Height above ground.</li>
-        <li>Operating band or frequency.</li>
+        <li>Circumference</li>
+        <li>Shape</li>
+        <li>Height</li>
+        <li>Band</li>
     </ul>
     <h4>Outputs</h4>
     <ul>
-        <li>Approximate radiation resistance and efficiency hints.</li>
-        <li>Pattern notes (broadside vs. edgewise, null directions).</li>
-        <li>Guidance on tuning and matching expectations.</li>
+        <li>Radiation resistance</li>
+        <li>Efficiency hints</li>
+        <li>Pattern notes</li>
     </ul>
 
     <h3>4.3 Skyloop Designer</h3>
     <p>
-        The Skyloop Designer is for large horizontal loops (often full-wave or larger on 80m or 40m),
-        typically used for multi-band coverage with a tuner.
+        For large horizontal loops used for multi-band coverage with a tuner.
     </p>
     <h4>Inputs</h4>
     <ul>
-        <li>Perimeter (total loop length you can fit in your space).</li>
-        <li>Average height above ground.</li>
-        <li>Target bands (e.g., 80–10m).</li>
+        <li>Perimeter</li>
+        <li>Height</li>
+        <li>Target bands</li>
     </ul>
     <h4>Outputs</h4>
     <ul>
-        <li>Band-by-band behavior (where it is near-resonant, where it is not).</li>
-        <li>NVIS vs. DX tendencies by band.</li>
-        <li>Qualitative pattern hints (number and direction of lobes at higher bands).</li>
+        <li>Band-by-band behavior</li>
+        <li>NVIS vs. DX tendencies</li>
+        <li>Lobe structure at higher bands</li>
     </ul>
 
     <h3>4.4 Vertical DX Designer</h3>
     <p>
-        The Vertical DX Designer helps configure vertical antennas aimed at low-angle radiation for
-        long-distance (DX) contacts.
+        For low-angle verticals optimized for long-distance DX.
     </p>
     <h4>Inputs</h4>
     <ul>
-        <li>Vertical height (physical radiator length).</li>
-        <li>Radial system details (number, length, and type of radials).</li>
-        <li>Ground type (good, average, poor).</li>
-        <li>Target band(s) (e.g., 40m, 20m).</li>
+        <li>Vertical height</li>
+        <li>Radial system</li>
+        <li>Ground type</li>
+        <li>Band</li>
     </ul>
     <h4>Outputs</h4>
     <ul>
-        <li>Estimated takeoff angle for DX.</li>
-        <li>Efficiency hints based on radial system and ground.</li>
-        <li>Pattern notes (omnidirectional vs. slight directional bias).</li>
+        <li>Takeoff angle</li>
+        <li>Efficiency hints</li>
+        <li>Pattern notes</li>
     </ul>
 
     <h3>4.5 Vertical NVIS Designer</h3>
     <p>
-        The Vertical NVIS Designer focuses on vertical configurations optimized for near-vertical
-        incidence skywave (NVIS) coverage—short to medium HF distances.
+        For verticals optimized for regional NVIS coverage.
     </p>
     <h4>Inputs</h4>
     <ul>
-        <li>Vertical height and any top-loading or loading coils.</li>
-        <li>Target NVIS bands (often 80m and 40m).</li>
-        <li>Ground and radial configuration.</li>
+        <li>Height</li>
+        <li>Loading options</li>
+        <li>Band</li>
     </ul>
     <h4>Outputs</h4>
     <ul>
-        <li>Higher-angle radiation emphasis for regional coverage.</li>
-        <li>Guidance on height vs. NVIS effectiveness.</li>
-        <li>Tradeoffs between NVIS and DX performance.</li>
+        <li>High-angle radiation</li>
+        <li>NVIS effectiveness</li>
+        <li>Tradeoffs vs. DX</li>
     </ul>
 
     <h3>4.6 Performer Vertical</h3>
     <p>
-        The Performer Vertical tool is oriented toward squeezing performance out of a single vertical
-        within real-world constraints (yard size, support height, radial count).
+        For maximizing performance from a single vertical in limited space.
     </p>
     <h4>Inputs</h4>
     <ul>
-        <li>Available vertical height.</li>
-        <li>Number and length of radials you can practically install.</li>
-        <li>Primary band(s) of interest.</li>
+        <li>Height</li>
+        <li>Radial count</li>
+        <li>Band goals</li>
     </ul>
     <h4>Outputs</h4>
     <ul>
-        <li>Efficiency and bandwidth tradeoff guidance.</li>
-        <li>Suggestions for incremental improvements (more radials, slightly taller, etc.).</li>
-        <li>Qualitative expectations for on-air performance.</li>
+        <li>Efficiency/bandwidth tradeoffs</li>
+        <li>Incremental improvement suggestions</li>
     </ul>
 
     <h3>4.7 Dominator Array</h3>
     <p>
-        The Dominator Array tool explores multi-element vertical arrays for pattern control
-        (gain and directivity).
+        For exploring multi-element vertical arrays with directional gain.
     </p>
     <h4>Inputs</h4>
     <ul>
-        <li>Number of elements.</li>
-        <li>Element spacing and layout.</li>
-        <li>Phasing or feeding scheme.</li>
-        <li>Target band.</li>
+        <li>Element count</li>
+        <li>Spacing</li>
+        <li>Phasing</li>
+        <li>Band</li>
     </ul>
     <h4>Outputs</h4>
     <ul>
-        <li>Qualitative forward gain expectations.</li>
-        <li>Front-to-back or front-to-side behavior.</li>
-        <li>Notes on complexity vs. benefit.</li>
+        <li>Forward gain expectations</li>
+        <li>Front-to-back behavior</li>
+        <li>Complexity vs. benefit</li>
     </ul>
 </div>
 
 <div class="section">
     <h2>5. Example Workflows</h2>
 
-    <h3>5.1 Planning an 80m Doublet for Multi-Band Use</h3>
+    <h3>5.1 80m Doublet for Multi-Band Use</h3>
     <ol>
-        <li>Open <strong>Doublet</strong> from the top navigation.</li>
-        <li>Set the primary band to 80m.</li>
-        <li>Enter a total length around 130–140 feet.</li>
-        <li>Set the average height (e.g., 35 feet).</li>
-        <li>Choose ladder line as the feedline type.</li>
-        <li>Review the behavior on 80m, 40m, 20m, and higher bands.</li>
+        <li>Open <strong>Doublet</strong>.</li>
+        <li>Set band to 80m.</li>
+        <li>Enter ~135 ft total length.</li>
+        <li>Set height.</li>
+        <li>Review multi-band behavior.</li>
     </ol>
 
-    <h3>5.2 Sketching a Backyard Skyloop</h3>
+    <h3>5.2 Backyard Skyloop</h3>
     <ol>
         <li>Open <strong>Skyloop</strong>.</li>
-        <li>Measure your available perimeter (e.g., fence line) and enter that as the loop length.</li>
-        <li>Set the average height based on your supports.</li>
-        <li>Review which bands the loop is near-resonant on and how it behaves on others.</li>
+        <li>Enter perimeter.</li>
+        <li>Enter height.</li>
+        <li>Review band coverage.</li>
     </ol>
 
-    <h3>5.3 Building a 40m DX Vertical</h3>
+    <h3>5.3 40m DX Vertical</h3>
     <ol>
-        <li>Open <strong>Verticals ▼ → Vertical DX Designer</strong>.</li>
-        <li>Enter your available vertical height (e.g., 33 feet).</li>
-        <li>Specify your radial system (e.g., 16 radials at 0.25λ each).</li>
-        <li>Set the target band to 40m.</li>
-        <li>Review the estimated takeoff angle and efficiency hints.</li>
+        <li>Open <strong>Vertical DX Designer</strong>.</li>
+        <li>Enter height.</li>
+        <li>Enter radial system.</li>
+        <li>Review takeoff angle.</li>
     </ol>
 </div>
 
 <div class="section">
-    <h2>6. Tips and Best Practices</h2>
+    <h2>6. Best Practices</h2>
     <ul>
-        <li><strong>Start simple:</strong> Begin with a single-band design, then expand to multi-band.</li>
-        <li><strong>Document your choices:</strong> Keep notes on lengths, heights, and feedline decisions.</li>
-        <li><strong>Iterate:</strong> Use HF Workbench to explore multiple options before cutting wire.</li>
-        <li><strong>Validate on air:</strong> Use real QSOs, RBN spots, and reports to confirm performance.</li>
+        <li>Start simple.</li>
+        <li>Document your choices.</li>
+        <li>Iterate before cutting wire.</li>
+        <li>Validate with real QSOs and RBN.</li>
     </ul>
 </div>
 
 <div class="section">
-    <h2>7. Related Help Pages</h2>
+    <h2>7. Related Pages</h2>
     <p>
-        For a fast, step-by-step overview, see the <strong>Quick Start</strong> page.
-        For definitions of terms used in this manual, see the <strong>Glossary</strong>.
+        See the <strong>Quick Start</strong> for a fast overview and the <strong>Glossary</strong>
+        for definitions.
     </p>
 </div>
 
