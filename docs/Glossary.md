@@ -1,54 +1,30 @@
-# Antenna Workbench — Glossary
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Glossary — Antenna Workbench</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: sans-serif; max-width: 900px; margin: auto; line-height: 1.6; }
+        h1, h2 { color: #003366; }
+        dt { font-weight: bold; margin-top: 1rem; }
+    </style>
+</head>
+<body>
 
-## A
-**ATU (Tuner)** — Matches antenna/feedline impedance to the radio.  
-**Average ground** — Typical soil with moderate conductivity.
+<h1>Glossary</h1>
 
-## B
-**Band** — Frequency range (e.g., 80m).  
-**Base gain** — Gain from geometry alone.
+<dl>
+    <dt>ATU</dt><dd>Antenna Tuning Unit (tuner).</dd>
+    <dt>Base Gain</dt><dd>Gain from geometry alone.</dd>
+    <dt>Coax</dt><dd>Unbalanced feedline such as RG‑213 or LMR‑400.</dd>
+    <dt>Doublet</dt><dd>Center-fed dipole using ladder line.</dd>
+    <dt>Electrical Length</dt><dd>Physical length expressed as a fraction of wavelength.</dd>
+    <dt>Gain (dBi)</dt><dd>Signal strength relative to isotropic.</dd>
+    <dt>NVIS</dt><dd>Near Vertical Incidence Skywave — high-angle regional coverage.</dd>
+    <dt>Radial</dt><dd>Ground wire used with vertical antennas.</dd>
+    <dt>Skyloop</dt><dd>Large horizontal loop antenna.</dd>
+    <dt>TOA</dt><dd>Takeoff angle of the main lobe.</dd>
+</dl>
 
-## C
-**Coax** — Unbalanced feedline (RG‑213, LMR‑400).  
-**Coax jumper** — Short coax between tuner and ladder line.
-
-## D
-**dBi** — Gain relative to isotropic.  
-**Doublet** — Center‑fed dipole using ladder line.
-
-## E
-**Electrical length** — Physical length expressed as % of λ.
-
-## F
-**Feedline loss** — Power lost in the line.  
-**Fraction of wavelength** — Dimension ÷ λ.
-
-## G
-**Gain** — Increase in signal strength.  
-**Ground screen** — Mesh or radials improving ground.
-
-## H
-**HF** — 3–30 MHz.
-
-## L
-**Ladder line** — Balanced feedline (300Ω–600Ω).  
-**Loop (Skyloop)** — Closed wire loop antenna.
-
-## N
-**NVIS** — High‑angle propagation for regional coverage.  
-**NVIS reflector** — Wire grid enhancing high‑angle gain.
-
-## R
-**Radial** — Ground wire for verticals.  
-**Reflector** — Element shaping radiation pattern.
-
-## S
-**Seaside gain** — Enhanced performance near saltwater.  
-**SWR** — Standing Wave Ratio.
-
-## T
-**TOA** — Takeoff angle of main lobe.  
-**Transformer** — Impedance‑matching device.
-
-## W
-**Wavelength (λ)** — c / f.
+</body>
+</html>
