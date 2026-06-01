@@ -1,14 +1,8 @@
 /* ---------------------------------------------------------
-   HF Workbench — Longwire Antenna (Non‑Resonant / Random Wire)
-   - Geometry panel
-   - Unified boost panel (two-column .boost-grid)
-   - Length + height + counterpoise
-   - Feedline family + type + length
-   - Transformer Requirements (9:1 unun + ground system notes)
+   HF Workbench — Longwire Antenna (Random Wire)
 --------------------------------------------------------- */
 
 import { requireFrequency, requirePositive, toNumber } from "../validators.js";
-import { infoBox, warnBox } from "../dom.js";
 import { findBand } from "../constants.js";
 import { log } from "../log.js";
 import { GeometryEngine } from "../engines/geometry-engine.js";
@@ -22,13 +16,10 @@ function baseLongwireGain(frac) {
     return 0.5;
 }
 
-// ✅ Standardized init signature for the router
+// ⭐ Correct signature for your router
 export function init({ PlotEngine, container }) {
-    // Use the provided container instead of querying #content directly
-    const host = container || document.querySelector("#content");
-    if (!host) return;
 
-    host.innerHTML = `
+    container.innerHTML = `
         <section class="tool">
             <h2>Longwire Antenna (Random Wire)</h2>
 
@@ -99,32 +90,18 @@ export function init({ PlotEngine, container }) {
             <div id="lw-summary" class="summary" style="margin-top:1rem;"></div>
 
         </section>
-    ";
+    `;
 
-    const freqInput = host.querySelector("#lw-freq");
-    const lengthInput = host.querySelector("#lw-length");
-    const heightInput = host.querySelector("#lw-height");
-    const counterInput = host.querySelector("#lw-counter");
+    const summaryDiv = container.querySelector("#lw-summary");
 
-    const todInput = host.querySelector("#lw-tod");
-    const seasideInput = host.querySelector("#lw-seaside");
-    const groundScreenInput = host.querySelector("#lw-groundscreen");
-    const elevatedInput = host.querySelector("#lw-elevated");
+    container.querySelector("#lw-compute").addEventListener("click", () => {
 
-    const feedFamilyInput = host.querySelector("#lw-feed-family");
-    const feedTypeInput = host.querySelector("#lw-feed-type");
-    const feedLenInput = host.querySelector("#lw-feed-length");
-
-    const summaryDiv = host.querySelector("#lw-summary");
-    const button = host.querySelector("#lw-compute");
-
-    button.addEventListener("click", () => {
         const errors = [];
 
-        const freq = toNumber(freqInput.value);
-        const length = toNumber(lengthInput.value);
-        const height = toNumber(heightInput.value);
-        const counter = toNumber(counterInput.value);
+        const freq = toNumber(container.querySelector("#lw-freq").value);
+        const length = toNumber(container.querySelector("#lw-length").value);
+        const height = toNumber(container.querySelector("#lw-height").value);
+        const counter = toNumber(container.querySelector("#lw-counter").value);
 
         requireFrequency(freq, errors);
         requirePositive(length, "Wire length", errors);
@@ -132,7 +109,7 @@ export function init({ PlotEngine, container }) {
         requirePositive(counter, "Counterpoise length", errors);
 
         if (errors.length) {
-            summaryDiv.innerHTML = warnBox(errors.join("<br>"));
+            summaryDiv.innerHTML = `<div class="warn">${errors.join("<br>")}</div>`;
             return;
         }
 
@@ -146,41 +123,24 @@ export function init({ PlotEngine, container }) {
 
         const baseGain = baseLongwireGain(geom.frac);
 
-        const feedFamily = feedFamilyInput.value === "ladder" ? "ladder" : "coax";
+        const feedFamily = container.querySelector("#lw-feed-family").value === "ladder" ? "ladder" : "coax";
 
         const boost = BoostEngine.computeBoost({
             reflectorCount: 0,
             directorCount: 0,
-            timeOfDay: todInput.value,
-            seaside: seasideInput.checked,
-            groundScreen: groundScreenInput.checked,
-            elevatedRadials: elevatedInput.checked,
+            timeOfDay: container.querySelector("#lw-tod").value,
+            seaside: container.querySelector("#lw-seaside").checked,
+            groundScreen: container.querySelector("#lw-groundscreen").checked,
+            elevatedRadials: container.querySelector("#lw-elevated").checked,
             nvisReflector: false,
             feedlineFamily: feedFamily,
-            feedlineType: feedTypeInput.value,
-            feedlineLengthFt: toNumber(feedLenInput.value),
+            feedlineType: container.querySelector("#lw-feed-type").value,
+            feedlineLengthFt: toNumber(container.querySelector("#lw-feed-length").value),
             dxTurboPatternBonus: false
         });
 
         const totalGain = baseGain + geom.totalGeomGainDelta + boost.totalBoost;
         const finalToa = Math.max(25, Math.min(75, geom.toa + boost.toaShift));
-
-        const geomLines = [
-            `Wire length: ${length.toFixed(1)} m`,
-            `Average height: ${height.toFixed(1)} m`,
-            `Counterpoise: ${counter.toFixed(1)} m`,
-            ...(geom.components.length ? geom.components.map(c => c.note ?? "") : [])
-        ].join("<br>");
-
-        const boostLines = boost.components.length
-            ? boost.components.map(d => {
-                const parts = [];
-                if (d.boost) parts.push(`${d.boost.toFixed(1)} dB from ${d.label}`);
-                else parts.push(d.label);
-                if (d.toaShift) parts.push(`TOA shift ${d.toaShift > 0 ? "+" : ""}${d.toaShift}°`);
-                return parts.join(" — ");
-            }).join("<br>")
-            : "No boost options enabled.";
 
         const transformerHtml = TransformerEngine.getTransformerNote("longwire", feedFamily);
 
@@ -196,24 +156,18 @@ export function init({ PlotEngine, container }) {
             finalToa
         });
 
-        summaryDiv.innerHTML = infoBox(`
-            <p><strong>Operating frequency:</strong> ${freq.toFixed(2)} MHz (${band?.label ?? "Unknown band"})</p>
+        summaryDiv.innerHTML = `
+            <div class="info">
+                <p><strong>Operating frequency:</strong> ${freq.toFixed(2)} MHz (${band?.label ?? "Unknown band"})</p>
 
-            <p><strong>Base Longwire Gain:</strong> ${baseGain.toFixed(1)} dBi</p>
+                <p><strong>Base Longwire Gain:</strong> ${baseGain.toFixed(1)} dBi</p>
 
-            <p><strong>Geometry details:</strong><br>${geomLines}</p>
+                <p><strong>Total estimated gain:</strong> ${totalGain.toFixed(1)} dBi</p>
 
-            <p><strong>Boost breakdown:</strong><br>${boostLines}</p>
+                <p><strong>Estimated TOA:</strong> ${finalToa.toFixed(0)}°</p>
 
-            <p><strong>Total estimated gain:</strong> ${totalGain.toFixed(1)} dBi</p>
-
-            <p><strong>Estimated TOA:</strong> ${finalToa.toFixed(0)}°</p>
-
-            ${transformerHtml}
-        `);
-
-        // Optional: hook into PlotEngine later if you want patterns/SWR
-        // PlotEngine.clearPlot();
-        // PlotEngine.plotText(`Longwire @ ${freq.toFixed(2)} MHz — ${totalGain.toFixed(1)} dBi, TOA ${finalToa.toFixed(0)}°`);
+                ${transformerHtml}
+            </div>
+        `;
     });
 }
