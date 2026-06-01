@@ -1,202 +1,267 @@
-/* ---------------------------------------------------------
-   Antenna Workbench — Skyloop Designer
+/* --------------------------------------------------------------
+   Antenna Workbench — Skyloop Designer (Workbench Edition)
    Full-wave horizontal loop with NVIS reflector support
---------------------------------------------------------- */
+   - GeometryEngine
+   - BoostEngine
+   - NVIS Reflector Engine
+   - TransformerEngine
+   - Unified boost panel
+   - Summary box
+   - Logging
+-------------------------------------------------------------- */
 
-import { wavelength, round } from "../utils.js";
 import { requireFrequency, requirePositive, toNumber } from "../validators.js";
 import { infoBox, warnBox } from "../dom.js";
 import { findBand } from "../constants.js";
 import { log } from "../log.js";
 
-import {
-    computeNVISReflector,
-    logNVISReflector
-} from "../engines/nvis-reflector.js";
+import { GeometryEngine } from "../engines/geometry-engine.js";
+import { BoostEngine } from "../engines/boost-engine.js";
+import { TransformerEngine } from "../engines/transformer-engine.js";
+import { computeNVISReflector, logNVISReflector } from "../engines/nvis-reflector.js";
 
-function $(root, sel) { return root.querySelector(sel); }
+import { wavelength, round } from "../utils.js";
 
-/* GEOMETRY */
-function computeSkyloop(freqMHz, perimeterM, heightM) {
-    const lambda = wavelength(freqMHz);
-    const side = perimeterM / 4;
-
-    return {
-        lambda,
-        perimeterM,
-        side,
-        heightM
-    };
+/* --------------------------------------------------------------
+   BASE GAIN MODEL FOR SKYLOOP
+-------------------------------------------------------------- */
+function baseSkyloopGain(frac) {
+    if (frac < 0.80) return 1.5;     // slightly short loop
+    if (frac < 1.10) return 2.2;     // near full-wave
+    if (frac < 1.40) return 2.6;     // slightly long
+    return 3.0;                      // long loop
 }
 
-/* FEEDPOINT Z */
-function estimateFeedZ(freqMHz, perimeterM) {
-    const lambda = wavelength(freqMHz);
-    const ratio = perimeterM / lambda;
-
-    if (ratio < 0.9) return 150;
-    if (ratio < 1.2) return 100;
-    if (ratio < 1.5) return 200;
-    return 300;
-}
-
-/* GAIN */
-function estimateGain(freqMHz, heightM) {
-    const lambda = wavelength(freqMHz);
-    const frac = heightM / lambda;
-
-    if (frac < 0.25) return 2.0;
-    if (frac < 0.5) return 3.5;
-    if (frac < 1.0) return 5.0;
-    return 5.5;
-}
-
-/* TOA */
-function estimateTOA(freqMHz, heightM) {
-    const lambda = wavelength(freqMHz);
-    const frac = heightM / lambda;
-
-    if (frac < 0.25) return 75;
-    if (frac < 0.5) return 60;
-    if (frac < 1.0) return 40;
-    return 30;
-}
-
-/* SUMMARY */
-function buildSummary(freqMHz, S, feedZ, gain, toa, R) {
-    const band = findBand(freqMHz);
-    const bandLabel = band
-        ? `${band.name} (${band.low}–${band.high} MHz)`
-        : "Non‑standard HF segment";
-
-    const lines = [];
-
-    lines.push(`<strong>Design frequency:</strong> ${round(freqMHz,2)} MHz (${bandLabel})`);
-    lines.push(`<strong>Perimeter:</strong> ${round(S.perimeterM,2)} m`);
-    lines.push(`<strong>Side length:</strong> ${round(S.side,2)} m`);
-    lines.push(`<strong>Height:</strong> ${round(S.heightM,2)} m`);
-    lines.push(`<strong>Feedpoint impedance:</strong> ${round(feedZ,1)} Ω`);
-    lines.push(`<strong>Estimated gain:</strong> ${round(gain,1)} dBi`);
-    lines.push(`<strong>Estimated TOA:</strong> ${round(toa,1)}°`);
-
-    if (R) {
-        lines.push(`<hr>`);
-        lines.push(`<strong>NVIS Reflector System:</strong>`);
-        lines.push(R.summary);
-        lines.push(`<p><strong>Adjusted NVIS gain:</strong> +${round(R.gainNVIS,1)} dB</p>`);
-        lines.push(`<p><strong>DX reduction:</strong> -${round(R.dxLoss,1)} dB</p>`);
-        lines.push(`<p><strong>TOA shift:</strong> +${round(R.toaDelta,1)}°</p>`);
-    }
-
-    return `
-        <div class="poster-preview">
-            ${lines.join("")}
-            <p style="margin-top:10px;font-size:13px;color:#aaa;">
-                Skyloops are broadband, quiet, and excellent for NVIS. Multi-wire reflectors
-                enhance high-angle radiation for regional coverage.
-            </p>
-        </div>
-    `;
-}
-
-/* VALIDATION */
-function validate(freqStr, heightStr, perStr, reflEnabledStr, numStr, spacingStr, offsetStr, reflHeightStr) {
-    const errors = [];
-
-    const fErr = requireFrequency(freqStr, "Design frequency");
-    if (fErr) errors.push(fErr);
-
-    const hErr = requirePositive(heightStr, "Height");
-    if (hErr) errors.push(hErr);
-
-    const pErr = requirePositive(perStr, "Perimeter");
-    if (pErr) errors.push(pErr);
-
-    const reflEnabled = reflEnabledStr === "yes";
-
-    if (reflEnabled) {
-        const nErr = requirePositive(numStr, "Number of reflector wires");
-        if (nErr) errors.push(nErr);
-
-        const sErr = requirePositive(spacingStr, "Reflector spacing");
-        if (sErr) errors.push(sErr);
-
-        const oErr = requirePositive(offsetStr, "Reflector offset");
-        if (oErr) errors.push(oErr);
-
-        const h2Err = requirePositive(reflHeightStr, "Reflector height");
-        if (h2Err) errors.push(h2Err);
-    }
-
-    return errors;
-}
-
-/* COMPUTE */
-function handleCompute(root) {
-    const freqStr = $(root, "#sky-freq").value;
-    const heightStr = $(root, "#sky-height").value;
-    const perStr = $(root, "#sky-perimeter").value;
-
-    const reflEnabledStr = $(root, "#sky-refl-enabled").value;
-    const numStr = $(root, "#sky-refl-num").value;
-    const spacingStr = $(root, "#sky-refl-spacing").value;
-    const offsetStr = $(root, "#sky-refl-offset").value;
-    const reflHeightStr = $(root, "#sky-refl-height").value;
-
-    const summaryHost = $(root, "#sky-summary");
-
-    const errors = validate(freqStr, heightStr, perStr, reflEnabledStr, numStr, spacingStr, offsetStr, reflHeightStr);
-    if (errors.length > 0) {
-        summaryHost.innerHTML = "";
-        summaryHost.appendChild(warnBox(errors.join("<br>")));
-        return;
-    }
-
-    const freqMHz = toNumber(freqStr);
-    const heightM = toNumber(heightStr);
-    const perimeterM = toNumber(perStr);
-
-    const S = computeSkyloop(freqMHz, perimeterM, heightM);
-    const feedZ = estimateFeedZ(freqMHz, perimeterM);
-    const gain = estimateGain(freqMHz, heightM);
-    const toa = estimateTOA(freqMHz, heightM);
-
-    let R = null;
-
-    if (reflEnabledStr === "yes") {
-        const numWires = toNumber(numStr);
-        const spacingM = toNumber(spacingStr);
-        const offsetM = toNumber(offsetStr);
-        const reflHeightM = toNumber(reflHeightStr);
-
-        R = computeNVISReflector(freqMHz, heightM, numWires, spacingM, offsetM, reflHeightM);
-        logNVISReflector({ freqMHz, heightM, numWires }, R);
-    }
-
-    summaryHost.innerHTML = "";
-    summaryHost.appendChild(infoBox(buildSummary(freqMHz, S, feedZ, gain, toa, R)));
-
-    log("skyloop-designer", "Computed skyloop with NVIS reflector", {
-        freqMHz,
-        heightM,
-        perimeterM,
-        feedZ,
-        gain,
-        toa,
-        reflector: R
-    });
-}
-
-/* ENTRY */
 export default function initSkyloopDesigner(root) {
-    const btn = $(root, "#sky-compute");
-    if (btn) btn.addEventListener("click", () => handleCompute(root));
+    const container = document.querySelector("#content") || root;
+    if (!container) return;
 
-    const summaryHost = $(root, "#sky-summary");
-    if (summaryHost) {
-        summaryHost.innerHTML =
-            "Enter frequency, height, perimeter, and optional NVIS reflector parameters, then click <strong>Compute Skyloop</strong>.";
-    }
+    container.innerHTML = `
+        <section class="tool">
+            <h2>Skyloop Designer</h2>
 
-    log("skyloop-designer", "Module initialized");
+            <h3>Geometry</h3>
+            <div class="field-grid">
+                <label>Frequency (MHz)
+                    <input id="sl-freq" type="number" step="0.01" value="3.55">
+                </label>
+
+                <label>Loop perimeter (m)
+                    <input id="sl-perimeter" type="number" step="1" value="284">
+                </label>
+
+                <label>Height (m)
+                    <input id="sl-height" type="number" step="0.5" value="5">
+                </label>
+            </div>
+
+            <h3>NVIS Reflector (Optional)</h3>
+            <div class="field-grid">
+                <label><input id="sl-ref-enable" type="checkbox"> Enable NVIS reflector</label>
+
+                <label>Reflector wires
+                    <input id="sl-ref-wires" type="number" step="1" value="0">
+                </label>
+
+                <label>Reflector spacing (m)
+                    <input id="sl-ref-spacing" type="number" step="0.5" value="0">
+                </label>
+
+                <label>Reflector height (m)
+                    <input id="sl-ref-height" type="number" step="0.5" value="0">
+                </label>
+            </div>
+
+            <h3>Boost</h3>
+            <div class="field-grid boost-grid">
+                <label>Time of day
+                    <select id="sl-tod">
+                        <option value="day">Day</option>
+                        <option value="night">Night</option>
+                        <option value="dawn">Dawn</option>
+                        <option value="dusk">Dusk</option>
+                    </select>
+                </label>
+
+                <label><input id="sl-seaside" type="checkbox"> Seaside (+10 dB)</label>
+                <label><input id="sl-groundscreen" type="checkbox"> Ground screen</label>
+
+                <label>Feedline type
+                    <select id="sl-feed-type">
+                        <option value="450">450Ω ladder line</option>
+                        <option value="300">300Ω twinlead</option>
+                        <option value="600">600Ω open wire</option>
+                    </select>
+                </label>
+
+                <label>Feedline length (ft)
+                    <input id="sl-feed-length" type="number" step="5" value="75">
+                </label>
+            </div>
+
+            <button id="sl-compute" style="margin-top:1rem;">Compute Skyloop</button>
+
+            <div id="sl-summary" class="summary" style="margin-top:1rem;"></div>
+        </section>
+    `;
+
+    // Inputs
+    const freqInput = document.getElementById("sl-freq");
+    const perimeterInput = document.getElementById("sl-perimeter");
+    const heightInput = document.getElementById("sl-height");
+
+    const refEnable = document.getElementById("sl-ref-enable");
+    const refWires = document.getElementById("sl-ref-wires");
+    const refSpacing = document.getElementById("sl-ref-spacing");
+    const refHeight = document.getElementById("sl-ref-height");
+
+    const todInput = document.getElementById("sl-tod");
+    const seasideInput = document.getElementById("sl-seaside");
+    const groundScreenInput = document.getElementById("sl-groundscreen");
+
+    const feedTypeInput = document.getElementById("sl-feed-type");
+    const feedLenInput = document.getElementById("sl-feed-length");
+
+    const summaryDiv = document.getElementById("sl-summary");
+    const button = document.getElementById("sl-compute");
+
+    button.addEventListener("click", () => {
+        const errors = [];
+
+        const freq = toNumber(freqInput.value);
+        const perimeter = toNumber(perimeterInput.value);
+        const height = toNumber(heightInput.value);
+
+        requireFrequency(freq, errors);
+        requirePositive(perimeter, "Loop perimeter", errors);
+        requirePositive(height, "Height", errors);
+
+        if (errors.length) {
+            summaryDiv.innerHTML = warnBox(errors.join("<br>"));
+            return;
+        }
+
+        const band = findBand(freq);
+        const lambda = wavelength(freq);
+        const frac = perimeter / lambda;
+
+        // Geometry
+        const geom = GeometryEngine.computeGeometry({
+            freqMHz: freq,
+            heightM: height,
+            dxTurbo: false,
+            foldoverEnabled: false,
+            foldAngleDeg: 0,
+            linearLoadingEnabled: false,
+            linearLoadingFactor: 0,
+            coilEnabled: false,
+            coilPosition: "base",
+            coilQ: 0,
+            hatEnabled: false,
+            hatRadiusM: 0,
+            hatSpokes: 0
+        });
+
+        const baseGain = baseSkyloopGain(frac);
+
+        // NVIS reflector
+        let reflector = null;
+        if (refEnable.checked) {
+            reflector = computeNVISReflector({
+                freqMHz: freq,
+                wires: toNumber(refWires.value),
+                spacingM: toNumber(refSpacing.value),
+                heightM: toNumber(refHeight.value)
+            });
+        }
+
+        // Boost
+        const boost = BoostEngine.computeBoost({
+            reflectorCount: 0,
+            directorCount: 0,
+            timeOfDay: todInput.value,
+            seaside: seasideInput.checked,
+            groundScreen: groundScreenInput.checked,
+            elevatedRadials: false,
+            nvisReflector: refEnable.checked,
+            feedlineFamily: "ladder",
+            feedlineType: feedTypeInput.value,
+            feedlineLengthFt: toNumber(feedLenInput.value),
+            dxTurboPatternBonus: false
+        });
+
+        const reflectorGain = reflector?.gainDb ?? 0;
+        const reflectorToaShift = reflector?.toaShift ?? 0;
+
+        const totalGain =
+            baseGain +
+            geom.totalGeomGainDelta +
+            boost.totalBoost +
+            reflectorGain;
+
+        const finalToa = Math.max(
+            60,
+            Math.min(90, geom.toa + boost.toaShift + reflectorToaShift)
+        );
+
+        const geomLines = geom.components?.length
+            ? geom.components.map(c => c.note ?? "").join("<br>")
+            : "No additional geometry modifiers.";
+
+        const boostLines = boost.components?.length
+            ? boost.components.map(d => {
+                const parts = [];
+                if (typeof d.boost === "number") {
+                    parts.push(`${d.boost.toFixed(1)} dB from ${d.label}`);
+                } else {
+                    parts.push(d.label);
+                }
+                if (d.toaShift) {
+                    parts.push(`TOA shift ${d.toaShift > 0 ? "+" : ""}${d.toaShift}°`);
+                }
+                return parts.join(" — ");
+            }).join("<br>")
+            : "No boost options enabled.";
+
+        const reflectorLines = reflector
+            ? logNVISReflector(reflector).replace(/\n/g, "<br>")
+            : "No NVIS reflector enabled.";
+
+        const transformerHtml = TransformerEngine.getTransformerNote("skyloop", "ladder");
+
+        log("Skyloop Designer", {
+            freq,
+            perimeter,
+            height,
+            geom,
+            baseGain,
+            boost,
+            reflector,
+            totalGain,
+            finalToa
+        });
+
+        summaryDiv.innerHTML = infoBox(`
+            <p><strong>Design frequency:</strong> ${freq.toFixed(2)} MHz (${band?.label ?? "Unknown band"})</p>
+
+            <p><strong>Loop perimeter:</strong> ${perimeter.toFixed(1)} m</p>
+            <p><strong>Electrical length:</strong> ${(frac * 100).toFixed(1)}% of λ</p>
+
+            <p><strong>Height:</strong> ${height.toFixed(1)} m</p>
+
+            <p><strong>Base Gain (no boosts):</strong> ${baseGain.toFixed(1)} dBi</p>
+
+            <p><strong>Geometry adjustments:</strong><br>${geomLines}</p>
+
+            <p><strong>Boost breakdown:</strong><br>${boostLines}</p>
+
+            <p><strong>NVIS reflector:</strong><br>${reflectorLines}</p>
+
+            <p><strong>Total estimated gain:</strong> ${totalGain.toFixed(1)} dBi</p>
+
+            <p><strong>Estimated NVIS TOA:</strong> ${finalToa.toFixed(0)}°</p>
+
+            ${transformerHtml}
+        `);
+    });
 }
