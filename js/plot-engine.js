@@ -1,17 +1,22 @@
 // js/plot-engine.js
 // HF Antenna Designer — Plot Engine
-// Centralized plotting utilities (SWR, gain, TOA, etc.)
+// Centralized plotting utilities (SWR, gain, TOA, loss, etc.)
 
 export const PlotEngine = (() => {
-    function ensureCanvas(containerId = "plot-area") {
+    function ensureContainer(containerId = "plot-area") {
         let container = document.getElementById(containerId);
         if (!container) {
             container = document.createElement("div");
             container.id = containerId;
             container.style.marginTop = "1rem";
+            container.style.padding = "0.5rem 0";
             document.getElementById("content")?.appendChild(container);
         }
+        return container;
+    }
 
+    function ensureCanvas(containerId = "plot-area") {
+        const container = ensureContainer(containerId);
         let canvas = container.querySelector("canvas");
         if (!canvas) {
             canvas = document.createElement("canvas");
@@ -60,8 +65,8 @@ export const PlotEngine = (() => {
         ctx.fillStyle = "#fff";
         ctx.font = "14px Arial";
         if (title) ctx.fillText(title, left, top - 20);
-        if (xLabel) ctx.fillText(xLabel, (left + right) / 2 - 20, bottom + 30);
-        if (yLabel) ctx.fillText(yLabel, left - 40, (top + bottom) / 2);
+        if (xLabel) ctx.fillText(xLabel, (left + right) / 2 - 40, bottom + 30);
+        if (yLabel) ctx.fillText(yLabel, left - 45, (top + bottom) / 2);
 
         if (!data || data.length === 0) return;
 
