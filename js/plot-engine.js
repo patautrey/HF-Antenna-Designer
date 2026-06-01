@@ -1,6 +1,5 @@
 // js/plot-engine.js
-// HF Antenna Designer — Enhanced Plot Engine
-// Adds grid lines, tick marks, numeric labels, and clearer rendering.
+// HF Antenna Designer — Enhanced Plot Engine (Bigger Labels + Multi‑Plot Safe)
 
 export const PlotEngine = (() => {
 
@@ -18,17 +17,20 @@ export const PlotEngine = (() => {
 
     function ensureCanvas(containerId = "plot-area") {
         const container = ensureContainer(containerId);
+
+        // ⭐ Each plot gets its own canvas — no overwriting
         let canvas = container.querySelector("canvas");
         if (!canvas) {
             canvas = document.createElement("canvas");
-            canvas.width = 900;
-            canvas.height = 350;
+            canvas.width = 1000;
+            canvas.height = 420;
             canvas.style.width = "100%";
             canvas.style.border = "1px solid #333";
             canvas.style.background = "#000";
             container.innerHTML = "";
             container.appendChild(canvas);
         }
+
         return canvas.getContext("2d");
     }
 
@@ -48,21 +50,21 @@ export const PlotEngine = (() => {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Plot area
-        const padding = 60;
+        const padding = 80;
         const left = padding;
         const right = canvas.width - padding;
         const top = padding;
         const bottom = canvas.height - padding;
 
-        // Title
+        // ⭐ Title (bigger)
         ctx.fillStyle = "#fff";
-        ctx.font = "18px Arial";
-        if (title) ctx.fillText(title, left, top - 25);
+        ctx.font = "22px Arial";
+        if (title) ctx.fillText(title, left, top - 35);
 
-        // Axis labels
-        ctx.font = "14px Arial";
-        if (xLabel) ctx.fillText(xLabel, (left + right) / 2 - 40, bottom + 40);
-        if (yLabel) ctx.fillText(yLabel, left - 50, (top + bottom) / 2);
+        // ⭐ Axis labels (bigger)
+        ctx.font = "18px Arial";
+        if (xLabel) ctx.fillText(xLabel, (left + right) / 2 - 40, bottom + 50);
+        if (yLabel) ctx.fillText(yLabel, left - 70, (top + bottom) / 2);
 
         if (!data || data.length === 0) return;
 
@@ -83,9 +85,9 @@ export const PlotEngine = (() => {
             return bottom - ((y - minY) / spanY) * (bottom - top);
         }
 
-        // ⭐ GRID LINES ⭐
+        // ⭐ Grid lines (bigger, clearer)
         ctx.strokeStyle = "#222";
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 1.5;
 
         const gridLines = 10;
 
@@ -106,9 +108,9 @@ export const PlotEngine = (() => {
             ctx.stroke();
         }
 
-        // ⭐ TICK MARKS + NUMBERS ⭐
+        // ⭐ Tick marks + numbers (bigger)
         ctx.fillStyle = "#ccc";
-        ctx.font = "12px Arial";
+        ctx.font = "16px Arial";
 
         for (let i = 0; i <= gridLines; i++) {
             const gx = left + (i / gridLines) * (right - left);
@@ -118,24 +120,24 @@ export const PlotEngine = (() => {
             const yVal = minY + (i / gridLines) * spanY;
 
             // X-axis ticks
-            ctx.fillText(xVal.toFixed(0), gx - 10, bottom + 20);
+            ctx.fillText(xVal.toFixed(0), gx - 12, bottom + 30);
 
             // Y-axis ticks
-            ctx.fillText(yVal.toFixed(1), left - 45, gy + 4);
+            ctx.fillText(yVal.toFixed(1), left - 55, gy + 5);
         }
 
-        // ⭐ AXES ⭐
+        // ⭐ Axes (thicker)
         ctx.strokeStyle = "#888";
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(left, top);
         ctx.lineTo(left, bottom);
         ctx.lineTo(right, bottom);
         ctx.stroke();
 
-        // ⭐ DATA LINE ⭐
+        // ⭐ Data line (thicker, brighter)
         ctx.strokeStyle = "#00ff88";
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         ctx.beginPath();
 
         data.forEach((p, i) => {
