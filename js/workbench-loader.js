@@ -67,17 +67,11 @@ function route() {
             loadModule("./modules/dominator.js");
             break;
 
-        case "#user-manual":
-            root.innerHTML = `<h2>User Manual</h2><p>Coming soon.</p>`;
-            break;
-
-        case "#quick-start":
-            root.innerHTML = `<h2>Quick Start</h2><p>Coming soon.</p>`;
-            break;
-
-        case "#glossary":
-            root.innerHTML = `<h2>Glossary</h2><p>Coming soon.</p>`;
-            break;
+        /* ---------------------------------------------------------
+           HELP ROUTES REMOVED
+           These were overriding your real help files.
+           Navigation now loads help/*.html directly.
+        --------------------------------------------------------- */
 
         default:
             root.innerHTML = `<h2>Unknown route</h2>`;
