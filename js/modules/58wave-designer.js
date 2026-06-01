@@ -1,5 +1,7 @@
 /* ---------------------------------------------------------
-   HF Workbench — 5/8 Wave Vertical Designer (with polar plots)
+   HF Workbench — 5/8 Wave Vertical Designer
+   - Polar plots (azimuth + elevation)
+   - Metric + imperial (ft + in, 1/8" precision)
 --------------------------------------------------------- */
 
 import { requireFrequency, requirePositive, toNumber } from "../validators.js";
@@ -9,8 +11,48 @@ import { GeometryEngine } from "../engines/geometry-engine.js";
 import { BoostEngine } from "../engines/boost-engine.js";
 import { TransformerEngine } from "../engines/transformer-engine.js";
 
+// Simple 5/8λ base gain model
 function base58WaveGain() {
     return 2.0;
+}
+
+// Convert meters → "X ft Y⅛ in" (nearest 1/8")
+function formatFeetInches(meters) {
+    const feetTotal = meters * 3.28084;
+    let feet = Math.floor(Math.abs(feetTotal));
+    let inches = (Math.abs(feetTotal) - feet) * 12;
+
+    // Round to nearest 1/8 inch
+    const eighths = Math.round(inches * 8);
+    inches = eighths / 8;
+
+    // Normalize if inches >= 12
+    if (inches >= 12) {
+        feet += 1;
+        inches -= 12;
+    }
+
+    // Build inches string with fraction if needed
+    const wholeInches = Math.floor(inches);
+    const frac = inches - wholeInches;
+    let fracStr = "";
+
+    const eighth = Math.round(frac * 8); // 0..7
+    if (eighth > 0) {
+        fracStr = `${eighth}/8`;
+    }
+
+    let inchPart = "";
+    if (wholeInches === 0 && fracStr) {
+        inchPart = `${fracStr} in`;
+    } else if (fracStr) {
+        inchPart = `${wholeInches} ${fracStr} in`;
+    } else {
+        inchPart = `${wholeInches} in`;
+    }
+
+    const sign = feetTotal < 0 ? "-" : "";
+    return `${sign}${feet} ft ${inchPart}`;
 }
 
 export function init({ PlotEngine, container }) {
@@ -162,15 +204,20 @@ export function init({ PlotEngine, container }) {
             finalToa
         });
 
+        const idealHeightImperial = formatFeetInches(idealHeight);
+        const actualHeightImperial = formatFeetInches(height);
+        const heightDeltaImperial = formatFeetInches(heightDelta);
+        const radialLengthImperial = formatFeetInches(radialLength);
+
         summaryDiv.innerHTML = `
             <div class="info">
                 <p><strong>Operating frequency:</strong> ${freq.toFixed(2)} MHz (${band?.label ?? "Unknown band"})</p>
 
-                <p><strong>Ideal 5/8λ height:</strong> ${idealHeight.toFixed(2)} m<br>
-                   <strong>Actual height:</strong> ${height.toFixed(2)} m<br>
-                   <strong>Height offset:</strong> ${heightDelta >= 0 ? "+" : ""}${heightDelta.toFixed(2)} m</p>
+                <p><strong>Ideal 5/8λ height:</strong> ${idealHeight.toFixed(2)} m (${idealHeightImperial})<br>
+                   <strong>Actual height:</strong> ${height.toFixed(2)} m (${actualHeightImperial})<br>
+                   <strong>Height offset:</strong> ${heightDelta >= 0 ? "+" : ""}${heightDelta.toFixed(2)} m (${heightDeltaImperial})</p>
 
-                <p><strong>Radial system:</strong> ${radialCount.toFixed(0)} × ${radialLength.toFixed(1)} m</p>
+                <p><strong>Radial system:</strong> ${radialCount.toFixed(0)} × ${radialLength.toFixed(1)} m (${radialLengthImperial})</p>
 
                 <p><strong>Base 5/8λ gain:</strong> ${baseGain.toFixed(1)} dBi</p>
 
@@ -182,6 +229,7 @@ export function init({ PlotEngine, container }) {
             </div>
         `;
 
+        // Polar patterns
         PlotEngine.clearPlot("v58-az");
         PlotEngine.clearPlot("v58-el");
 
