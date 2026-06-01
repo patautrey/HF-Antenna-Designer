@@ -1,14 +1,12 @@
 // js/master-index.js
 // HF Antenna Designer — Router + Sidebar UI
-// Uses antenna modules in js/modules/
+// Antenna modules live directly in js/ (same folder as this file)
 
 import { PlotEngine } from "./plot-engine.js";
 
 // ---------------------------------------------------------------------------
 // MODULE REGISTRY
 // ---------------------------------------------------------------------------
-// Filenames taken directly from your File List PDF.
-// All paths resolved as "./modules/<file>.js".
 
 const MODULES = [
     // --- Horizontal / loops / dipoles ---
@@ -119,7 +117,8 @@ const MODULES = [
 // ---------------------------------------------------------------------------
 
 function modulePath(file) {
-    return `./modules/${file}`;
+    // Antenna modules live in the same folder as this file: /js/
+    return `./${file}`;
 }
 
 // ---------------------------------------------------------------------------
