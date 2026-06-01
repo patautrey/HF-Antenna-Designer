@@ -2,12 +2,201 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>User Manual</title>
+    <title>HF Workbench – User Manual</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.5; padding: 20px; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #003366; }
+        h1 { border-bottom: 2px solid #003366; padding-bottom: 0.3rem; }
+        code { background: #f4f4f4; padding: 2px 4px; border-radius: 3px; }
+        ul { margin-left: 1.2rem; }
+        .tool-name { font-weight: bold; }
+        .section { margin-bottom: 2rem; }
+        .note { background: #fff8d5; border-left: 4px solid #e0c200; padding: 0.6rem 0.8rem; margin: 1rem 0; }
+    </style>
 </head>
+<body>
 
-<body style="font-family: Arial; padding: 20px;">
-    <h1>User Manual</h1>
-    <p>This page is loading correctly. Add your manual content here.</p>
+<h1>HF Workbench – User Manual</h1>
+
+<div class="section">
+    <h2>1. Overview</h2>
+    <p>
+        HF Workbench is a collection of web-based tools for designing and exploring HF antennas.
+        It runs entirely in your browser—no installation required—and focuses on practical,
+        “operator-first” design workflows.
+    </p>
+    <p>The current tool set includes:</p>
+    <ul>
+        <li><span class="tool-name">Doublet Designer</span> – General-purpose multi-band doublet planning.</li>
+        <li><span class="tool-name">Loop Designer</span> – Small loop / magnetic loop style designs.</li>
+        <li><span class="tool-name">Skyloop Designer</span> – Large horizontal loop / skyloop planning.</li>
+        <li><span class="tool-name">Vertical DX Designer</span> – Ground-mounted or elevated verticals for DX.</li>
+        <li><span class="tool-name">Vertical NVIS Designer</span> – Low-angle verticals optimized for NVIS coverage.</li>
+        <li><span class="tool-name">Performer Vertical</span> – Performance-focused vertical configuration tool.</li>
+        <li><span class="tool-name">Dominator Array</span> – Multi-element vertical array exploration.</li>
+    </ul>
+    <div class="note">
+        <strong>Note:</strong> HF Workbench is a design aid, not a replacement for on-air testing.
+        Always verify modeled performance with real-world measurements where possible.
+    </div>
+</div>
+
+<div class="section">
+    <h2>2. Navigation and Layout</h2>
+    <h3>2.1 Top Navigation Bar</h3>
+    <p>
+        The top navigation bar provides quick access to the main tools and help resources:
+    </p>
+    <ul>
+        <li><strong>Home</strong> – Returns to the HF Workbench welcome screen.</li>
+        <li><strong>Doublet</strong>, <strong>Loop</strong>, <strong>Skyloop</strong> – Open the corresponding designer modules.</li>
+        <li><strong>Verticals ▼</strong> – Dropdown with:
+            <ul>
+                <li>Vertical DX Designer</li>
+                <li>Vertical NVIS Designer</li>
+                <li>Performer Vertical</li>
+                <li>Dominator Array</li>
+            </ul>
+        </li>
+        <li><strong>Help ▼</strong> – Dropdown with:
+            <ul>
+                <li>User Manual (this page)</li>
+                <li>Quick Start</li>
+                <li>Glossary</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3>2.2 Main Content Area</h3>
+    <p>
+        The main content area (center of the page) is where each tool’s interface is loaded.
+        When you select a tool from the navigation bar, HF Workbench dynamically loads that module
+        into the content area without reloading the entire page.
+    </p>
+</div>
+
+<div class="section">
+    <h2>3. Common Concepts</h2>
+    <p>
+        Several concepts appear across multiple tools. Understanding these will make the
+        individual designers easier to use.
+    </p>
+
+    <h3>3.1 Frequency and Bands</h3>
+    <ul>
+        <li><strong>Design Frequency</strong> – The primary frequency (or band) the tool uses for calculations.</li>
+        <li><strong>Multi-band Behavior</strong> – Some tools show how a given geometry behaves on multiple HF bands.</li>
+    </ul>
+
+    <h3>3.2 Wire Lengths and Geometry</h3>
+    <ul>
+        <li><strong>Total Length</strong> – Overall wire length of the antenna (e.g., total doublet length).</li>
+        <li><strong>Leg Length</strong> – Length of each side of a center-fed antenna.</li>
+        <li><strong>Height</strong> – Average or maximum height above ground.</li>
+        <li><strong>Shape</strong> – Straight, loop, skyloop, or multi-element vertical arrangements.</li>
+    </ul>
+
+    <h3>3.3 Feedline and Matching</h3>
+    <ul>
+        <li><strong>Feedpoint Impedance</strong> – The modeled impedance at the antenna feedpoint.</li>
+        <li><strong>Feedline Type</strong> – Coax, ladder line, or other transmission line types.</li>
+        <li><strong>Matching Network</strong> – External tuner or matching system used to achieve a good match at the rig.</li>
+    </ul>
+</div>
+
+<div class="section">
+    <h2>4. Tool Reference</h2>
+
+    <h3>4.1 Doublet Designer</h3>
+    <p>
+        The Doublet Designer helps you plan a multi-band center-fed wire antenna.
+        It is especially useful for 80–10m coverage using a tuner and balanced feedline.
+    </p>
+    <ul>
+        <li><strong>Inputs:</strong> desired bands, total length, height, feedline type.</li>
+        <li><strong>Outputs:</strong> approximate impedance by band, pattern hints, and tuning expectations.</li>
+    </ul>
+
+    <h3>4.2 Loop Designer</h3>
+    <p>
+        The Loop Designer focuses on small or medium-sized loops, often used where space is limited
+        or where noise rejection is important.
+    </p>
+    <ul>
+        <li><strong>Inputs:</strong> loop circumference, shape, height, frequency.</li>
+        <li><strong>Outputs:</strong> approximate radiation resistance, efficiency hints, and pattern notes.</li>
+    </ul>
+
+    <h3>4.3 Skyloop Designer</h3>
+    <p>
+        The Skyloop Designer is for large horizontal loops (often full-wave or larger on 80m or 40m),
+        typically used for all-band coverage with a tuner.
+    </p>
+    <ul>
+        <li><strong>Inputs:</strong> perimeter, average height, band coverage goals.</li>
+        <li><strong>Outputs:</strong> band-by-band behavior, likely lobes, and NVIS vs DX tendencies.</li>
+    </ul>
+
+    <h3>4.4 Vertical DX Designer</h3>
+    <p>
+        The Vertical DX Designer helps you configure vertical antennas aimed at low-angle radiation
+        for long-distance (DX) contacts.
+    </p>
+    <ul>
+        <li><strong>Inputs:</strong> vertical height, radial system details, ground type, target band(s).</li>
+        <li><strong>Outputs:</strong> estimated takeoff angle, efficiency hints, and pattern notes.</li>
+    </ul>
+
+    <h3>4.5 Vertical NVIS Designer</h3>
+    <p>
+        The Vertical NVIS Designer focuses on vertical configurations optimized for near-vertical
+        incidence skywave (NVIS) coverage—short to medium HF distances.
+    </p>
+    <ul>
+        <li><strong>Inputs:</strong> height, loading options, band selection.</li>
+        <li><strong>Outputs:</strong> higher-angle radiation emphasis and coverage expectations.</li>
+    </ul>
+
+    <h3>4.6 Performer Vertical</h3>
+    <p>
+        The Performer Vertical tool is oriented toward squeezing performance out of a single vertical
+        within practical constraints (yard size, support height, radial count).
+    </p>
+    <ul>
+        <li><strong>Inputs:</strong> available height, radial count/length, band goals.</li>
+        <li><strong>Outputs:</strong> tradeoff guidance between efficiency, bandwidth, and complexity.</li>
+    </ul>
+
+    <h3>4.7 Dominator Array</h3>
+    <p>
+        The Dominator Array tool explores multi-element vertical arrays for pattern control
+        (gain and directivity).
+    </p>
+    <ul>
+        <li><strong>Inputs:</strong> number of elements, spacing, phasing, band.</li>
+        <li><strong>Outputs:</strong> qualitative pattern behavior (forward gain, F/B expectations).</li>
+    </ul>
+</div>
+
+<div class="section">
+    <h2>5. Workflow Tips</h2>
+    <ul>
+        <li><strong>Start simple:</strong> Begin with a single-band design, then expand to multi-band.</li>
+        <li><strong>Document your choices:</strong> Keep notes on lengths, heights, and feedline choices.</li>
+        <li><strong>Iterate:</strong> Use the tools to explore “what if” scenarios before cutting wire.</li>
+        <li><strong>Validate on air:</strong> Use real QSOs, RBN spots, and reports to confirm performance.</li>
+    </ul>
+</div>
+
+<div class="section">
+    <h2>6. Getting Help</h2>
+    <p>
+        For quick reminders, see the <strong>Quick Start</strong> page. For terminology, see the
+        <strong>Glossary</strong>. This User Manual is intended as the “big picture” reference
+        for how the HF Workbench is organized and how the tools fit together.
+    </p>
+</div>
+
 </body>
 </html>
