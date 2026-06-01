@@ -4,57 +4,46 @@
     <meta charset="UTF-8">
     <title>HF Workbench</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <link rel="stylesheet" href="./css/workbench.css">
 </head>
 
 <body>
 
-    <!-- ============================
-         TOP NAVIGATION BAR
-    ============================= -->
-    <header class="topnav">
+<header class="topnav">
 
-        <a href="#home" class="nav-item">Home</a>
-        <a href="#doublet" class="nav-item">Doublet</a>
-        <a href="#loop" class="nav-item">Loop</a>
-        <a href="#skyloop" class="nav-item">Skyloop</a>
+    <a href="#home" class="nav-item">Home</a>
+    <a href="#doublet" class="nav-item">Doublet</a>
+    <a href="#loop" class="nav-item">Loop</a>
+    <a href="#skyloop" class="nav-item">Skyloop</a>
 
-        <!-- Verticals Dropdown -->
-        <div class="dropdown">
-            <button class="dropdown-btn">Verticals ▼</button>
-            <div class="dropdown-content">
-                <a href="#vertical-dx">Vertical DX Designer</a>
-                <a href="#vertical-nvis">Vertical NVIS Designer</a>
-                <a href="#performer">Performer Vertical</a>
-                <a href="#dominator">Dominator Array</a>
-            </div>
+    <!-- Verticals Dropdown -->
+    <div class="dropdown">
+        <div class="dropdown-btn">Verticals ▼</div>
+        <div class="dropdown-content">
+            <a href="#vertical-dx">Vertical DX Designer</a>
+            <a href="#vertical-nvis">Vertical NVIS Designer</a>
+            <a href="#performer">Performer Vertical</a>
+            <a href="#dominator">Dominator Array</a>
         </div>
+    </div>
 
-        <!-- Help Dropdown -->
-        <div class="dropdown">
-            <button class="dropdown-btn">Help ▼</button>
-            <div class="dropdown-content">
-                <a href="#user-manual">User Manual</a>
-                <a href="#quick-start">Quick Start</a>
-                <a href="#glossary">Glossary</a>
-            </div>
+    <!-- Help Dropdown -->
+    <div class="dropdown">
+        <div class="dropdown-btn">Help ▼</div>
+        <div class="dropdown-content">
+            <a href="help/user-manual.html" target="_blank">User Manual</a>
+            <a href="help/quick-start.html" target="_blank">Quick Start</a>
+            <a href="help/glossary.html" target="_blank">Glossary</a>
         </div>
+    </div>
 
-    </header>
+</header>
 
-    <!-- ============================
-         MAIN RENDER TARGET
-         (This is the missing piece)
-    ============================= -->
-    <main>
-        <div id="content"></div>
-    </main>
+<main>
+    <div id="content"></div>
+</main>
 
-    <!-- ============================
-         SCRIPT LOADER
-    ============================= -->
-    <script type="module" src="./js/workbench-loader.js"></script>
+<script type="module" src="./js/workbench-loader.js"></script>
 
 </body>
 </html>
