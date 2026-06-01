@@ -1,8 +1,9 @@
 // js/plot-engine.js
-// HF Antenna Designer — Plot Engine
-// Centralized plotting utilities (SWR, gain, TOA, loss, etc.)
+// HF Antenna Designer — Enhanced Plot Engine
+// Adds grid lines, tick marks, numeric labels, and clearer rendering.
 
 export const PlotEngine = (() => {
+
     function ensureContainer(containerId = "plot-area") {
         let container = document.getElementById(containerId);
         if (!container) {
@@ -20,8 +21,8 @@ export const PlotEngine = (() => {
         let canvas = container.querySelector("canvas");
         if (!canvas) {
             canvas = document.createElement("canvas");
-            canvas.width = 800;
-            canvas.height = 300;
+            canvas.width = 900;
+            canvas.height = 350;
             canvas.style.width = "100%";
             canvas.style.border = "1px solid #333";
             canvas.style.background = "#000";
@@ -46,27 +47,22 @@ export const PlotEngine = (() => {
         ctx.fillStyle = "#000";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Axes
-        const padding = 50;
+        // Plot area
+        const padding = 60;
         const left = padding;
         const right = canvas.width - padding;
         const top = padding;
         const bottom = canvas.height - padding;
 
-        ctx.strokeStyle = "#666";
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(left, top);
-        ctx.lineTo(left, bottom);
-        ctx.lineTo(right, bottom);
-        ctx.stroke();
-
-        // Labels
+        // Title
         ctx.fillStyle = "#fff";
+        ctx.font = "18px Arial";
+        if (title) ctx.fillText(title, left, top - 25);
+
+        // Axis labels
         ctx.font = "14px Arial";
-        if (title) ctx.fillText(title, left, top - 20);
-        if (xLabel) ctx.fillText(xLabel, (left + right) / 2 - 40, bottom + 30);
-        if (yLabel) ctx.fillText(yLabel, left - 45, (top + bottom) / 2);
+        if (xLabel) ctx.fillText(xLabel, (left + right) / 2 - 40, bottom + 40);
+        if (yLabel) ctx.fillText(yLabel, left - 50, (top + bottom) / 2);
 
         if (!data || data.length === 0) return;
 
@@ -87,62 +83,73 @@ export const PlotEngine = (() => {
             return bottom - ((y - minY) / spanY) * (bottom - top);
         }
 
+        // ⭐ GRID LINES ⭐
+        ctx.strokeStyle = "#222";
+        ctx.lineWidth = 1;
+
+        const gridLines = 10;
+
+        for (let i = 0; i <= gridLines; i++) {
+            const gx = left + (i / gridLines) * (right - left);
+            const gy = top + (i / gridLines) * (bottom - top);
+
+            // Vertical grid
+            ctx.beginPath();
+            ctx.moveTo(gx, top);
+            ctx.lineTo(gx, bottom);
+            ctx.stroke();
+
+            // Horizontal grid
+            ctx.beginPath();
+            ctx.moveTo(left, gy);
+            ctx.lineTo(right, gy);
+            ctx.stroke();
+        }
+
+        // ⭐ TICK MARKS + NUMBERS ⭐
+        ctx.fillStyle = "#ccc";
+        ctx.font = "12px Arial";
+
+        for (let i = 0; i <= gridLines; i++) {
+            const gx = left + (i / gridLines) * (right - left);
+            const gy = bottom - (i / gridLines) * (bottom - top);
+
+            const xVal = minX + (i / gridLines) * spanX;
+            const yVal = minY + (i / gridLines) * spanY;
+
+            // X-axis ticks
+            ctx.fillText(xVal.toFixed(0), gx - 10, bottom + 20);
+
+            // Y-axis ticks
+            ctx.fillText(yVal.toFixed(1), left - 45, gy + 4);
+        }
+
+        // ⭐ AXES ⭐
+        ctx.strokeStyle = "#888";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(left, top);
+        ctx.lineTo(left, bottom);
+        ctx.lineTo(right, bottom);
+        ctx.stroke();
+
+        // ⭐ DATA LINE ⭐
         ctx.strokeStyle = "#00ff88";
         ctx.lineWidth = 2;
         ctx.beginPath();
+
         data.forEach((p, i) => {
             const px = mapX(p.x);
             const py = mapY(p.y);
             if (i === 0) ctx.moveTo(px, py);
             else ctx.lineTo(px, py);
         });
+
         ctx.stroke();
-    }
-
-    // Convenience wrappers
-
-    function drawSWRPlot(points) {
-        drawLinePlot({
-            title: "SWR vs Frequency",
-            xLabel: "Frequency (MHz)",
-            yLabel: "SWR",
-            data: points
-        });
-    }
-
-    function drawGainPlot(points) {
-        drawLinePlot({
-            title: "Gain vs Frequency",
-            xLabel: "Frequency (MHz)",
-            yLabel: "Gain (dBi)",
-            data: points
-        });
-    }
-
-    function drawTOAPlot(points) {
-        drawLinePlot({
-            title: "Take-Off Angle vs Height",
-            xLabel: "Height (m)",
-            yLabel: "TOA (degrees)",
-            data: points
-        });
-    }
-
-    function drawLossPlot(points) {
-        drawLinePlot({
-            title: "Feedline Loss vs Frequency",
-            xLabel: "Frequency (MHz)",
-            yLabel: "Loss (dB)",
-            data: points
-        });
     }
 
     return {
         clearPlot,
-        drawLinePlot,
-        drawSWRPlot,
-        drawGainPlot,
-        drawTOAPlot,
-        drawLossPlot
+        drawLinePlot
     };
 })();
