@@ -124,3 +124,162 @@ export default function initDoubletDesigner(root) {
     const heightInput = document.getElementById("db-height");
 
     const feedTypeInput = document.getElementById("db-feed-type");
+    const feedLenInput = document.getElementById("db-feed-length");
+
+    const refEnable = document.getElementById("db-ref-enable");
+    const refWires = document.getElementById("db-ref-wires");
+    const refSpacing = document.getElementById("db-ref-spacing");
+    const refHeight = document.getElementById("db-ref-height");
+
+    const todInput = document.getElementById("db-tod");
+    const seasideInput = document.getElementById("db-seaside");
+    const groundScreenInput = document.getElementById("db-groundscreen");
+
+    const coaxTypeInput = document.getElementById("db-coax-type");
+    const coaxLenInput = document.getElementById("db-coax-length");
+
+    const summaryDiv = document.getElementById("db-summary");
+    const button = document.getElementById("db-compute");
+
+    button.addEventListener("click", () => {
+        const errors = [];
+
+        const freq = toNumber(freqInput.value);
+        const totalLength = toNumber(lengthInput.value);
+        const height = toNumber(heightInput.value);
+
+        requireFrequency(freq, errors);
+        requirePositive(totalLength, "Total wire length", errors);
+        requirePositive(height, "Height", errors);
+
+        if (errors.length) {
+            summaryDiv.innerHTML = warnBox(errors.join("<br>"));
+            return;
+        }
+
+        const band = findBand(freq);
+        const lambda = wavelength(freq);
+        const frac = totalLength / lambda;
+
+        // Geometry
+        const geom = GeometryEngine.computeGeometry({
+            freqMHz: freq,
+            heightM: height,
+            dxTurbo: false,
+            foldoverEnabled: false,
+            foldAngleDeg: 0,
+            linearLoadingEnabled: false,
+            linearLoadingFactor: 0,
+            coilEnabled: false,
+            coilPosition: "base",
+            coilQ: 0,
+            hatEnabled: false,
+            hatRadiusM: 0,
+            hatSpokes: 0
+        });
+
+        const baseGain = baseDoubletGain(frac);
+
+        // NVIS reflector
+        let reflector = null;
+        if (refEnable.checked) {
+            reflector = computeNVISReflector({
+                freqMHz: freq,
+                wires: toNumber(refWires.value),
+                spacingM: toNumber(refSpacing.value),
+                heightM: toNumber(refHeight.value)
+            });
+        }
+
+        // Boost
+        const boost = BoostEngine.computeBoost({
+            reflectorCount: 0,
+            directorCount: 0,
+            timeOfDay: todInput.value,
+            seaside: seasideInput.checked,
+            groundScreen: groundScreenInput.checked,
+            elevatedRadials: false,
+            nvisReflector: refEnable.checked,
+            feedlineFamily: "ladder",
+            feedlineType: feedTypeInput.value,
+            feedlineLengthFt: toNumber(feedLenInput.value),
+            dxTurboPatternBonus: false,
+            coaxJumperType: coaxTypeInput.value,
+            coaxJumperLengthFt: toNumber(coaxLenInput.value)
+        });
+
+        const reflectorGain = reflector?.gainDb ?? 0;
+        const reflectorToaShift = reflector?.toaShift ?? 0;
+
+        const totalGain =
+            baseGain +
+            geom.totalGeomGainDelta +
+            boost.totalBoost +
+            reflectorGain;
+
+        const finalToa = Math.max(
+            40,
+            Math.min(90, geom.toa + boost.toaShift + reflectorToaShift)
+        );
+
+        const geomLines = geom.components?.length
+            ? geom.components.map(c => c.note ?? "").join("<br>")
+            : "No additional geometry modifiers.";
+
+        const boostLines = boost.components?.length
+            ? boost.components.map(d => {
+                const parts = [];
+                if (typeof d.boost === "number") {
+                    parts.push(`${d.boost.toFixed(1)} dB from ${d.label}`);
+                } else {
+                    parts.push(d.label);
+                }
+                if (d.toaShift) {
+                    parts.push(`TOA shift ${d.toaShift > 0 ? "+" : ""}${d.toaShift}°`);
+                }
+                return parts.join(" — ");
+            }).join("<br>")
+            : "No boost options enabled.";
+
+        const reflectorLines = reflector
+            ? logNVISReflector(reflector).replace(/\n/g, "<br>")
+            : "No NVIS reflector enabled.";
+
+        const transformerHtml = TransformerEngine.getTransformerNote("doublet", "ladder");
+
+        log("Doublet Designer", {
+            freq,
+            totalLength,
+            height,
+            geom,
+            baseGain,
+            boost,
+            reflector,
+            totalGain,
+            finalToa
+        });
+
+        summaryDiv.innerHTML = infoBox(`
+            <p><strong>Design frequency:</strong> ${freq.toFixed(2)} MHz (${band?.label ?? "Unknown band"})</p>
+
+            <p><strong>Total wire length:</strong> ${totalLength.toFixed(1)} m</p>
+            <p><strong>Electrical length:</strong> ${(frac * 100).toFixed(1)}% of λ</p>
+
+            <p><strong>Height:</strong> ${height.toFixed(1)} m</p>
+
+            <p><strong>Base Gain (no boosts):</strong> ${baseGain.toFixed(1)} dBi</p>
+
+            <p><strong>Geometry adjustments:</strong><br>${geomLines}</p>
+
+            <p><strong>Boost breakdown:</strong><br>${boostLines}</p>
+
+            <p><strong>NVIS reflector:</strong><br>${reflectorLines}</p>
+
+            <p><strong>Total estimated gain:</strong> ${totalGain.toFixed(1)} dBi</p>
+
+            <p><strong>Estimated TOA:</strong> ${finalToa.toFixed(0)}°</p>
+
+            ${transformerHtml}
+        `);
+    });
+}
