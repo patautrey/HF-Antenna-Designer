@@ -1,12 +1,14 @@
 // js/master-index.js
 // HF Antenna Designer — Master Router & UI
-// Uses existing antenna modules; no changes required to them.
+// Uses your existing antenna modules; no renaming required.
 
 import { PlotEngine } from "./plot-engine.js";
 
-// ---- MODULE MANIFEST ------------------------------------------------------
-// You can extend this list over time. Start with key designers;
-// add more entries as you go. No need to rename existing files.
+// ---------------------------------------------------------------------------
+// MODULE MANIFEST
+// ---------------------------------------------------------------------------
+// This is the only place you "register" modules for the UI.
+// Paths match the filenames you already have in your repo listing.
 
 const MODULES = [
     // Horizontal / loops / dipoles
@@ -14,37 +16,60 @@ const MODULES = [
     { id: "skyloop",        label: "Skyloop Designer",           category: "Horizontal",   path: "./skyloop-designer.js" },
     { id: "loop",           label: "Horizontal Loop Designer",   category: "Horizontal",   path: "./loop-designer.js" },
     { id: "fullwave-loop",  label: "Fullwave Loop Designer",     category: "Horizontal",   path: "./fullwave-loop-designer.js" },
-    { id: "delta-loop",     label: "Delta Loop Designer",        category: "Horizontal",   path: "./hf-delta-loop.js" },
+    { id: "horizontal-loop",label: "HF Horizontal Loop",         category: "Horizontal",   path: "./horizontal-loop-designer.js" },
+    { id: "fan-dipole",     label: "Fan Dipole Designer",        category: "Horizontal",   path: "./fan-dipole-designer.js" },
+    { id: "nvis-dipole",    label: "NVIS Dipole Designer",       category: "Horizontal",   path: "./nvis-dipole-designer.js" },
+    { id: "ocf-dipole",     label: "OCF Dipole Designer",        category: "Horizontal",   path: "./ocf-dipole-designer.js" },
 
     // Verticals
     { id: "vertical-dx",    label: "Vertical DX Designer",       category: "Vertical",     path: "./vertical-dx-designer.js" },
     { id: "vertical-nvis",  label: "Vertical NVIS Designer",     category: "Vertical",     path: "./vertical-nvis-designer.js" },
+    { id: "vertical",       label: "General Vertical Designer",  category: "Vertical",     path: "./vertical-designer.js" },
     { id: "quarterwave",    label: "Quarter-wave Vertical",      category: "Vertical",     path: "./quarterwave-designer.js" },
-    { id: "5-8wave",        label: "5/8-wave Vertical",          category: "Vertical",     path: "./58wave-designer.js" },
+    { id: "58wave",         label: "5/8-wave Vertical",          category: "Vertical",     path: "./58wave-designer.js" },
+    { id: "vertical-array-2el", label: "Vertical Array 2el",     category: "Vertical",     path: "./vertical-array-2el-designer.js" },
+    { id: "vertical-array-3el", label: "Vertical Array 3el",     category: "Vertical",     path: "./vertical-array-3el-designer.js" },
+    { id: "rybakov",        label: "Rybakov Vertical Designer",  category: "Vertical",     path: "./rybakov-designer.js" },
 
-    // Arrays / beams
+    // Arrays / beams / quads
     { id: "yagi",           label: "Yagi Designer",              category: "Arrays & Beams", path: "./yagi-designer.js" },
+    { id: "lpda",           label: "LPDA Designer",              category: "Arrays & Beams", path: "./lpda-designer.js" },
     { id: "quad",           label: "Quad Designer",              category: "Arrays & Beams", path: "./quad-designer.js" },
+    { id: "moxon",          label: "Moxon Designer",             category: "Arrays & Beams", path: "./moxon-designer.js" },
     { id: "curtain",        label: "Curtain Array Designer",     category: "Arrays & Beams", path: "./curtainarray-designer.js" },
+    { id: "rhombic",        label: "Rhombic Designer",           category: "Arrays & Beams", path: "./rhombic-designer.js" },
+    { id: "sterba",         label: "Sterba Curtain Designer",    category: "Arrays & Beams", path: "./sterba-designer.js" },
+    { id: "vbeam",          label: "V-Beam Designer",            category: "Arrays & Beams", path: "./vbeam-designer.js" },
+    { id: "foursquare",     label: "Foursquare Designer",        category: "Arrays & Beams", path: "./foursquare-designer.js" },
     { id: "bobtail",        label: "Bobtail Curtain Designer",   category: "Arrays & Beams", path: "./bobtail-designer.js" },
-    { id: "vertical-array-2el", label: "Vertical Array 2el",     category: "Arrays & Beams", path: "./vertical-array-2el-designer.js" },
 
     // End-fed / EFHW / random wire
     { id: "efhw",           label: "EFHW Designer",              category: "End-Fed & Random", path: "./efhw-designer.js" },
+    { id: "efhw-lab",       label: "EFHW Lab",                   category: "End-Fed & Random", path: "./efhw-lab.js" },
     { id: "randomwire",     label: "Random Wire Designer",       category: "End-Fed & Random", path: "./randomwire-designer.js" },
-    { id: "ocf-dipole",     label: "OCF Dipole Designer",        category: "End-Fed & Random", path: "./ocf-dipole-designer.js" },
+    { id: "terminated-dipole", label: "Terminated Dipole",       category: "End-Fed & Random", path: "./terminated-dipole.js" },
+    { id: "hf-randomwire-9to1", label: "Random Wire 9:1",        category: "End-Fed & Random", path: "./hf-random-wire-9to1.js" },
 
-    // Beverages / long wires
+    // Long wires / beverages
     { id: "beverage",       label: "Beverage Designer",          category: "Long Wire & Beverage", path: "./beverage-designer.js" },
-    { id: "longwire",       label: "Longwire Designer",          category: "Long Wire & Beverage", path: "./hf-longwire.js" },
+    { id: "hf-beverage",    label: "HF Beverage",                category: "Long Wire & Beverage", path: "./hf-beverage.js" },
+    { id: "hf-beverage-reverse-fed", label: "HF Beverage Reverse-fed", category: "Long Wire & Beverage", path: "./hf-beverage-reverse-fed.js" },
+    { id: "hf-longwire",    label: "HF Longwire",                category: "Long Wire & Beverage", path: "./hf-longwire.js" },
+    { id: "hf-sloping-longwire-directional", label: "Sloping Longwire Directional", category: "Long Wire & Beverage", path: "./hf-sloping-longwire-directional.js" },
 
     // Labs & tools
     { id: "feedline-lab",   label: "Feedline Lab",               category: "Labs & Tools",  path: "./coax-lab.js" },
     { id: "ground-lab",     label: "Ground Lab",                 category: "Labs & Tools",  path: "./ground-lab.js" },
+    { id: "ground-loss-lab",label: "Ground Loss Lab",            category: "Labs & Tools",  path: "./ground-loss-lab.js" },
     { id: "pattern-lab",    label: "Pattern Lab",                category: "Labs & Tools",  path: "./pattern-lab.js" },
     { id: "swr-lab",        label: "SWR Lab",                    category: "Labs & Tools",  path: "./swr-lab.js" },
+    { id: "noise-lab",      label: "Noise Lab",                  category: "Labs & Tools",  path: "./noise-lab.js" },
+    { id: "noise-snr-lab",  label: "Noise SNR Lab",              category: "Labs & Tools",  path: "./noise-snr-lab.js" },
     { id: "link-budget",    label: "Link Budget",                category: "Labs & Tools",  path: "./link-budget.js" },
+    { id: "loss-budget",    label: "Loss Budget",                category: "Labs & Tools",  path: "./loss-budget.js" },
     { id: "propagation",    label: "Propagation Explorer",       category: "Labs & Tools",  path: "./propagation.js" },
+    { id: "muf-luf",        label: "MUF/LUF Explorer",           category: "Labs & Tools",  path: "./muf-luf-explorer.js" },
+    { id: "system-gain",    label: "System Gain",                category: "Labs & Tools",  path: "./system-gain.js" },
     { id: "rf-safety",      label: "RF Safety",                  category: "Labs & Tools",  path: "./rf-safety.js" },
 
     // Docs
@@ -53,20 +78,25 @@ const MODULES = [
     { id: "glossary",       label: "Glossary",                   category: "Documentation", path: "./glossary.js" }
 ];
 
-// ---- STATE -----------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// STATE
+// ---------------------------------------------------------------------------
 
 const state = {
-    currentModuleId: null,
-    favorites: new Set()
+    currentModuleId: null
 };
 
-// ---- DOM HELPERS -----------------------------------------------------------
+// ---------------------------------------------------------------------------
+// DOM HELPERS
+// ---------------------------------------------------------------------------
 
 function $(id) {
     return document.getElementById(id);
 }
 
-// ---- SIDEBAR RENDERING -----------------------------------------------------
+// ---------------------------------------------------------------------------
+// SIDEBAR RENDERING
+// ---------------------------------------------------------------------------
 
 function groupByCategory(modules) {
     const map = new Map();
@@ -144,7 +174,9 @@ function renderModuleList(filterText) {
     });
 }
 
-// ---- MODULE LOADING --------------------------------------------------------
+// ---------------------------------------------------------------------------
+// MODULE LOADING
+// ---------------------------------------------------------------------------
 
 async function loadModuleById(id) {
     const mod = MODULES.find(m => m.id === id);
@@ -167,13 +199,14 @@ async function loadModuleById(id) {
         // Clear any existing plot
         PlotEngine.clearPlot();
 
-        // Convention: each designer exports an init function
+        // Convention: each designer may export init({ PlotEngine }) or default({ PlotEngine })
         if (typeof module.init === "function") {
-            await module.init({ PlotEngine });
+            await module.init({ PlotEngine, container: content });
         } else if (typeof module.default === "function") {
-            await module.default({ PlotEngine });
+            await module.default({ PlotEngine, container: content });
         } else {
-            content.innerHTML += `<p><em>Module loaded, but no init() or default() function was found.</em></p>`;
+            // If the module just writes to #content on its own, that's fine.
+            content.innerHTML += `<p><em>Module loaded. No init() or default() function detected; assuming self-rendering.</em></p>`;
         }
     } catch (err) {
         console.error(err);
@@ -187,11 +220,13 @@ function renderError(message) {
     content.innerHTML = `
         <h2>Error</h2>
         <p>${message}</p>
-        <p>Check the console for more details.</p>
+        <p>Check the browser console for more details.</p>
     `;
 }
 
-// ---- URL HASH HANDLING -----------------------------------------------------
+// ---------------------------------------------------------------------------
+// URL HASH HANDLING
+// ---------------------------------------------------------------------------
 
 function updateLocationHash(id) {
     if (!id) return;
@@ -216,7 +251,9 @@ window.addEventListener("hashchange", () => {
     loadModuleById(hash);
 });
 
-// ---- INIT ------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// INIT
+// ---------------------------------------------------------------------------
 
 function initApp() {
     renderSidebar();
