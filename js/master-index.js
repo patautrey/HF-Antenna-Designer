@@ -1,61 +1,91 @@
 // js/master-index.js
-// HF Antenna Designer — Auto‑Path Router + Sidebar UI
+// HF Antenna Designer — Router + Sidebar UI
+// Uses antenna modules in js/modules/
 
 import { PlotEngine } from "./plot-engine.js";
 
 // ---------------------------------------------------------------------------
 // MODULE REGISTRY
 // ---------------------------------------------------------------------------
-// You ONLY list the filenames. The router builds the correct "../" path.
-// No more broken imports. No more missing sidebar.
+// You ONLY list the filenames. The router builds "./modules/<file>" paths.
 
 const MODULES = [
     // Horizontal
-    { id: "doublet", label: "HF Doublet Designer", file: "doublet-designer.js", category: "Horizontal" },
-    { id: "skyloop", label: "Skyloop Designer", file: "skyloop-designer.js", category: "Horizontal" },
-    { id: "loop", label: "Horizontal Loop Designer", file: "loop-designer.js", category: "Horizontal" },
-    { id: "fullwave-loop", label: "Fullwave Loop Designer", file: "fullwave-loop-designer.js", category: "Horizontal" },
-    { id: "horizontal-loop", label: "HF Horizontal Loop", file: "horizontal-loop-designer.js", category: "Horizontal" },
+    { id: "doublet",        label: "HF Doublet Designer",        file: "doublet-designer.js",        category: "Horizontal" },
+    { id: "skyloop",        label: "Skyloop Designer",           file: "skyloop-designer.js",        category: "Horizontal" },
+    { id: "loop",           label: "Horizontal Loop Designer",   file: "loop-designer.js",           category: "Horizontal" },
+    { id: "fullwave-loop",  label: "Fullwave Loop Designer",     file: "fullwave-loop-designer.js",  category: "Horizontal" },
+    { id: "horizontal-loop",label: "HF Horizontal Loop",         file: "horizontal-loop-designer.js",category: "Horizontal" },
+    { id: "fan-dipole",     label: "Fan Dipole Designer",        file: "fan-dipole-designer.js",     category: "Horizontal" },
+    { id: "nvis-dipole",    label: "NVIS Dipole Designer",       file: "nvis-dipole-designer.js",    category: "Horizontal" },
+    { id: "ocf-dipole",     label: "OCF Dipole Designer",        file: "ocf-dipole-designer.js",     category: "Horizontal" },
 
     // Verticals
-    { id: "vertical-dx", label: "Vertical DX Designer", file: "vertical-dx-designer.js", category: "Vertical" },
-    { id: "vertical-nvis", label: "Vertical NVIS Designer", file: "vertical-nvis-designer.js", category: "Vertical" },
-    { id: "quarterwave", label: "Quarter-wave Vertical", file: "quarterwave-designer.js", category: "Vertical" },
-    { id: "58wave", label: "5/8-wave Vertical", file: "58wave-designer.js", category: "Vertical" },
+    { id: "vertical-dx",    label: "Vertical DX Designer",       file: "vertical-dx-designer.js",    category: "Vertical" },
+    { id: "vertical-nvis",  label: "Vertical NVIS Designer",     file: "vertical-nvis-designer.js",  category: "Vertical" },
+    { id: "vertical",       label: "General Vertical Designer",  file: "vertical-designer.js",       category: "Vertical" },
+    { id: "quarterwave",    label: "Quarter-wave Vertical",      file: "quarterwave-designer.js",    category: "Vertical" },
+    { id: "58wave",         label: "5/8-wave Vertical",          file: "58wave-designer.js",         category: "Vertical" },
+    { id: "vertical-array-2el", label: "Vertical Array 2el",     file: "vertical-array-2el-designer.js", category: "Vertical" },
+    { id: "vertical-array-3el", label: "Vertical Array 3el",     file: "vertical-array-3el-designer.js", category: "Vertical" },
+    { id: "rybakov",        label: "Rybakov Vertical Designer",  file: "rybakov-designer.js",        category: "Vertical" },
 
-    // Arrays
-    { id: "yagi", label: "Yagi Designer", file: "yagi-designer.js", category: "Arrays & Beams" },
-    { id: "quad", label: "Quad Designer", file: "quad-designer.js", category: "Arrays & Beams" },
-    { id: "curtain", label: "Curtain Array Designer", file: "curtainarray-designer.js", category: "Arrays & Beams" },
-    { id: "bobtail", label: "Bobtail Curtain Designer", file: "bobtail-designer.js", category: "Arrays & Beams" },
+    // Arrays / beams / quads
+    { id: "yagi",           label: "Yagi Designer",              file: "yagi-designer.js",           category: "Arrays & Beams" },
+    { id: "lpda",           label: "LPDA Designer",              file: "lpda-designer.js",           category: "Arrays & Beams" },
+    { id: "quad",           label: "Quad Designer",              file: "quad-designer.js",           category: "Arrays & Beams" },
+    { id: "moxon",          label: "Moxon Designer",             file: "moxon-designer.js",          category: "Arrays & Beams" },
+    { id: "curtain",        label: "Curtain Array Designer",     file: "curtainarray-designer.js",   category: "Arrays & Beams" },
+    { id: "rhombic",        label: "Rhombic Designer",           file: "rhombic-designer.js",        category: "Arrays & Beams" },
+    { id: "sterba",         label: "Sterba Curtain Designer",    file: "sterba-designer.js",         category: "Arrays & Beams" },
+    { id: "vbeam",          label: "V-Beam Designer",            file: "vbeam-designer.js",          category: "Arrays & Beams" },
+    { id: "foursquare",     label: "Foursquare Designer",        file: "foursquare-designer.js",     category: "Arrays & Beams" },
+    { id: "bobtail",        label: "Bobtail Curtain Designer",   file: "bobtail-designer.js",        category: "Arrays & Beams" },
 
     // End-fed / Random Wire
-    { id: "efhw", label: "EFHW Designer", file: "efhw-designer.js", category: "End-Fed & Random" },
-    { id: "randomwire", label: "Random Wire Designer", file: "randomwire-designer.js", category: "End-Fed & Random" },
+    { id: "efhw",           label: "EFHW Designer",              file: "efhw-designer.js",           category: "End-Fed & Random" },
+    { id: "efhw-lab",       label: "EFHW Lab",                   file: "efhw-lab.js",                category: "End-Fed & Random" },
+    { id: "randomwire",     label: "Random Wire Designer",       file: "randomwire-designer.js",     category: "End-Fed & Random" },
+    { id: "terminated-dipole", label: "Terminated Dipole",       file: "terminated-dipole.js",       category: "End-Fed & Random" },
 
-    // Labs
-    { id: "feedline-lab", label: "Feedline Lab", file: "coax-lab.js", category: "Labs & Tools" },
-    { id: "pattern-lab", label: "Pattern Lab", file: "pattern-lab.js", category: "Labs & Tools" },
-    { id: "swr-lab", label: "SWR Lab", file: "swr-lab.js", category: "Labs & Tools" },
+    // Long wires / beverages
+    { id: "beverage",       label: "Beverage Designer",          file: "beverage-designer.js",       category: "Long Wire & Beverage" },
+    { id: "hf-beverage",    label: "HF Beverage",                file: "hf-beverage.js",             category: "Long Wire & Beverage" },
+    { id: "hf-beverage-reverse-fed", label: "HF Beverage Reverse-fed", file: "hf-beverage-reverse-fed.js", category: "Long Wire & Beverage" },
+    { id: "hf-longwire",    label: "HF Longwire",                file: "hf-longwire.js",             category: "Long Wire & Beverage" },
+
+    // Labs & tools
+    { id: "feedline-lab",   label: "Feedline Lab",               file: "coax-lab.js",                category: "Labs & Tools" },
+    { id: "ground-lab",     label: "Ground Lab",                 file: "ground-lab.js",              category: "Labs & Tools" },
+    { id: "ground-loss-lab",label: "Ground Loss Lab",            file: "ground-loss-lab.js",         category: "Labs & Tools" },
+    { id: "pattern-lab",    label: "Pattern Lab",                file: "pattern-lab.js",             category: "Labs & Tools" },
+    { id: "swr-lab",        label: "SWR Lab",                    file: "swr-lab.js",                 category: "Labs & Tools" },
+    { id: "noise-lab",      label: "Noise Lab",                  file: "noise-lab.js",               category: "Labs & Tools" },
+    { id: "noise-snr-lab",  label: "Noise SNR Lab",              file: "noise-snr-lab.js",           category: "Labs & Tools" },
+    { id: "link-budget",    label: "Link Budget",                file: "link-budget.js",             category: "Labs & Tools" },
+    { id: "loss-budget",    label: "Loss Budget",                file: "loss-budget.js",             category: "Labs & Tools" },
+    { id: "propagation",    label: "Propagation Explorer",       file: "propagation.js",             category: "Labs & Tools" },
+    { id: "muf-luf",        label: "MUF/LUF Explorer",           file: "muf-luf-explorer.js",        category: "Labs & Tools" },
+    { id: "system-gain",    label: "System Gain",                file: "system-gain.js",             category: "Labs & Tools" },
+    { id: "rf-safety",      label: "RF Safety",                  file: "rf-safety.js",               category: "Labs & Tools" },
 
     // Docs
-    { id: "quick-start", label: "Quick Start Guide", file: "quick-start.js", category: "Documentation" },
-    { id: "user-manual", label: "User Manual", file: "user-manual.js", category: "Documentation" },
-    { id: "glossary", label: "Glossary", file: "glossary.js", category: "Documentation" }
+    { id: "quick-start",    label: "Quick Start Guide",          file: "quick-start.js",             category: "Documentation" },
+    { id: "user-manual",    label: "User Manual",                file: "user-manual.js",             category: "Documentation" },
+    { id: "glossary",       label: "Glossary",                   file: "glossary.js",                category: "Documentation" }
 ];
 
 // ---------------------------------------------------------------------------
-// PATH BUILDER — THIS IS THE FIX
+// PATH BUILDER
 // ---------------------------------------------------------------------------
-// All modules live in the repo root, so we import them using "../".
-// This guarantees correct imports regardless of how many modules you add.
 
 function modulePath(file) {
-    return `../${file}`;
+    // All antenna modules live in js/modules/
+    return `./modules/${file}`;
 }
 
 // ---------------------------------------------------------------------------
-// SIDEBAR
+// DOM HELPERS
 // ---------------------------------------------------------------------------
 
 function $(id) { return document.getElementById(id); }
@@ -68,6 +98,10 @@ function groupByCategory(list) {
     });
     return map;
 }
+
+// ---------------------------------------------------------------------------
+// SIDEBAR
+// ---------------------------------------------------------------------------
 
 function renderSidebar() {
     const sidebar = $("sidebar");
@@ -139,16 +173,19 @@ async function loadModule(mod) {
 
         PlotEngine.clearPlot();
 
-        if (module.init) {
+        if (typeof module.init === "function") {
             module.init({ PlotEngine, container: content });
-        } else if (module.default) {
+        } else if (typeof module.default === "function") {
             module.default({ PlotEngine, container: content });
         } else {
-            content.innerHTML += `<p><em>Module loaded (no init function).</em></p>`;
+            content.innerHTML += `<p><em>Module loaded (no init function detected).</em></p>`;
         }
     } catch (err) {
         console.error(err);
-        content.innerHTML = `<h2>Error</h2><p>Failed to load ${mod.file}</p>`;
+        content.innerHTML = `
+            <h2>Error</h2>
+            <p>Failed to load: <code>${modulePath(mod.file)}</code></p>
+        `;
     }
 }
 
@@ -158,7 +195,8 @@ async function loadModule(mod) {
 
 document.addEventListener("DOMContentLoaded", () => {
     renderSidebar();
-    $("content").innerHTML = `
+    const content = $("content");
+    content.innerHTML = `
         <h2>Welcome to HF Antenna Designer</h2>
         <p>Select an antenna module from the sidebar.</p>
     `;
