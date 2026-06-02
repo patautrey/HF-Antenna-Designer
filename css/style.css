@@ -1,12 +1,10 @@
 /* ---------------------------------------------------------
-   HF Workbench — Ultra‑Large Mobile UI (True 3× Scale)
-   - Inputs, labels, buttons massively enlarged
-   - Sidebar collapses on mobile
-   - Perfect for field use on a phone
+   HF Workbench — 4× UI + Collapsible Sidebar + Mobile Menu
+   Pat Autrey Edition
 --------------------------------------------------------- */
 
 :root {
-    --scale: 3;                     /* TRUE 3× scaling */
+    --scale: 4;                     /* TRUE 4× scaling */
     --font: calc(1rem * var(--scale));
     --font-lg: calc(1.4rem * var(--scale));
     --font-xl: calc(2rem * var(--scale));
@@ -58,7 +56,7 @@ body {
     font-size: var(--font);
     padding: var(--pad-lg);
     border-radius: calc(0.5rem * var(--scale));
-    border: 2px solid #666;
+    border: 3px solid #666;
     background: #111;
     color: #fff;
     width: 100%;
@@ -70,9 +68,9 @@ body {
 --------------------------------------------------------- */
 
 .tool input[type="checkbox"] {
-    width: calc(1.2rem * var(--scale));
-    height: calc(1.2rem * var(--scale));
-    transform: scale(2.2);          /* BIG checkboxes */
+    width: calc(1.4rem * var(--scale));
+    height: calc(1.4rem * var(--scale));
+    transform: scale(2.8);
     margin-right: calc(0.6rem * var(--scale));
 }
 
@@ -82,9 +80,9 @@ body {
 
 .field-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-    gap: calc(1.4rem * var(--scale));
-    margin-bottom: calc(1.6rem * var(--scale));
+    grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+    gap: calc(1.6rem * var(--scale));
+    margin-bottom: calc(1.8rem * var(--scale));
 }
 
 /* ---------------------------------------------------------
@@ -120,28 +118,73 @@ button:hover {
 }
 
 /* ---------------------------------------------------------
-   SIDEBAR (CRITICAL FIX)
+   SIDEBAR — DESKTOP
 --------------------------------------------------------- */
 
 #sidebar {
-    width: 260px;                   /* desktop width */
+    width: 260px;
     background: #111;
     padding: var(--pad-lg);
     box-sizing: border-box;
+    transition: width 0.3s ease, transform 0.3s ease;
 }
 
-/* MOBILE SIDEBAR FIX */
+/* ---------------------------------------------------------
+   COLLAPSED SIDEBAR (desktop toggle)
+--------------------------------------------------------- */
+
+#sidebar.collapsed {
+    width: 80px;
+}
+
+#sidebar.collapsed .sidebar-label {
+    display: none;
+}
+
+/* ---------------------------------------------------------
+   MOBILE SIDEBAR — FLOATING DRAWER
+--------------------------------------------------------- */
+
 @media (max-width: 900px) {
+
     #sidebar {
-        width: 120px;               /* MUCH narrower on phones */
-        font-size: calc(0.7rem * var(--scale));
-        padding: calc(0.4rem * var(--scale));
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 260px;
+        transform: translateX(-260px);
+        z-index: 9999;
+        padding-top: calc(2rem * var(--scale));
     }
 
-    #sidebar button,
-    #sidebar a {
-        font-size: calc(0.8rem * var(--scale));
-        padding: calc(0.4rem * var(--scale));
+    #sidebar.open {
+        transform: translateX(0);
+    }
+
+    /* Floating mobile menu button */
+    #mobile-menu-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 10000;
+        background: #0077ff;
+        color: #fff;
+        padding: calc(0.6rem * var(--scale));
+        border-radius: 50%;
+        font-size: calc(1.4rem * var(--scale));
+        border: none;
+        cursor: pointer;
+        width: calc(2.5rem * var(--scale));
+        height: calc(2.5rem * var(--scale));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #content {
+        margin-left: 0 !important;
+        padding-top: calc(4rem * var(--scale));
     }
 }
 
@@ -152,10 +195,9 @@ button:hover {
 #content {
     padding: var(--pad-lg);
     margin-left: 260px;
+    transition: margin-left 0.3s ease;
 }
 
-@media (max-width: 900px) {
-    #content {
-        margin-left: 120px;         /* matches mobile sidebar */
-    }
+#sidebar.collapsed + #content {
+    margin-left: 80px;
 }
