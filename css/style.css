@@ -1,48 +1,63 @@
 /* ---------------------------------------------------------
-   HF Workbench — Global UI Scale (3× Larger Inputs)
-   Applies to ALL antenna modules
+   HF Workbench — Ultra‑Large Mobile UI (True 3× Scale)
+   - Inputs, labels, buttons massively enlarged
+   - Sidebar collapses on mobile
+   - Perfect for field use on a phone
 --------------------------------------------------------- */
 
 :root {
-    --ui-scale: 3;
-    --font-base: calc(1rem * var(--ui-scale));
-    --font-small: calc(0.8rem * var(--ui-scale));
-    --font-large: calc(1.4rem * var(--ui-scale));
-    --pad-base: calc(0.5rem * var(--ui-scale));
-    --pad-large: calc(1rem * var(--ui-scale));
+    --scale: 3;                     /* TRUE 3× scaling */
+    --font: calc(1rem * var(--scale));
+    --font-lg: calc(1.4rem * var(--scale));
+    --font-xl: calc(2rem * var(--scale));
+    --pad: calc(0.6rem * var(--scale));
+    --pad-lg: calc(1rem * var(--scale));
 }
 
-/* ------------------------------
-   Section Headers
------------------------------- */
+/* ---------------------------------------------------------
+   GLOBAL TEXT
+--------------------------------------------------------- */
+
+body {
+    font-size: var(--font);
+    background: #000;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* ---------------------------------------------------------
+   HEADERS
+--------------------------------------------------------- */
 
 .tool h2 {
-    font-size: calc(2rem * var(--ui-scale));
-    margin-bottom: calc(1rem * var(--ui-scale));
+    font-size: var(--font-xl);
+    margin-bottom: var(--pad-lg);
 }
 
 .tool h3 {
-    font-size: calc(1.4rem * var(--ui-scale));
-    margin-top: calc(1rem * var(--ui-scale));
-    margin-bottom: calc(0.5rem * var(--ui-scale));
+    font-size: var(--font-lg);
+    margin-top: var(--pad-lg);
+    margin-bottom: var(--pad);
 }
 
-/* ------------------------------
-   Labels + Inputs
------------------------------- */
+/* ---------------------------------------------------------
+   INPUTS + LABELS
+--------------------------------------------------------- */
 
 .tool label {
-    font-size: var(--font-base);
+    font-size: var(--font);
     display: flex;
     flex-direction: column;
-    gap: calc(0.3rem * var(--ui-scale));
+    gap: calc(0.4rem * var(--scale));
 }
 
 .tool input,
 .tool select {
-    font-size: var(--font-base);
-    padding: var(--pad-large);
-    border-radius: calc(0.5rem * var(--ui-scale));
+    font-size: var(--font);
+    padding: var(--pad-lg);
+    border-radius: calc(0.5rem * var(--scale));
     border: 2px solid #666;
     background: #111;
     color: #fff;
@@ -50,75 +65,97 @@
     box-sizing: border-box;
 }
 
-/* ------------------------------
-   Checkboxes
------------------------------- */
+/* ---------------------------------------------------------
+   CHECKBOXES
+--------------------------------------------------------- */
 
 .tool input[type="checkbox"] {
-    width: calc(1.2rem * var(--ui-scale));
-    height: calc(1.2rem * var(--ui-scale));
-    transform: scale(1.8);
-    margin-right: calc(0.5rem * var(--ui-scale));
+    width: calc(1.2rem * var(--scale));
+    height: calc(1.2rem * var(--scale));
+    transform: scale(2.2);          /* BIG checkboxes */
+    margin-right: calc(0.6rem * var(--scale));
 }
 
-.tool label input[type="checkbox"] + span,
-.tool label input[type="checkbox"] {
-    font-size: var(--font-base);
-}
-
-/* ------------------------------
-   Field Grid Layout
------------------------------- */
+/* ---------------------------------------------------------
+   FIELD GRID
+--------------------------------------------------------- */
 
 .field-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: calc(1.2rem * var(--ui-scale));
-    margin-bottom: calc(1.5rem * var(--ui-scale));
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: calc(1.4rem * var(--scale));
+    margin-bottom: calc(1.6rem * var(--scale));
 }
 
-/* ------------------------------
-   Buttons
------------------------------- */
+/* ---------------------------------------------------------
+   BUTTONS
+--------------------------------------------------------- */
 
 button {
-    font-size: var(--font-large);
-    padding: calc(0.8rem * var(--ui-scale)) calc(1.6rem * var(--ui-scale));
-    border-radius: calc(0.6rem * var(--ui-scale));
-    background: #0044aa;
+    font-size: var(--font-lg);
+    padding: calc(1rem * var(--scale)) calc(2rem * var(--scale));
+    border-radius: calc(0.6rem * var(--scale));
+    background: #0055cc;
     color: #fff;
     border: none;
     cursor: pointer;
 }
 
 button:hover {
-    background: #0066dd;
+    background: #0077ff;
 }
 
-/* ------------------------------
-   Summary Output
------------------------------- */
+/* ---------------------------------------------------------
+   SUMMARY BLOCK
+--------------------------------------------------------- */
 
 .summary {
-    font-size: var(--font-base);
+    font-size: var(--font);
     line-height: 1.6;
-    padding: var(--pad-large);
+    padding: var(--pad-lg);
     background: #111;
-    border-left: 4px solid #0af;
-    border-radius: calc(0.5rem * var(--ui-scale));
-    margin-top: calc(1rem * var(--ui-scale));
+    border-left: 6px solid #0af;
+    border-radius: calc(0.5rem * var(--scale));
+    margin-top: calc(1rem * var(--scale));
 }
 
-/* ------------------------------
-   Info + Warning Blocks
------------------------------- */
+/* ---------------------------------------------------------
+   SIDEBAR (CRITICAL FIX)
+--------------------------------------------------------- */
 
-.info {
-    font-size: var(--font-base);
+#sidebar {
+    width: 260px;                   /* desktop width */
+    background: #111;
+    padding: var(--pad-lg);
+    box-sizing: border-box;
 }
 
-.warn {
-    font-size: var(--font-base);
-    color: #ff4444;
-    font-weight: bold;
+/* MOBILE SIDEBAR FIX */
+@media (max-width: 900px) {
+    #sidebar {
+        width: 120px;               /* MUCH narrower on phones */
+        font-size: calc(0.7rem * var(--scale));
+        padding: calc(0.4rem * var(--scale));
+    }
+
+    #sidebar button,
+    #sidebar a {
+        font-size: calc(0.8rem * var(--scale));
+        padding: calc(0.4rem * var(--scale));
+    }
+}
+
+/* ---------------------------------------------------------
+   CONTENT AREA
+--------------------------------------------------------- */
+
+#content {
+    padding: var(--pad-lg);
+    margin-left: 260px;
+}
+
+@media (max-width: 900px) {
+    #content {
+        margin-left: 120px;         /* matches mobile sidebar */
+    }
 }
