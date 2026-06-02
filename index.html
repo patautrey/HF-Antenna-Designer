@@ -1,43 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>HF Antenna Designer</title>
+<!-- ===================================================== -->
+<!--   HF WORKBENCH SIDEBAR — FULL, CORRECT STRUCTURE      -->
+<!-- ===================================================== -->
 
-    <!-- GLOBAL 4× UI + MOBILE DRAWER CSS -->
-    <link rel="stylesheet" href="css/style.css">
+<div id="sidebar">
 
-    <!-- MAIN APP ROUTER -->
-    <script type="module" src="js/main.js"></script>
-</head>
+    <!-- MENU ITEMS (router requires .menu-item + data-module) -->
+    <div class="menu-item" data-module="vertical-designer">Vertical Designer</div>
+    <div class="menu-item" data-module="feedline">Feedline Lab</div>
+    <div class="menu-item" data-module="posters">Posters</div>
+    <div class="menu-item" data-module="propagation">Propagation Lab</div>
+    <div class="menu-item" data-module="nvis-designer">NVIS Designer</div>
+    <div class="menu-item" data-module="doublet-designer">Doublet Designer</div>
+    <div class="menu-item" data-module="dx-vertical">DX Vertical</div>
 
-<body>
+    <!-- DESKTOP COLLAPSE BUTTON -->
+    <button id="sidebar-toggle" class="sidebar-label">⮜</button>
 
-    <!-- ===================================================== -->
-    <!--   HF WORKBENCH SIDEBAR — FULL, CORRECT STRUCTURE      -->
-    <!-- ===================================================== -->
+</div>
 
-    <div id="sidebar">
+<!-- FLOATING MOBILE MENU BUTTON -->
+<button id="mobile-menu-btn">☰</button>
 
-        <!-- MENU ITEMS (router requires .menu-item + data-module) -->
-        <div class="menu-item" data-module="vertical-designer">Vertical Designer</div>
-        <div class="menu-item" data-module="feedline">Feedline Lab</div>
-        <div class="menu-item" data-module="posters">Posters</div>
-        <div class="menu-item" data-module="propagation">Propagation Lab</div>
-        <div class="menu-item" data-module="nvis-designer">NVIS Designer</div>
-        <div class="menu-item" data-module="doublet-designer">Doublet Designer</div>
-        <div class="menu-item" data-module="dx-vertical">DX Vertical</div>
-
-        <!-- DESKTOP COLLAPSE BUTTON -->
-        <button id="sidebar-toggle" class="sidebar-label">⮜</button>
-
-    </div>
-
-    <!-- FLOATING MOBILE MENU BUTTON -->
-    <button id="mobile-menu-btn">☰</button>
-
-    <!-- MAIN CONTENT AREA -->
-    <div id="content"></div>
-
-</body>
-</html>
+<!-- MAIN CONTENT AREA -->
+<div id="content"></div>
