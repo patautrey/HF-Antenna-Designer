@@ -1,30 +1,42 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Glossary — Antenna Workbench</title>
-    <meta charset="utf-8">
-    <style>
-        body { font-family: sans-serif; max-width: 900px; margin: auto; line-height: 1.6; }
-        h1, h2 { color: #003366; }
-        dt { font-weight: bold; margin-top: 1rem; }
-    </style>
-</head>
-<body>
+HF Antenna Designer
+Glossary
+============================================================
 
-<h1>Glossary</h1>
+Antenna Gain
+Increase in signal strength in a given direction.
 
-<dl>
-    <dt>ATU</dt><dd>Antenna Tuning Unit (tuner).</dd>
-    <dt>Base Gain</dt><dd>Gain from geometry alone.</dd>
-    <dt>Coax</dt><dd>Unbalanced feedline such as RG‑213 or LMR‑400.</dd>
-    <dt>Doublet</dt><dd>Center-fed dipole using ladder line.</dd>
-    <dt>Electrical Length</dt><dd>Physical length expressed as a fraction of wavelength.</dd>
-    <dt>Gain (dBi)</dt><dd>Signal strength relative to isotropic.</dd>
-    <dt>NVIS</dt><dd>Near Vertical Incidence Skywave — high-angle regional coverage.</dd>
-    <dt>Radial</dt><dd>Ground wire used with vertical antennas.</dd>
-    <dt>Skyloop</dt><dd>Large horizontal loop antenna.</dd>
-    <dt>TOA</dt><dd>Takeoff angle of the main lobe.</dd>
-</dl>
+Beamwidth
+Angular width of the main lobe.
 
-</body>
-</html>
+Current Distribution
+How RF current flows along an element.
+
+Director
+A parasitic element that increases forward gain.
+
+Driven Element
+The element connected to the feedline.
+
+Efficiency
+Ratio of radiated power to input power.
+
+Feedpoint Impedance
+The impedance seen by the transmitter.
+
+Front‑to‑Back Ratio
+Difference between forward and rear gain.
+
+Ground Loss
+Power lost to soil conductivity.
+
+NVIS
+Near Vertical Incidence Skywave.
+
+Radiation Resistance
+Portion of resistance that produces radiation.
+
+SWR
+Standing Wave Ratio.
+
+TOA
+Takeoff Angle — elevation angle of maximum radiation.
