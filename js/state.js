@@ -1,50 +1,44 @@
-/* ---------------------------------------------------------
-   Antenna Workbench — Global State Manager
-   Centralized shared state for all modules
---------------------------------------------------------- */
+/* ============================================================
+   HF Antenna Designer — Global State Engine
+   ============================================================ */
 
-const state = {};
+const State = {
 
-/* ---------------------------------------------------------
-   SET A VALUE
---------------------------------------------------------- */
-export function setState(key, value) {
-    state[key] = value;
-}
+    data: {
+        currentModule: null,
+        parameters: {},
+        theme: "light",
+        preferences: {}
+    },
 
-/* ---------------------------------------------------------
-   GET A VALUE
---------------------------------------------------------- */
-export function getState(key, fallback = null) {
-    return state.hasOwnProperty(key) ? state[key] : fallback;
-}
+    setState(key, value) {
+        this.data[key] = value;
+    },
 
-/* ---------------------------------------------------------
-   MERGE MULTIPLE VALUES
---------------------------------------------------------- */
-export function mergeState(obj) {
-    Object.assign(state, obj);
-}
+    getState(key) {
+        return this.data[key];
+    },
 
-/* ---------------------------------------------------------
-   REMOVE A VALUE
---------------------------------------------------------- */
-export function deleteState(key) {
-    if (state.hasOwnProperty(key)) {
-        delete state[key];
+    setParam(name, value) {
+        this.data.parameters[name] = value;
+    },
+
+    getParam(name) {
+        return this.data.parameters[name];
+    },
+
+    resetParameters() {
+        this.data.parameters = {};
+    },
+
+    resetAll() {
+        this.data = {
+            currentModule: null,
+            parameters: {},
+            theme: "light",
+            preferences: {}
+        };
     }
-}
+};
 
-/* ---------------------------------------------------------
-   CLEAR ALL STATE
---------------------------------------------------------- */
-export function clearState() {
-    Object.keys(state).forEach(k => delete state[k]);
-}
-
-/* ---------------------------------------------------------
-   EXPORT RAW STATE (READ‑ONLY)
---------------------------------------------------------- */
-export function getAllState() {
-    return { ...state };
-}
+export default State;
