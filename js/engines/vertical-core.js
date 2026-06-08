@@ -1,162 +1,117 @@
 /* ============================================================
-   HF Antenna Designer — Vertical Core Engine (Part 3)
-   Pattern Generation + Chart Integration (Precision Mode)
+   HF Antenna Designer — Vertical Core Engine (Part 4)
+   Final Render + Event Wiring + Integration
    ============================================================ */
 
+import UIEngine from "./ui-engine.js";
 import MathEngine from "./math-engine.js";
 import ChartEngine from "./chart-engine.js";
 
 const VerticalCore = {
 
     /* ------------------------------------------------------------
-       1. PRECISION AZIMUTH PATTERN (H-plane)
+       1. VALIDATE INPUTS
        ------------------------------------------------------------ */
-    azimuthPattern(params) {
-        const angles = [];
-        const gain = [];
-
-        const { freq, height } = params;
-        const λ = MathEngine.wavelength(freq);
-        const k = (2 * Math.PI) / λ;
-
-        for (let deg = 0; deg <= 360; deg += 2) {
-            const θ = Math.PI / 2; // horizontal cut
-            const φ = deg * (Math.PI / 180);
-
-            const Eθ = Math.cos(k * height * Math.cos(θ));
-            const Eφ = 0;
-
-            const E = Math.sqrt(Eθ * Eθ + Eφ * Eφ);
-
-            angles.push(deg);
-            gain.push(20 * Math.log10(Math.abs(E) + 1e-9));
-        }
-
-        return { angles, gain };
+    validate(params) {
+        if (isNaN(params.freq) || params.freq <= 0) return false;
+        if (isNaN(params.height) || params.height <= 0) return false;
+        if (isNaN(params.radialCount) || params.radialCount < 0) return false;
+        if (isNaN(params.radialLength) || params.radialLength < 0) return false;
+        return true;
     },
 
     /* ------------------------------------------------------------
-       2. PRECISION ELEVATION PATTERN (E-plane)
+       2. MAIN CALCULATION PIPELINE
        ------------------------------------------------------------ */
-    elevationPattern(params) {
-        const angles = [];
-        const gain = [];
+    calculate(params) {
+        const Z = this.feedpoint(params);
+        const swrData = this.swrData(params);
+        const eff = this.efficiency(params);
+        const toa = this.takeoffAngle(params);
+        const gain = this.gain(params);
 
-        const { freq, height } = params;
-        const λ = MathEngine.wavelength(freq);
-        const k = (2 * Math.PI) / λ;
-
-        for (let deg = 0; deg <= 90; deg += 1) {
-            const θ = deg * (Math.PI / 180);
-            const φ = 0;
-
-            const Eθ = Math.cos(k * height * Math.cos(θ));
-            const Eφ = 0;
-
-            const E = Math.sqrt(Eθ * Eθ + Eφ * Eφ);
-
-            angles.push(deg);
-            gain.push(20 * Math.log10(Math.abs(E) + 1e-9));
-        }
-
-        return { angles, gain };
+        return {
+            impedance: Z,
+            swr: swrData.swr,
+            returnLoss: swrData.rl,
+            efficiency: eff,
+            takeoffAngle: toa,
+            gain: gain
+        };
     },
 
     /* ------------------------------------------------------------
-       3. 3D RADIATION PATTERN (Precision Mode)
+       3. UPDATE METRIC CARDS
        ------------------------------------------------------------ */
-    pattern3D(params) {
-        const { freq, height } = params;
-        const λ = MathEngine.wavelength(freq);
-        const k = (2 * Math.PI) / λ;
+    updateMetrics(container, results) {
+        const metrics = document.createElement("div");
+        metrics.style.display = "grid";
+        metrics.style.gridTemplateColumns = "1fr 1fr 1fr 1fr";
+        metrics.style.gap = "20px";
+        metrics.style.marginTop = "20px";
 
-        const size = 60;
-        const x = [];
-        const y = [];
-        const z = [];
-
-        for (let i = 0; i < size; i++) {
-            const rowX = [];
-            const rowY = [];
-            const rowZ = [];
-
-            const θ = (i / (size - 1)) * Math.PI;
-
-            for (let j = 0; j < size; j++) {
-                const φ = (j / (size - 1)) * 2 * Math.PI;
-
-                const Eθ = Math.cos(k * height * Math.cos(θ));
-                const Eφ = 0;
-
-                const E = Math.sqrt(Eθ * Eθ + Eφ * Eφ);
-
-                const r = Math.abs(E);
-
-                rowX.push(r * Math.sin(θ) * Math.cos(φ));
-                rowY.push(r * Math.sin(θ) * Math.sin(φ));
-                rowZ.push(r * Math.cos(θ));
-            }
-
-            x.push(rowX);
-            y.push(rowY);
-            z.push(rowZ);
-        }
-
-        return { x, y, z };
-    },
-
-    /* ------------------------------------------------------------
-       4. SWR SWEEP
-       ------------------------------------------------------------ */
-    swrSweep(params) {
-        const freq = params.freq;
-        const sweep = [];
-        const swr = [];
-
-        for (let f = freq - 0.5; f <= freq + 0.5; f += 0.02) {
-            const p = { ...params, freq: f };
-            const Z = this.feedpoint(p);
-            sweep.push(f);
-            swr.push(MathEngine.swr(Z));
-        }
-
-        return { frequency: sweep, swr };
-    },
-
-    /* ------------------------------------------------------------
-       5. CURRENT DISTRIBUTION
-       ------------------------------------------------------------ */
-    currentDistribution(params) {
-        const segments = 40;
-        const arr = MathEngine.currentDistribution_vertical(
-            params.height,
-            params.freq,
-            segments
+        metrics.appendChild(
+            UIEngine.metricCard("Feedpoint R (Ω)", results.impedance.R.toFixed(1))
+        );
+        metrics.appendChild(
+            UIEngine.metricCard("Feedpoint X (Ω)", results.impedance.X.toFixed(1))
+        );
+        metrics.appendChild(
+            UIEngine.metricCard("SWR", results.swr.toFixed(2))
+        );
+        metrics.appendChild(
+            UIEngine.metricCard("Efficiency", (results.efficiency * 100).toFixed(1), "%")
+        );
+        metrics.appendChild(
+            UIEngine.metricCard("TOA (°)", results.takeoffAngle.toFixed(1))
+        );
+        metrics.appendChild(
+            UIEngine.metricCard("Gain (dBi)", results.gain.toFixed(2))
         );
 
-        const elements = [];
-        for (let i = 0; i < segments; i++) {
-            elements.push(i + 1);
-        }
-
-        return { elements, current: arr };
+        container.appendChild(metrics);
     },
 
     /* ------------------------------------------------------------
-       6. RENDER ALL CHARTS
+       4. HANDLE CALCULATE BUTTON
        ------------------------------------------------------------ */
-    renderCharts(params) {
-        const az = this.azimuthPattern(params);
-        ChartEngine.azimuth("azimuthPlot", az);
+    wireCalculate(container) {
+        const btn = document.getElementById("calcVertical");
 
-        const el = this.elevationPattern(params);
-        ChartEngine.elevation("elevationPlot", el);
+        btn.addEventListener("click", () => {
+            const params = this.getParams();
 
-        const sw = this.swrSweep(params);
-        ChartEngine.swrCurve("swrPlot", sw);
+            if (!this.validate(params)) {
+                alert("Invalid input values.");
+                return;
+            }
 
-        const cd = this.currentDistribution(params);
-        ChartEngine.currentDistribution("currentPlot", cd);
+            const results = this.calculate(params);
+
+            this.renderCharts(params);
+
+            const metricsContainer = document.createElement("div");
+            this.updateMetrics(metricsContainer, results);
+
+            container.appendChild(metricsContainer);
+        });
+    },
+
+    /* ------------------------------------------------------------
+       5. RENDER (FULL ENGINE)
+       ------------------------------------------------------------ */
+    render(container) {
+        UIEngine.clear(container);
+
+        const inputPanel = this.buildInputPanel();
+        const outputPanels = this.buildOutputPanels();
+
+        UIEngine.render(container, [
+            inputPanel,
+            ...outputPanels
+        ]);
+
+        this.wireCalculate(container);
     }
 };
 
