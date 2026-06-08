@@ -1,12 +1,9 @@
-/js
-   /modules        ← all antenna modules live here
-   app.js          ← router
-   master-index.js ← automatic module discovery
-/css
-   style.css
-index.html
-/docs
-   User_Manual.md
-   Quick_Start.md
-   Glossary.md
-   Maintenance_and_File_Management.md
+# HF Antenna Designer  
+## Maintenance & File Management Guide
+
+This document explains how to maintain HF_Antenna_Designer, how automatic module discovery works, and how to safely manage 150+ modules.
+
+---
+
+# 1. Project Structure
+
