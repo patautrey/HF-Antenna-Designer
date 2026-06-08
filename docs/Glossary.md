@@ -32,7 +32,7 @@ Power lost to soil conductivity.
 NVIS -
 Near Vertical Incidence Skywave.
 
-Radiation Resistance
+Radiation Resistance -
 Portion of resistance that produces radiation.
 
 SWR -
