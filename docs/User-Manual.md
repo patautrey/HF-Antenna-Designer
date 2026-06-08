@@ -1,6 +1,6 @@
 HF Antenna Designer
 User Manual
-
+============================================================
 
 HF_Antenna_Designer is a comprehensive HF antenna engineering suite containing over 150 antenna models, calculators, and analysis tools. This manual explains how to use the interface, how modules behave, and how to navigate the system.
 
