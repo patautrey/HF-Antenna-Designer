@@ -2,41 +2,41 @@ HF Antenna Designer
 Glossary
 ============================================================
 
-Antenna Gain
+Antenna Gain -
 Increase in signal strength in a given direction.
 
-Beamwidth
+Beamwidth -
 Angular width of the main lobe.
 
-Current Distribution
+Current Distribution -
 How RF current flows along an element.
 
-Director
+Director -
 A parasitic element that increases forward gain.
 
-Driven Element
+Driven Element -
 The element connected to the feedline.
 
-Efficiency
+Efficiency -
 Ratio of radiated power to input power.
 
-Feedpoint Impedance
+Feedpoint Impedance -
 The impedance seen by the transmitter.
 
-Front‑to‑Back Ratio
+Front‑to‑Back Ratio -
 Difference between forward and rear gain.
 
-Ground Loss
+Ground Loss -
 Power lost to soil conductivity.
 
-NVIS
+NVIS -
 Near Vertical Incidence Skywave.
 
 Radiation Resistance
 Portion of resistance that produces radiation.
 
-SWR
+SWR -
 Standing Wave Ratio.
 
-TOA
+TOA -
 Takeoff Angle — elevation angle of maximum radiation.
