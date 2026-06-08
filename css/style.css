@@ -1,66 +1,67 @@
 /* ============================================================
-   HF Antenna Designer — Complete Style Sheet (Repaired)
+   HF Antenna Designer — Full Light Theme (Engineering Style)
+   Responsive Sidebar + Comfortable Spacing + Modern Typography
    ============================================================ */
 
 /* ------------------------------
    GLOBAL
 --------------------------------*/
-body {
+html, body {
     margin: 0;
     padding: 0;
+    height: 100%;
+    font-family: "Inter", "Roboto", "Open Sans", system-ui, sans-serif;
+    background: #ffffff;
+    color: #111111;
+    line-height: 1.6;
+}
+
+body {
     display: flex;
-    height: 100vh;
-    font-family: Arial, sans-serif;
-    background: #1e1e1e;
-    color: #e0e0e0;
     overflow: hidden;
 }
 
 /* ------------------------------
-   SIDEBAR
+   SIDEBAR (Light Gray, Responsive)
 --------------------------------*/
 #sidebar {
-    width: 320px;
-    background: #111;
-    overflow-y: auto;
+    background: #f2f2f2;
+    width: clamp(260px, 22vw, 360px);
     padding: 20px;
-    border-right: 2px solid #333;
+    overflow-y: auto;
+    border-right: 1px solid #d0d0d0;
     box-sizing: border-box;
 }
 
 /* Category headers */
 .menu-category {
-    font-weight: bold;
-    margin-top: 22px;
+    font-weight: 600;
+    margin-top: 24px;
     margin-bottom: 10px;
-    font-size: 1.15em;
-    color: #66aaff;
-    letter-spacing: 0.5px;
+    font-size: 1.1em;
+    color: #0057b8; /* Engineering blue */
+    letter-spacing: 0.3px;
 }
 
-/* Sidebar items — FIXED VISIBILITY */
+/* Sidebar items */
 .menu-item {
-    padding: 10px 12px;
+    padding: 12px 14px;
     cursor: pointer;
-    border-radius: 4px;
-    margin-bottom: 4px;
-    color: #f5f5f5;          /* <-- FIX: bright readable text */
+    border-radius: 6px;
+    margin-bottom: 6px;
+    color: #222;
     font-size: 15px;
-    letter-spacing: 0.3px;
     transition: background 0.15s ease, color 0.15s ease;
 }
 
-/* Hover state */
 .menu-item:hover {
-    background: #2a2a2a;
-    color: #ffffff;
+    background: #e0e0e0;
 }
 
-/* Active (selected) state */
 .menu-item.active {
-    background: #0077ff;
+    background: #0057b8;
     color: #ffffff;
-    font-weight: bold;
+    font-weight: 600;
 }
 
 /* Scrollbar styling */
@@ -68,51 +69,53 @@ body {
     width: 10px;
 }
 #sidebar::-webkit-scrollbar-track {
-    background: #111;
+    background: #f2f2f2;
 }
 #sidebar::-webkit-scrollbar-thumb {
-    background: #333;
+    background: #cccccc;
     border-radius: 5px;
 }
 #sidebar::-webkit-scrollbar-thumb:hover {
-    background: #444;
+    background: #bbbbbb;
 }
 
 /* ------------------------------
-   CONTENT AREA
+   CONTENT AREA (White Paper)
 --------------------------------*/
 #content {
     flex: 1;
-    padding: 25px;
+    padding: 30px;
     overflow-y: auto;
+    background: #ffffff;
     box-sizing: border-box;
 }
 
-/* Content scrollbar */
+/* Scrollbar */
 #content::-webkit-scrollbar {
     width: 12px;
 }
 #content::-webkit-scrollbar-track {
-    background: #1e1e1e;
+    background: #ffffff;
 }
 #content::-webkit-scrollbar-thumb {
-    background: #444;
+    background: #cccccc;
     border-radius: 6px;
 }
 #content::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: #bbbbbb;
 }
 
 /* ------------------------------
    HEADINGS & TEXT
 --------------------------------*/
 h1, h2, h3, h4 {
-    color: #ffffff;
+    color: #003366;
     margin-top: 0;
+    font-weight: 600;
 }
 
 p, label {
-    color: #e0e0e0;
+    color: #111;
     font-size: 15px;
 }
 
@@ -120,26 +123,43 @@ p, label {
    INPUTS & BUTTONS
 --------------------------------*/
 input, select {
-    background: #222;
-    color: #fff;
-    border: 1px solid #444;
-    padding: 6px 8px;
-    border-radius: 4px;
-    margin-bottom: 10px;
+    background: #ffffff;
+    color: #111;
+    border: 1px solid #cccccc;
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin-bottom: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 15px;
 }
 
 button {
-    background: #0077ff;
-    color: #fff;
+    background: #0057b8;
+    color: #ffffff;
     border: none;
-    padding: 8px 14px;
-    border-radius: 4px;
+    padding: 10px 18px;
+    border-radius: 6px;
     cursor: pointer;
-    margin-top: 5px;
+    margin-top: 10px;
+    font-size: 15px;
+    font-weight: 500;
 }
 
 button:hover {
-    background: #3399ff;
+    background: #0070e0;
+}
+
+/* ------------------------------
+   PANELS / CARDS
+--------------------------------*/
+.panel {
+    background: #fafafa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    border: 1px solid #e6e6e6;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 
 /* ------------------------------
@@ -149,22 +169,23 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 15px;
+    font-size: 15px;
 }
 
 th, td {
-    border: 1px solid #444;
-    padding: 8px;
+    border: 1px solid #dcdcdc;
+    padding: 10px;
     text-align: left;
 }
 
 th {
-    background: #333;
-    color: #fff;
+    background: #f0f0f0;
+    color: #003366;
+    font-weight: 600;
 }
 
-td {
-    background: #222;
-    color: #ddd;
+tr:nth-child(even) td {
+    background: #fafafa;
 }
 
 /* ------------------------------
@@ -176,4 +197,39 @@ td {
 
 .hidden {
     display: none;
+}
+
+/* ------------------------------
+   PLOTLY LIGHT THEME OVERRIDES
+--------------------------------*/
+.js-plotly-plot .plotly {
+    font-family: "Inter", "Roboto", "Open Sans", system-ui, sans-serif;
+}
+
+.plot-container {
+    background: #ffffff !important;
+}
+
+svg.main-svg {
+    background: #ffffff !important;
+}
+
+.plotly .cartesianlayer .gridlayer line {
+    stroke: #dddddd !important;
+}
+
+.plotly .cartesianlayer .axislayer-above text {
+    fill: #111111 !important;
+}
+
+.plotly .polar > .bg {
+    fill: #ffffff !important;
+}
+
+.plotly .polar > .gridlayer line {
+    stroke: #dddddd !important;
+}
+
+.plotly .polar > .angulargridlayer line {
+    stroke: #dddddd !important;
 }
