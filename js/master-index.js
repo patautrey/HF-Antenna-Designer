@@ -1,26 +1,33 @@
 // ============================================================
-// HF Antenna Designer — Automatic Module Discovery
-// Scans /js/modules/ and loads every module dynamically
+// HF Antenna Designer — Master Module Index (Full Corrected)
 // ============================================================
 
-// Scan all JS files inside /js/modules/
-const moduleFiles = import.meta.glob("./modules/*.js");
+// This object will hold all discovered modules
+export const modules = {};
 
-// Build module map
-const modules = {};
+// Dynamically import every JS file inside /js/modules/
+async function loadAllModules() {
+    const moduleFiles = import.meta.glob("./modules/*.js");
 
-for (const path in moduleFiles) {
-    // Extract filename: "./modules/vertical-designer.js" → "vertical-designer"
-    const id = path
-        .split("/")
-        .pop()
-        .replace(".js", "");
+    for (const path in moduleFiles) {
+        try {
+            const mod = await moduleFiles[path]();
 
-    // Lazy-load module when requested
-    modules[id] = async (container) => {
-        const mod = await moduleFiles[path]();
-        mod.default(container);
-    };
+            // Extract filename without path or extension
+            const id = path
+                .replace("./modules/", "")
+                .replace(".js", "");
+
+            // Store module under its ID
+            modules[id] = mod;
+
+        } catch (err) {
+            console.error("Module failed to load:", path, err);
+        }
+    }
+
+    console.log("Modules loaded:", Object.keys(modules));
 }
 
-export default modules;
+// Load everything immediately
+await loadAllModules();
