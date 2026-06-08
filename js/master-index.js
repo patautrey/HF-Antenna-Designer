@@ -1,33 +1,34 @@
 // ============================================================
-// HF Antenna Designer — Master Module Index (Full Corrected)
+// HF Antenna Designer — Master Module Index (Browser Safe)
 // ============================================================
 
-// This object will hold all discovered modules
+// This object will hold all modules
 export const modules = {};
 
-// Dynamically import every JS file inside /js/modules/
+// Dynamically load every JS file inside /js/modules/
 async function loadAllModules() {
-    const moduleFiles = import.meta.glob("./modules/*.js");
+    try {
+        const response = await fetch("./js/modules/modules.json");
+        const fileList = await response.json();
 
-    for (const path in moduleFiles) {
-        try {
-            const mod = await moduleFiles[path]();
+        for (const file of fileList) {
+            const path = `./modules/${file}`;
+            try {
+                const mod = await import(path);
 
-            // Extract filename without path or extension
-            const id = path
-                .replace("./modules/", "")
-                .replace(".js", "");
+                const id = file.replace(".js", "");
+                modules[id] = mod;
 
-            // Store module under its ID
-            modules[id] = mod;
-
-        } catch (err) {
-            console.error("Module failed to load:", path, err);
+            } catch (err) {
+                console.error("Failed to import:", path, err);
+            }
         }
-    }
 
-    console.log("Modules loaded:", Object.keys(modules));
+        console.log("Modules loaded:", Object.keys(modules));
+
+    } catch (err) {
+        console.error("Failed to load modules.json", err);
+    }
 }
 
-// Load everything immediately
 await loadAllModules();
