@@ -1,50 +1,106 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>User Manual — Antenna Workbench</title>
-    <meta charset="utf-8">
-    <style>
-        body { font-family: sans-serif; max-width: 900px; margin: auto; line-height: 1.6; }
-        h1, h2, h3 { color: #003366; }
-    </style>
-</head>
-<body>
+HF Antenna Designer
+User Manual
 
-<h1>Antenna Workbench — User Manual</h1>
 
-<p>This manual explains how each tool works, what the controls mean, and how to interpret the results.</p>
+HF_Antenna_Designer is a comprehensive HF antenna engineering suite containing over 150 antenna models, calculators, and analysis tools. This manual explains how to use the interface, how modules behave, and how to navigate the system.
 
-<h2>1. Core Concepts</h2>
-<p><strong>Geometry Engine</strong> models physical antenna dimensions, loading, radials, and ground interaction.</p>
-<p><strong>Boost Engine</strong> models environmental and system factors such as time of day, ground screen, seaside, and feedline losses.</p>
-<p><strong>NVIS Reflector Engine</strong> models reflector grids for high-angle radiation.</p>
-<p><strong>Transformer Engine</strong> provides matching notes and impedance guidance.</p>
+Introduction
 
-<h2>2. Vertical DX Designer</h2>
-<p>Models a low-angle DX vertical with radials and ground interaction.</p>
-<ul>
-    <li>Inputs: frequency, height, radials, ground type</li>
-    <li>Boosts: seaside, ground screen, elevated radials, feedline</li>
-    <li>Outputs: gain, TOA, geometry adjustments, transformer notes</li>
-</ul>
+HF_Antenna_Designer is designed for:
 
-<h2>3. Vertical NVIS Designer</h2>
-<p>Models a short vertical optimized for high-angle NVIS coverage.</p>
+• Amateur radio operators
+• Antenna experimenters
+• RF engineers
+• Field deployment teams
 
-<h2>4. Doublet Designer</h2>
-<p>Models a multiband center-fed doublet with ladder line.</p>
+The system provides:
 
-<h2>5. Skyloop Designer</h2>
-<p>Models a full-wave horizontal loop with optional NVIS reflector.</p>
+• Antenna geometry calculators
+• Radiation pattern tools
+• Feedline and SWR analysis
+• Efficiency and ground loss tools
+• Documentation and reference materials
 
-<h2>6. Interpreting Results</h2>
-<ul>
-    <li><strong>Gain (dBi)</strong> — signal strength</li>
-    <li><strong>TOA</strong> — DX (low), NVIS (high)</li>
-    <li><strong>Geometry adjustments</strong> — physical effects</li>
-    <li><strong>Boost breakdown</strong> — environmental/system effects</li>
-    <li><strong>Transformer notes</strong> — matching difficulty</li>
-</ul>
+Interface Overview
 
-</body>
-</html>
+The interface has two main areas:
+
+Sidebar
+
+Organized into categories:
+
+• Verticals
+• Dipoles & Wires
+• Loops
+• Yagis & Beams
+• Longwires & Beverages
+• Arrays
+• Labs & Tools
+• Documentation
+
+Each item loads a module instantly.
+
+Content Area
+
+Displays the selected module.
+Modules typically include:
+
+• Input fields
+• Calculated results
+• Geometry tables
+• Radiation patterns
+• Efficiency metrics
+• SWR and impedance data
+
+Selecting a Module
+
+Click any item in the sidebar.
+The module loads immediately.
+
+Modules are self‑contained and do not affect each other.
+
+Entering Frequency
+
+Most modules begin with:
+
+Frequency (MHz)
+
+Enter your operating frequency and click Calculate (or the module recalculates automatically).
+
+Exporting Results
+
+Use the Export Tools module to:
+
+• Copy summaries
+• Export geometry
+• Save configuration snapshots
+
+Labs & Tools
+
+Labs provide deeper analysis:
+
+• Feedline Lab
+• SWR Lab
+• Pattern Lab
+• Ground Lab
+• Efficiency Lab
+• Noise Lab
+• Band Opening Tool
+• Feedpoint Analyzer
+
+Documentation
+
+The sidebar includes:
+
+• User Manual
+• Glossary
+• Maintenance Guide
+• Quick Start Guide
+
+Troubleshooting
+
+If a module does not load:
+
+• Check filename matches data‑module
+• Run validate-modules.js
+• Ensure the module exports a default function
