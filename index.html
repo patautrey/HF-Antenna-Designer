@@ -4,37 +4,113 @@
     <meta charset="UTF-8">
     <title>HF Antenna Designer</title>
 
-    <!-- GLOBAL UI STYLES -->
     <link rel="stylesheet" href="css/style.css">
-
-    <!-- MAIN APP ROUTER -->
     <script type="module" src="js/app.js"></script>
 </head>
 
 <body>
 
     <!-- ===================================================== -->
-    <!--   HF WORKBENCH SIDEBAR — FULL, CORRECT STRUCTURE      -->
+    <!--   HF ANTENNA DESIGNER — CATEGORY SIDEBAR LAYOUT       -->
     <!-- ===================================================== -->
 
     <div id="sidebar">
 
-        <!-- MENU ITEMS (router requires .menu-item + data-module) -->
-        <div class="menu-item" data-module="vertical-designer">Vertical Designer</div>
-        <div class="menu-item" data-module="feedline">Feedline Lab</div>
-        <div class="menu-item" data-module="posters">Posters</div>
-        <div class="menu-item" data-module="propagation">Propagation Lab</div>
-        <div class="menu-item" data-module="nvis-designer">NVIS Designer</div>
-        <div class="menu-item" data-module="doublet-designer">Doublet Designer</div>
-        <div class="menu-item" data-module="dx-vertical">DX Vertical</div>
+        <h2>HF Antenna Designer</h2>
 
-        <!-- DESKTOP COLLAPSE BUTTON -->
-        <button id="sidebar-toggle" class="sidebar-label">⮜</button>
+        <!-- ========================= -->
+        <!--   VERTICAL ANTENNAS       -->
+        <!-- ========================= -->
+        <h3>Verticals</h3>
+        <div class="menu-item" data-module="vertical-designer">¼‑Wave Vertical</div>
+        <div class="menu-item" data-module="vertical-halfwave">½‑Wave Vertical</div>
+        <div class="menu-item" data-module="vertical-5-8">5/8‑Wave Vertical</div>
+        <div class="menu-item" data-module="vertical-toploaded">Top‑Loaded Vertical</div>
+        <div class="menu-item" data-module="vertical-loaded">Loaded Vertical</div>
+        <div class="menu-item" data-module="vertical-groundplane">Ground‑Plane Vertical</div>
+        <div class="menu-item" data-module="vertical-dx-designer">DX Vertical</div>
+        <div class="menu-item" data-module="vertical-array-2el-designer">2‑Element Vertical Array</div>
+        <div class="menu-item" data-module="vertical-array-3el-designer">3‑Element Vertical Array</div>
+        <div class="menu-item" data-module="vertical-radiator-array">Vertical Radiator Array</div>
+        <div class="menu-item" data-module="vertical-nvis-designer">Vertical NVIS</div>
+        <div class="menu-item" data-module="vertical-delta-loop">Vertical Delta Loop</div>
+
+        <!-- ========================= -->
+        <!--   DIPOLES & WIRE ANTENNAS -->
+        <!-- ========================= -->
+        <h3>Dipoles & Wires</h3>
+        <div class="menu-item" data-module="doublet-designer">Doublet Designer</div>
+        <div class="menu-item" data-module="efhw-designer">EFHW Designer</div>
+        <div class="menu-item" data-module="ocf-dipole-designer">OCF Dipole</div>
+        <div class="menu-item" data-module="fan-dipole-designer">Fan Dipole</div>
+        <div class="menu-item" data-module="randomwire-designer">Random Wire</div>
+        <div class="menu-item" data-module="terminated-dipole">Terminated Dipole</div>
+        <div class="menu-item" data-module="edz-designer">Extended Double Zepp</div>
+        <div class="menu-item" data-module="marconi-inverted-l">Inverted‑L</div>
+        <div class="menu-item" data-module="marconi-sloper">Marconi Sloper</div>
+
+        <!-- ========================= -->
+        <!--   LOOPS                   -->
+        <!-- ========================= -->
+        <h3>Loops</h3>
+        <div class="menu-item" data-module="horizontal-loop-designer">Horizontal Loop</div>
+        <div class="menu-item" data-module="fullwave-loop-designer">Full‑Wave Loop</div>
+        <div class="menu-item" data-module="delta-loop-designer">Delta Loop</div>
+        <div class="menu-item" data-module="skyloop-designer">Skyloop</div>
+        <div class="menu-item" data-module="hloop">Magnetic Loop</div>
+
+        <!-- ========================= -->
+        <!--   YAGIS & BEAMS           -->
+        <!-- ========================= -->
+        <h3>Yagis & Beams</h3>
+        <div class="menu-item" data-module="yagi-designer">Yagi Designer</div>
+        <div class="menu-item" data-module="beam-lab">Beam Lab</div>
+        <div class="menu-item" data-module="moxon-designer">Moxon</div>
+        <div class="menu-item" data-module="hexbeam-designer">Hexbeam</div>
+        <div class="menu-item" data-module="lpda-designer">Log‑Periodic (LPDA)</div>
+        <div class="menu-item" data-module="quagi">Quagi</div>
+        <div class="menu-item" data-module="quad-designer">Quad Loop Beam</div>
+
+        <!-- ========================= -->
+        <!--   LONGWIRES & BEVERAGES   -->
+        <!-- ========================= -->
+        <h3>Longwires & Beverages</h3>
+        <div class="menu-item" data-module="hf-longwire">Longwire</div>
+        <div class="menu-item" data-module="beverage-designer">Beverage</div>
+        <div class="menu-item" data-module="hf-beverage-reverse-fed">Reverse‑Fed Beverage</div>
+        <div class="menu-item" data-module="sloping-longwire-directional">Directional Sloping Wire</div>
+
+        <!-- ========================= -->
+        <!--   ARRAYS                  -->
+        <!-- ========================= -->
+        <h3>Arrays</h3>
+        <div class="menu-item" data-module="phased-array">Phased Arrays</div>
+        <div class="menu-item" data-module="foursquare-designer">Four‑Square</div>
+        <div class="menu-item" data-module="curtainarray-designer">Curtain Array</div>
+        <div class="menu-item" data-module="sterba-designer">Sterba Curtain</div>
+
+        <!-- ========================= -->
+        <!--   LABS & TOOLS            -->
+        <!-- ========================= -->
+        <h3>Labs & Tools</h3>
+        <div class="menu-item" data-module="feedline">Feedline Lab</div>
+        <div class="menu-item" data-module="swr-lab">SWR Lab</div>
+        <div class="menu-item" data-module="pattern-lab">Pattern Lab</div>
+        <div class="menu-item" data-module="ground-lab">Ground Lab</div>
+        <div class="menu-item" data-module="efficiency-lab">Efficiency Lab</div>
+        <div class="menu-item" data-module="band-opening">Band Opening</div>
+        <div class="menu-item" data-module="noise-lab">Noise Lab</div>
+        <div class="menu-item" data-module="feedpoint-analyzer">Feedpoint Analyzer</div>
+        <div class="menu-item" data-module="workbench-exporter">Export Tools</div>
+
+        <!-- ========================= -->
+        <!--   DOCUMENTATION           -->
+        <!-- ========================= -->
+        <h3>Documentation</h3>
+        <div class="menu-item" data-module="user-manual">User Manual</div>
+        <div class="menu-item" data-module="glossary">Glossary</div>
 
     </div>
-
-    <!-- FLOATING MOBILE MENU BUTTON -->
-    <button id="mobile-menu-btn">☰</button>
 
     <!-- MAIN CONTENT AREA -->
     <div id="content"></div>
