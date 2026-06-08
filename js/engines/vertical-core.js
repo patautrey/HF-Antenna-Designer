@@ -1,122 +1,162 @@
 /* ============================================================
-   HF Antenna Designer — Vertical Core Engine (Part 2)
-   Calculations + Ground + Radials + Impedance + Efficiency
+   HF Antenna Designer — Vertical Core Engine (Part 3)
+   Pattern Generation + Chart Integration (Precision Mode)
    ============================================================ */
 
 import MathEngine from "./math-engine.js";
+import ChartEngine from "./chart-engine.js";
 
 const VerticalCore = {
 
     /* ------------------------------------------------------------
-       1. GET BASIC PARAMETERS
+       1. PRECISION AZIMUTH PATTERN (H-plane)
        ------------------------------------------------------------ */
-    getParams() {
-        return {
-            type: document.getElementById("verticalType").value,
-            freq: parseFloat(document.getElementById("freq").value),
-            height: parseFloat(document.getElementById("height").value),
-            radialCount: parseInt(document.getElementById("radialCount").value),
-            radialLength: parseFloat(document.getElementById("radialLength").value),
-            groundType: document.getElementById("groundType").value,
-            dxMode: document.getElementById("dxMode").value
-        };
-    },
+    azimuthPattern(params) {
+        const angles = [];
+        const gain = [];
 
-    /* ------------------------------------------------------------
-       2. RADIATION RESISTANCE
-       ------------------------------------------------------------ */
-    radiationResistance(params) {
-        const { type, height, freq } = params;
-
-        // Special cases
-        if (type === "verticaldipole") return 73; // half-wave dipole vertical
-        if (type === "fiveeighths") return 150;  // typical 5/8-wave Rr
-
-        // Default vertical model
-        return MathEngine.radiationResistance_vertical(height, freq);
-    },
-
-    /* ------------------------------------------------------------
-       3. GROUND LOSS
-       ------------------------------------------------------------ */
-    groundLoss(params) {
-        const { groundType, radialCount, radialLength, freq } = params;
-
-        if (groundType === "seaside") return MathEngine.groundLoss_seaside();
-
-        // Radial-based ground loss
-        return MathEngine.groundLoss_radials(radialCount, radialLength, freq);
-    },
-
-    /* ------------------------------------------------------------
-       4. REACTANCE MODEL
-       ------------------------------------------------------------ */
-    reactance(params) {
-        const { type, height, freq } = params;
+        const { freq, height } = params;
         const λ = MathEngine.wavelength(freq);
-        const hλ = height / λ;
+        const k = (2 * Math.PI) / λ;
 
-        // 1/4-wave vertical near resonance
-        if (type === "quarter") {
-            return 120 * (hλ - 0.25) * 100;
+        for (let deg = 0; deg <= 360; deg += 2) {
+            const θ = Math.PI / 2; // horizontal cut
+            const φ = deg * (Math.PI / 180);
+
+            const Eθ = Math.cos(k * height * Math.cos(θ));
+            const Eφ = 0;
+
+            const E = Math.sqrt(Eθ * Eθ + Eφ * Eφ);
+
+            angles.push(deg);
+            gain.push(20 * Math.log10(Math.abs(E) + 1e-9));
         }
 
-        // 1/2-wave vertical (high reactance)
-        if (type === "half") {
-            return 800 * (hλ - 0.5);
+        return { angles, gain };
+    },
+
+    /* ------------------------------------------------------------
+       2. PRECISION ELEVATION PATTERN (E-plane)
+       ------------------------------------------------------------ */
+    elevationPattern(params) {
+        const angles = [];
+        const gain = [];
+
+        const { freq, height } = params;
+        const λ = MathEngine.wavelength(freq);
+        const k = (2 * Math.PI) / λ;
+
+        for (let deg = 0; deg <= 90; deg += 1) {
+            const θ = deg * (Math.PI / 180);
+            const φ = 0;
+
+            const Eθ = Math.cos(k * height * Math.cos(θ));
+            const Eφ = 0;
+
+            const E = Math.sqrt(Eθ * Eθ + Eφ * Eφ);
+
+            angles.push(deg);
+            gain.push(20 * Math.log10(Math.abs(E) + 1e-9));
         }
 
-        // Default thin-wire approximation
-        return 200 * (hλ - 0.25);
+        return { angles, gain };
     },
 
     /* ------------------------------------------------------------
-       5. FEEDPOINT IMPEDANCE
+       3. 3D RADIATION PATTERN (Precision Mode)
        ------------------------------------------------------------ */
-    feedpoint(params) {
-        const Rr = this.radiationResistance(params);
-        const Rg = this.groundLoss(params);
-        const X = this.reactance(params);
+    pattern3D(params) {
+        const { freq, height } = params;
+        const λ = MathEngine.wavelength(freq);
+        const k = (2 * Math.PI) / λ;
 
-        return MathEngine.feedpointImpedance(Rr, Rg, X);
+        const size = 60;
+        const x = [];
+        const y = [];
+        const z = [];
+
+        for (let i = 0; i < size; i++) {
+            const rowX = [];
+            const rowY = [];
+            const rowZ = [];
+
+            const θ = (i / (size - 1)) * Math.PI;
+
+            for (let j = 0; j < size; j++) {
+                const φ = (j / (size - 1)) * 2 * Math.PI;
+
+                const Eθ = Math.cos(k * height * Math.cos(θ));
+                const Eφ = 0;
+
+                const E = Math.sqrt(Eθ * Eθ + Eφ * Eφ);
+
+                const r = Math.abs(E);
+
+                rowX.push(r * Math.sin(θ) * Math.cos(φ));
+                rowY.push(r * Math.sin(θ) * Math.sin(φ));
+                rowZ.push(r * Math.cos(θ));
+            }
+
+            x.push(rowX);
+            y.push(rowY);
+            z.push(rowZ);
+        }
+
+        return { x, y, z };
     },
 
     /* ------------------------------------------------------------
-       6. SWR + RETURN LOSS
+       4. SWR SWEEP
        ------------------------------------------------------------ */
-    swrData(params) {
-        const Z = this.feedpoint(params);
-        return {
-            swr: MathEngine.swr(Z),
-            rl: MathEngine.returnLoss(Z)
-        };
+    swrSweep(params) {
+        const freq = params.freq;
+        const sweep = [];
+        const swr = [];
+
+        for (let f = freq - 0.5; f <= freq + 0.5; f += 0.02) {
+            const p = { ...params, freq: f };
+            const Z = this.feedpoint(p);
+            sweep.push(f);
+            swr.push(MathEngine.swr(Z));
+        }
+
+        return { frequency: sweep, swr };
     },
 
     /* ------------------------------------------------------------
-       7. EFFICIENCY
+       5. CURRENT DISTRIBUTION
        ------------------------------------------------------------ */
-    efficiency(params) {
-        const Rr = this.radiationResistance(params);
-        const Rg = this.groundLoss(params);
+    currentDistribution(params) {
+        const segments = 40;
+        const arr = MathEngine.currentDistribution_vertical(
+            params.height,
+            params.freq,
+            segments
+        );
 
-        return Rr / (Rr + Rg);
+        const elements = [];
+        for (let i = 0; i < segments; i++) {
+            elements.push(i + 1);
+        }
+
+        return { elements, current: arr };
     },
 
     /* ------------------------------------------------------------
-       8. TAKEOFF ANGLE (TOA)
+       6. RENDER ALL CHARTS
        ------------------------------------------------------------ */
-    takeoffAngle(params) {
-        return MathEngine.takeoffAngle(params.freq, params.height);
-    },
+    renderCharts(params) {
+        const az = this.azimuthPattern(params);
+        ChartEngine.azimuth("azimuthPlot", az);
 
-    /* ------------------------------------------------------------
-       9. GAIN WITH GROUND
-       ------------------------------------------------------------ */
-    gain(params) {
-        const baseGain = 1.5; // dBi typical for 1/4-wave
+        const el = this.elevationPattern(params);
+        ChartEngine.elevation("elevationPlot", el);
 
-        const Rg = this.groundLoss(params);
-        return MathEngine.gainWithGround(baseGain, Rg);
+        const sw = this.swrSweep(params);
+        ChartEngine.swrCurve("swrPlot", sw);
+
+        const cd = this.currentDistribution(params);
+        ChartEngine.currentDistribution("currentPlot", cd);
     }
 };
 
