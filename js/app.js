@@ -1,34 +1,25 @@
-// ============================================================
-// HF Antenna Designer — App Router (Browser Safe)
-// ============================================================
+/* ============================================================
+   HF Antenna Designer — Application Bootstrap
+   ============================================================ */
 
-import { modules } from "./master-index.js";
+import Layout from "./layout.js";
+import Sidebar from "./sidebar.js";
+import Theme from "./theme.js";
+import Router from "./router.js";
 
-const sidebarItems = document.querySelectorAll(".menu-item");
-const content = document.getElementById("content");
+const App = {
 
-function loadModule(id) {
-    const mod = modules[id];
+    async init() {
+        Layout.createLayout();
+        Theme.init();
+        Sidebar.renderSidebar();
 
-    if (!mod) {
-        content.innerHTML = `
-            <h2>Module Not Found</h2>
-            <p>ID: <b>${id}</b></p>
-        `;
-        console.error("Module not found:", id, modules);
-        return;
+        await Router.navigate("vertical-quarterwave");
     }
+};
 
-    content.innerHTML = "";
-    mod.default(content);
-}
-
-sidebarItems.forEach(item => {
-    item.addEventListener("click", () => {
-        sidebarItems.forEach(i => i.classList.remove("active"));
-        item.classList.add("active");
-
-        const id = item.dataset.module;
-        loadModule(id);
-    });
+window.addEventListener("DOMContentLoaded", () => {
+    App.init();
 });
+
+export default App;
