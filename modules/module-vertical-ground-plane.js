@@ -1,16 +1,16 @@
 /* ============================================================
-   HF Antenna Designer — Module: Vertical Ground‑Plane
+   HF Antenna Designer — Module: Vertical Ground‑Plane Antenna
    ============================================================ */
 
 export default {
 
-    name: "Vertical Ground‑Plane",
+    name: "Vertical Ground‑Plane Antenna",
 
     async init(container) {
         const engine = await import("/engines/vertical-ground-plane.js");
 
         if (!engine || !engine.default) {
-            console.error("Vertical Ground‑Plane engine missing");
+            console.error("Vertical Ground‑Plane Antenna engine missing");
             return;
         }
 
@@ -22,8 +22,9 @@ export default {
             radialCount: 4,
             radialLength: 5.0,
             radialAngle: 45,
-            feedHeight: 2.0,
             wireGauge: 14,
+            mountingHeight: 2.0,
+            orientation: 0,
             groundType: "medium"
         };
 
