@@ -1,54 +1,45 @@
-/* ---------------------------------------------------------
-   HF Workbench — Router
-   Loads the correct module into #content based on hash route.
---------------------------------------------------------- */
+/* ============================================================
+   HF Antenna Designer — Lazy‑Loading Router Engine
+   ============================================================ */
 
-import initVerticalDX from "./modules/vertical-dx.js";
-import initPerformer from "./modules/performer.js";
-import initDominator from "./modules/dominator.js";
-import initVerticalNVIS from "./modules/vertical-nvis.js";
-import initNVISDesigner from "./modules/nvis-designer.js";
+import ModuleRegistry from "./modules.js";
 
-import initOCF from "./modules/ocf.js";
-import initEFHW from "./modules/efhw.js";
-import initRandomWire from "./modules/random-wire.js";
-import initDoublet from "./modules/doublet.js";
-import initHLoop from "./modules/hloop.js";
-import initSkyloop from "./modules/skyloop.js";
+const Router = {
 
-const routes = {
-    "#vertical-dx": initVerticalDX,
-    "#performer": initPerformer,
-    "#dominator": initDominator,
-    "#vertical-nvis": initVerticalNVIS,
-    "#nvis-designer": initNVISDesigner,
+    currentModule: null,
 
-    "#ocf": initOCF,
-    "#efhw": initEFHW,
-    "#random-wire": initRandomWire,
-    "#doublet": initDoublet,
-    "#hloop": initHLoop,
-    "#skyloop": initSkyloop
+    async navigate(moduleName) {
+        const path = ModuleRegistry.getModulePath(moduleName);
+        if (!path) {
+            console.error("Module not found:", moduleName);
+            return;
+        }
+
+        this.currentModule = moduleName;
+        await this.loadModule(path);
+    },
+
+    async loadModule(path) {
+        try {
+            const container = document.getElementById("main");
+            if (container) container.innerHTML = "";
+
+            const moduleFile = await import(path);
+            if (!moduleFile || !moduleFile.default) {
+                console.error("Invalid module:", path);
+                return;
+            }
+
+            const moduleObj = moduleFile.default;
+
+            if (typeof moduleObj.init === "function") {
+                moduleObj.init(container);
+            }
+
+        } catch (err) {
+            console.error("Error loading module:", path, err);
+        }
+    }
 };
 
-function loadRoute() {
-    const hash = window.location.hash || "#vertical-dx";
-    const loader = routes[hash];
-
-    const content = document.querySelector("#content");
-    if (!content) return;
-
-    if (loader) {
-        loader(content);
-    } else {
-        content.innerHTML = `
-            <section class="tool">
-                <h2>Unknown Tool</h2>
-                <p>The requested tool does not exist.</p>
-            </section>
-        `;
-    }
-}
-
-window.addEventListener("hashchange", loadRoute);
-window.addEventListener("DOMContentLoaded", loadRoute);
+export default Router;
