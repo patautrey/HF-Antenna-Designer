@@ -1,7 +1,7 @@
-============================================================
+
 HF Antenna Designer
 Maintenance & File Management Guide
-============================================================
+
 
 This document explains how HF_Antenna_Designer is structured, how automatic module discovery works, and how to safely maintain a large system containing 150+ antenna modules, labs, calculators, and engineering tools.
 
