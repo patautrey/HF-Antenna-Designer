@@ -18,11 +18,12 @@ export default {
 
         const defaults = {
             frequency: 14.2,
-            verticalLength: 8.0,
-            topHatWidth: 6.0,
-            topHatWires: 2,
-            feedHeight: 2.0,
+            verticalSection: 6.0,
+            topHatLength: 10.0,
+            topHatHeight: 8.0,
             wireGauge: 14,
+            mountingHeight: 2.0,
+            orientation: 0,
             groundType: "medium"
         };
 
