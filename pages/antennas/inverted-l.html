@@ -1,0 +1,37 @@
+<!-- ============================================================
+     HF Antenna Designer — Page: Inverted‑L Antenna
+     ============================================================ -->
+
+<section class="antenna-header">
+    <h1>{{ name }}</h1>
+    <p>{{ description }}</p>
+</section>
+
+<section class="visual-reference">
+    <h3>📸 Visual Reference</h3>
+    <div class="image-carousel">
+        {{ renderImageCarousel(imageQueries) }}
+    </div>
+</section>
+
+<section class="antenna-explanation">
+    <h3>What This Antenna Is</h3>
+    <p>
+        The Inverted‑L antenna combines a vertical radiator with a horizontal top wire,
+        forming an “L” shape. It is widely used on the low HF bands because it offers
+        strong low‑angle radiation for DX while fitting into modest spaces where a
+        full vertical or dipole would not fit.
+    </p>
+</section>
+
+<section class="antenna-modeling">
+    <h3>How This Antenna Is Modeled</h3>
+    <ul>
+        <li>Vertical section produces the primary low‑angle DX radiation.</li>
+        <li>Horizontal section increases electrical length and tuning range.</li>
+        <li>Ground losses are included and dominate low‑band efficiency.</li>
+        <li>Radial count and length directly influence performance.</li>
+        <li>Current distribution is modeled along both legs of the antenna.</li>
+        <li>End effects adjust the required physical wire length.</li>
+    </ul>
+</section>
