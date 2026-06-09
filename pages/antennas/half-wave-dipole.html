@@ -1,0 +1,37 @@
+<!-- ============================================================
+     HF Antenna Designer — Page: Half-Wave Dipole
+     ============================================================ -->
+
+<section class="antenna-header">
+    <h1>{{ name }}</h1>
+    <p>{{ description }}</p>
+</section>
+
+<section class="visual-reference">
+    <h3>📸 Visual Reference</h3>
+    <div class="image-carousel">
+        {{ renderImageCarousel(imageQueries) }}
+    </div>
+</section>
+
+<section class="antenna-explanation">
+    <h3>What This Antenna Is</h3>
+    <p>
+        The half-wave dipole is the most widely used HF antenna. It consists of two
+        quarter-wave legs fed at the center and provides a predictable, efficient,
+        and reliable radiation pattern. When installed at a good height, it offers
+        excellent performance for both local and DX communication.
+    </p>
+</section>
+
+<section class="antenna-modeling">
+    <h3>How This Antenna Is Modeled</h3>
+    <ul>
+        <li>Total length sets the resonant frequency.</li>
+        <li>Height above ground determines takeoff angle and pattern shape.</li>
+        <li>Inverted-V configuration modifies impedance and bandwidth.</li>
+        <li>End effects shorten the required physical length.</li>
+        <li>Wire diameter influences Q factor and bandwidth.</li>
+        <li>Bidirectional broadside pattern is calculated accurately.</li>
+    </ul>
+</section>
