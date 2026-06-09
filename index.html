@@ -24,9 +24,9 @@
     <div id="panel"></div>
 
     <script type="module">
-        import { antennaSelector } from "/ui/components/antenna-selector.js";
-        import { runPanel } from "/app/runPanel.js";
-        import { app } from "/app/app.js";
+        import { antennaSelector } from "./ui/components/antenna-selector.js";
+        import { runPanel } from "./app/runPanel.js";
+        import { app } from "./app/app.js";
 
         document.getElementById("selector").innerHTML = antennaSelector();
 
@@ -35,7 +35,6 @@
             runPanel(app, panel, "panel");
         };
 
-        // Default panel
         runPanel(app, "flowerpot", "panel");
     </script>
 
