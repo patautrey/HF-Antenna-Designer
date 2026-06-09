@@ -68,7 +68,6 @@ export default class FlowerpotPerformancePanel {
                 const efficiency = pattern.efficiency || 0;
 
                 const bandwidth = this.estimateBandwidth(swr);
-
                 const chokeOK = result.metadata.chokeTurns >= 5;
 
                 document.getElementById("fp_pa_output").innerHTML = `
