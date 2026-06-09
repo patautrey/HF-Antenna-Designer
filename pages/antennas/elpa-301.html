@@ -1,0 +1,36 @@
+<!-- ============================================================
+     HF Antenna Designer — Page: Elpa 301
+     ============================================================ -->
+
+<section class="antenna-header">
+    <h1>{{ name }}</h1>
+    <p>{{ description }}</p>
+</section>
+
+<section class="visual-reference">
+    <h3>📸 Visual Reference</h3>
+    <div class="image-carousel">
+        {{ renderImageCarousel(imageQueries) }}
+    </div>
+</section>
+
+<section class="antenna-explanation">
+    <h3>What This Antenna Is</h3>
+    <p>
+        The Elpa 301 is a multi-element HF wire array designed to provide directional
+        gain on the lower HF bands. It uses several parallel wire elements spaced
+        closely together to form a lightweight, high-performance directional antenna
+        suitable for installations where full-size beams are not practical.
+    </p>
+</section>
+
+<section class="antenna-modeling">
+    <h3>How This Antenna Is Modeled</h3>
+    <ul>
+        <li>Element spacing determines gain and front-to-back ratio.</li>
+        <li>Mutual coupling between elements is included for accuracy.</li>
+        <li>End effects adjust the electrical length of each element.</li>
+        <li>Height above ground controls takeoff angle and pattern shape.</li>
+        <li>Feed impedance is modeled at 50 Ω for compatibility.</li>
+    </ul>
+</section>
