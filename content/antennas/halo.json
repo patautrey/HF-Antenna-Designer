@@ -1,0 +1,16 @@
+{
+    "name": "Halo Antenna",
+    "imageQueries": [
+        "halo_antenna",
+        "halo_antenna_diagram",
+        "mobile_halo_antenna"
+    ],
+    "description": "The Halo antenna is a horizontally polarized omnidirectional loop used primarily on VHF. It is essentially a folded dipole bent into a circle, often gamma-matched for 50-ohm feed, and is popular for mobile weak-signal work.",
+    "modelingNotes": [
+        "Loop diameter determines resonant frequency and radiation pattern.",
+        "Conductor diameter affects bandwidth and Q factor.",
+        "Gamma match length controls feedpoint impedance.",
+        "Horizontal polarization provides better weak-signal performance.",
+        "Mounting height influences horizon gain and pattern symmetry."
+    ]
+}
