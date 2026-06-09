@@ -1,0 +1,17 @@
+{
+    "name": "Gotham Vertical",
+    "imageQueries": [
+        "gotham_vertical_antenna",
+        "loaded_vertical_antenna_coil",
+        "short_vertical_hf_antenna"
+    ],
+    "description": "The Gotham Vertical is a compact HF vertical antenna that uses a mid‑mounted loading coil to achieve resonance on lower HF bands. It is known for its small physical size and moderate performance when installed with adequate radials.",
+    "modelingNotes": [
+        "Loading coil inductance determines resonant frequency.",
+        "Coil position affects current distribution and efficiency.",
+        "Ground-mounted installations require many radials for good performance.",
+        "Losses in the loading coil significantly reduce efficiency.",
+        "Short verticals have low radiation resistance and must be modeled carefully.",
+        "Height above ground influences takeoff angle and pattern shape."
+    ]
+}
