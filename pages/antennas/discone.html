@@ -1,6 +1,35 @@
+<!-- ============================================================
+     HF Antenna Designer — Page: Discone Antenna
+     ============================================================ -->
+
+<section class="antenna-header">
+    <h1>{{ name }}</h1>
+    <p>{{ description }}</p>
+</section>
+
 <section class="visual-reference">
     <h3>📸 Visual Reference</h3>
     <div class="image-carousel">
-        <!-- IMAGE_TAG_HERE -->
+        {{ renderImageCarousel(imageQueries) }}
     </div>
+</section>
+
+<section class="antenna-explanation">
+    <h3>What This Antenna Is</h3>
+    <p>
+        The discone is an ultra-wideband antenna consisting of a disc above a cone.
+        It provides vertical polarization, omnidirectional coverage, and bandwidth
+        ratios from 3:1 up to 10:1 depending on geometry.
+    </p>
+</section>
+
+<section class="antenna-modeling">
+    <h3>How This Antenna Is Modeled</h3>
+    <ul>
+        <li>Disc diameter sets the upper frequency limit.</li>
+        <li>Cone length and angle set the lower frequency limit.</li>
+        <li>Feed impedance is typically near 50 Ω.</li>
+        <li>Bandwidth ratio determines tuning range.</li>
+        <li>Mounting height affects horizon gain.</li>
+    </ul>
 </section>
