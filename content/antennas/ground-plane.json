@@ -1,0 +1,17 @@
+{
+    "name": "Ground Plane Antenna",
+    "imageQueries": [
+        "quarter_wave_ground_plane_antenna",
+        "vertical_antenna_radials",
+        "ground_plane_antenna_diagram"
+    ],
+    "description": "A ground plane antenna is a quarter-wave vertical radiator with multiple radials that act as a reflective ground surface. It provides omnidirectional coverage and is widely used on HF, VHF, and UHF bands.",
+    "modelingNotes": [
+        "Radiator length determines resonant frequency.",
+        "Radial angle affects feedpoint impedance and bandwidth.",
+        "More radials improve pattern symmetry and efficiency.",
+        "Mutual coupling between radials influences impedance.",
+        "Mounting height determines horizon gain and takeoff angle.",
+        "A true ground plane requires at least 3–4 radials."
+    ]
+}
