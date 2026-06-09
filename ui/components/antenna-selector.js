@@ -1,7 +1,3 @@
-/* ============================================================
-   Antenna Selector Component
-   ============================================================ */
-
 export function antennaSelector() {
     return `
     <select id="antenna_select">
