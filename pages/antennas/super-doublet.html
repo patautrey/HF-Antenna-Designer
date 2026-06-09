@@ -1,0 +1,36 @@
+<!-- ============================================================
+     HF Antenna Designer — Page: Super Doublet
+     ============================================================ -->
+
+<section class="antenna-header">
+    <h1>{{ name }}</h1>
+    <p>{{ description }}</p>
+</section>
+
+<section class="visual-reference">
+    <h3>📸 Visual Reference</h3>
+    <div class="image-carousel">
+        {{ renderImageCarousel(imageQueries) }}
+    </div>
+</section>
+
+<section class="antenna-explanation">
+    <h3>What This Antenna Is</h3>
+    <p>
+        The Super Doublet is a center-fed HF wire antenna fed with open-wire or
+        ladder-line and matched with a balanced tuner. Unlike a resonant dipole,
+        the Super Doublet is designed for efficient multiband operation, taking
+        advantage of low-loss balanced feedline even at high SWR.
+    </p>
+</section>
+
+<section class="antenna-modeling">
+    <h3>How This Antenna Is Modeled</h3>
+    <ul>
+        <li>Total wire length shapes the radiation pattern on each band.</li>
+        <li>Open-wire feedline minimizes loss across all HF bands.</li>
+        <li>Height above ground determines takeoff angle and NVIS/DX balance.</li>
+        <li>A balanced tuner is assumed for proper multiband matching.</li>
+        <li>Longer doublets develop multi-lobed patterns ideal for DX.</li>
+    </ul>
+</section>
