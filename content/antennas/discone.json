@@ -1,0 +1,16 @@
+{
+    "name": "Discone Antenna",
+    "imageQueries": [
+        "discone_antenna",
+        "discone_diagram",
+        "discone_vertical_mount"
+    ],
+    "description": "The discone is an ultra-wideband vertical antenna used for VHF/UHF scanning and monitoring. It consists of a disc above a cone and provides omnidirectional coverage with bandwidth ratios from 3:1 to 10:1.",
+    "modelingNotes": [
+        "Disc diameter sets the upper frequency limit.",
+        "Cone length and angle determine the lower frequency limit.",
+        "Feed impedance is typically near 50 ohms.",
+        "Bandwidth ratio determines tuning range.",
+        "Mounting height affects horizon gain."
+    ]
+}
