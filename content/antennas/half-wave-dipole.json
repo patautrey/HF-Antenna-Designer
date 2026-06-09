@@ -1,0 +1,17 @@
+{
+    "name": "Half-Wave Dipole",
+    "imageQueries": [
+        "half_wave_dipole_antenna",
+        "inverted_v_dipole",
+        "hf_dipole_diagram"
+    ],
+    "description": "The half-wave dipole is the fundamental HF antenna, consisting of two quarter-wave legs fed at the center. It provides a predictable radiation pattern, moderate gain, and excellent efficiency when installed at a reasonable height.",
+    "modelingNotes": [
+        "Total length determines resonant frequency.",
+        "Height above ground strongly affects takeoff angle.",
+        "Inverted-V configuration lowers feed impedance and broadens bandwidth.",
+        "End effects shorten the required physical length.",
+        "Wire diameter influences bandwidth and Q factor.",
+        "Dipoles exhibit a bidirectional pattern broadside to the wire."
+    ]
+}
