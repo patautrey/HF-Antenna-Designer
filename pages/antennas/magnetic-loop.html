@@ -1,0 +1,38 @@
+<!-- ============================================================
+     HF Antenna Designer — Page: Magnetic Loop (John Portune)
+     ============================================================ -->
+
+<section class="antenna-header">
+    <h1>{{ name }}</h1>
+    <p>{{ description }}</p>
+</section>
+
+<section class="visual-reference">
+    <h3>📸 Visual Reference</h3>
+    <div class="image-carousel">
+        {{ renderImageCarousel(imageQueries) }}
+    </div>
+</section>
+
+<section class="antenna-explanation">
+    <h3>What This Antenna Is</h3>
+    <p>
+        This magnetic loop follows the high-efficiency design principles taught by
+        John Portune. It uses large copper tubing, a high-Q tuning capacitor, and a
+        properly sized coupling loop to achieve excellent performance in restricted
+        spaces such as balconies, apartments, and portable setups.
+    </p>
+</section>
+
+<section class="antenna-modeling">
+    <h3>How This Antenna Is Modeled</h3>
+    <ul>
+        <li>Loop circumference is set between 0.1λ and 0.25λ for optimal efficiency.</li>
+        <li>Large-diameter copper tubing reduces loss resistance and increases Q.</li>
+        <li>High-Q vacuum/butterfly capacitors provide narrow bandwidth and efficiency.</li>
+        <li>Efficiency is computed from radiation vs. loss resistance.</li>
+        <li>Skin effect and conductor losses are included for realistic modeling.</li>
+        <li>Coupling loop diameter is 20–25% of the main loop diameter.</li>
+        <li>Capacitor voltage is calculated and displayed for safety awareness.</li>
+    </ul>
+</section>
