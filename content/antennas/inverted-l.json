@@ -1,0 +1,17 @@
+{
+    "name": "Inverted‑L Antenna",
+    "imageQueries": [
+        "inverted_l_antenna",
+        "inverted_l_vertical_horizontal_wire",
+        "inverted_l_hf_antenna_diagram"
+    ],
+    "description": "The Inverted‑L is a compact HF antenna consisting of a vertical section and a horizontal top wire. It provides excellent low‑band performance when space is limited and is widely used for 160m, 80m, and 40m operation.",
+    "modelingNotes": [
+        "Vertical section provides low‑angle radiation for DX.",
+        "Horizontal section increases electrical length and tuning flexibility.",
+        "Ground losses dominate performance on low HF bands.",
+        "Radial count and length strongly affect efficiency.",
+        "Current distribution is modeled along both vertical and horizontal legs.",
+        "End effects shorten the required physical wire length."
+    ]
+}
