@@ -1,0 +1,17 @@
+{
+    "name": "Hex Beam",
+    "imageQueries": [
+        "hex_beam_antenna",
+        "hexbeam_spreaders",
+        "hex_beam_wire_layout"
+    ],
+    "description": "The Hex Beam is a compact directional HF antenna that uses a six‑arm spreader system to support a pair of wire elements shaped into a broad hexagon. It provides excellent gain, front‑to‑back ratio, and multiband capability in a lightweight structure.",
+    "modelingNotes": [
+        "Reflector spacing determines front-to-back ratio.",
+        "Driven element perimeter sets resonant frequency.",
+        "Spreader length controls the geometry of the wire layout.",
+        "Mutual coupling between wires shapes the radiation pattern.",
+        "Height above ground influences takeoff angle and gain.",
+        "Hexagonal geometry provides compact size with beam-like performance."
+    ]
+}
