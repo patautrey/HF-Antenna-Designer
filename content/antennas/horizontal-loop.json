@@ -1,0 +1,17 @@
+{
+    "name": "Horizontal Loop",
+    "imageQueries": [
+        "horizontal_loop_antenna",
+        "skywire_loop_antenna",
+        "hf_full_wave_loop_diagram"
+    ],
+    "description": "The Horizontal Loop, often called the Skywire Loop, is a full‑wave wire loop mounted horizontally. It provides excellent multiband performance, low noise reception, and strong NVIS capability on lower HF bands.",
+    "modelingNotes": [
+        "Loop perimeter determines the fundamental resonant frequency.",
+        "Height above ground strongly affects NVIS vs DX performance.",
+        "Shape (square, triangle, irregular) has minimal effect on resonance.",
+        "Corner feedpoint provides a convenient impedance for ladder-line.",
+        "Ladder-line feed enables efficient multiband operation.",
+        "Full-wave loops exhibit low noise compared to dipoles."
+    ]
+}
