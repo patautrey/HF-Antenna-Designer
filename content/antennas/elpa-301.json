@@ -1,0 +1,17 @@
+{
+    "name": "Elpa 301",
+    "imageQueries": [
+        "elpa_301_antenna",
+        "elpa_301_hf_array",
+        "elpa_301_wire_antenna"
+    ],
+    "description": "The Elpa 301 is a multi-element HF wire array designed for strong directional performance on the lower HF bands. It uses multiple parallel elements with specific spacing to achieve gain and front-to-back ratio while remaining lightweight and wire-based.",
+    "modelingNotes": [
+        "Multiple parallel elements create directional gain.",
+        "Element spacing determines front-to-back ratio.",
+        "Mutual coupling between elements must be modeled accurately.",
+        "Height above ground strongly affects takeoff angle.",
+        "End effects influence resonant length and impedance.",
+        "Ideal for low-band DX where full-size beams are impractical."
+    ]
+}
