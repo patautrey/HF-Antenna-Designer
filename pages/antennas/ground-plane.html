@@ -1,0 +1,36 @@
+<!-- ============================================================
+     HF Antenna Designer — Page: Ground Plane Antenna
+     ============================================================ -->
+
+<section class="antenna-header">
+    <h1>{{ name }}</h1>
+    <p>{{ description }}</p>
+</section>
+
+<section class="visual-reference">
+    <h3>📸 Visual Reference</h3>
+    <div class="image-carousel">
+        {{ renderImageCarousel(imageQueries) }}
+    </div>
+</section>
+
+<section class="antenna-explanation">
+    <h3>What This Antenna Is</h3>
+    <p>
+        A ground plane antenna is a quarter-wave vertical radiator with several
+        radials that act as a reflective ground surface. It provides omnidirectional
+        coverage and is commonly used on HF, VHF, and UHF bands due to its simplicity
+        and reliable performance.
+    </p>
+</section>
+
+<section class="antenna-modeling">
+    <h3>How This Antenna Is Modeled</h3>
+    <ul>
+        <li>Radiator length sets the resonant frequency.</li>
+        <li>Radial angle influences feedpoint impedance and bandwidth.</li>
+        <li>Mutual coupling between radials is included for accuracy.</li>
+        <li>Radial count affects efficiency and pattern symmetry.</li>
+        <li>Mounting height determines takeoff angle and horizon gain.</li>
+    </ul>
+</section>
