@@ -17,14 +17,14 @@ export default {
         const Discone = engine.default;
 
         const defaults = {
-            frequency: 150.0,               // MHz baseline (VHF typical)
-            discDiameter: 0.5,              // meters
-            coneLength: 0.6,                // meters
-            coneAngle: 60,                  // degrees
-            elementCount: 8,                // number of cone radials
-            feedImpedance: 50,              // ohms
-            bandwidthRatio: 3.0,            // wideband capability
-            mountingMethod: "vertical",     // vertical omni
+            frequency: 150.0,
+            discDiameter: 0.5,
+            coneLength: 0.6,
+            coneAngle: 60,
+            elementCount: 8,
+            feedImpedance: 50,
+            bandwidthRatio: 3.0,
+            mountingMethod: "vertical",
             mountingHeight: 3.0,
             orientation: 0,
             groundType: "none"
