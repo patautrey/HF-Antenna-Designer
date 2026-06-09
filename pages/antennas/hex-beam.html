@@ -1,0 +1,36 @@
+<!-- ============================================================
+     HF Antenna Designer — Page: Hex Beam
+     ============================================================ -->
+
+<section class="antenna-header">
+    <h1>{{ name }}</h1>
+    <p>{{ description }}</p>
+</section>
+
+<section class="visual-reference">
+    <h3>📸 Visual Reference</h3>
+    <div class="image-carousel">
+        {{ renderImageCarousel(imageQueries) }}
+    </div>
+</section>
+
+<section class="antenna-explanation">
+    <h3>What This Antenna Is</h3>
+    <p>
+        The Hex Beam is a lightweight, compact directional HF antenna that uses six
+        fiberglass spreaders to support a pair of wire elements shaped into a broad
+        hexagon. It offers beam-like performance with lower wind load and easier
+        installation compared to traditional Yagi antennas.
+    </p>
+</section>
+
+<section class="antenna-modeling">
+    <h3>How This Antenna Is Modeled</h3>
+    <ul>
+        <li>Reflector spacing determines front-to-back ratio.</li>
+        <li>Driven element perimeter sets resonant frequency.</li>
+        <li>Spreader length defines the hexagonal geometry.</li>
+        <li>Mutual coupling between wires shapes the radiation pattern.</li>
+        <li>Height above ground influences takeoff angle and gain.</li>
+    </ul>
+</section>
