@@ -1,0 +1,35 @@
+<!-- ============================================================
+     HF Antenna Designer — Page: Halo Antenna
+     ============================================================ -->
+
+<section class="antenna-header">
+    <h1>{{ name }}</h1>
+    <p>{{ description }}</p>
+</section>
+
+<section class="visual-reference">
+    <h3>📸 Visual Reference</h3>
+    <div class="image-carousel">
+        {{ renderImageCarousel(imageQueries) }}
+    </div>
+</section>
+
+<section class="antenna-explanation">
+    <h3>What This Antenna Is</h3>
+    <p>
+        The Halo antenna is a horizontally polarized omnidirectional loop, commonly
+        used on VHF for mobile weak-signal operation. It is essentially a folded
+        dipole bent into a circle, often gamma-matched for 50-ohm feed.
+    </p>
+</section>
+
+<section class="antenna-modeling">
+    <h3>How This Antenna Is Modeled</h3>
+    <ul>
+        <li>Loop diameter determines resonant frequency and radiation pattern.</li>
+        <li>Conductor diameter affects bandwidth and Q factor.</li>
+        <li>Gamma match length controls feedpoint impedance.</li>
+        <li>Horizontal polarization provides better weak-signal performance.</li>
+        <li>Mounting height influences horizon gain and pattern symmetry.</li>
+    </ul>
+</section>
