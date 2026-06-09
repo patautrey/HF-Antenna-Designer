@@ -1,0 +1,16 @@
+{
+    "name": "Beverage Antenna",
+    "imageQueries": [
+        "beverage_antenna",
+        "beverage_wire_antenna_diagram",
+        "beverage_antenna_termination_resistor"
+    ],
+    "description": "The Beverage antenna is a long-wire, low-noise receiving antenna used primarily on the low HF bands. It is a traveling-wave antenna, typically 1–5 wavelengths long, mounted close to the ground, and terminated with a resistor to provide strong directionality.",
+    "modelingNotes": [
+        "Wire length determines directivity and low-angle sensitivity.",
+        "Height above ground affects noise performance and pattern shape.",
+        "Termination resistor sets the directionality and reduces reflections.",
+        "Ground conductivity influences efficiency and pattern stability.",
+        "Orientation determines the primary receiving direction."
+    ]
+}
