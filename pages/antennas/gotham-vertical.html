@@ -1,0 +1,37 @@
+<!-- ============================================================
+     HF Antenna Designer — Page: Gotham Vertical
+     ============================================================ -->
+
+<section class="antenna-header">
+    <h1>{{ name }}</h1>
+    <p>{{ description }}</p>
+</section>
+
+<section class="visual-reference">
+    <h3>📸 Visual Reference</h3>
+    <div class="image-carousel">
+        {{ renderImageCarousel(imageQueries) }}
+    </div>
+</section>
+
+<section class="antenna-explanation">
+    <h3>What This Antenna Is</h3>
+    <p>
+        The Gotham Vertical is a compact HF vertical antenna that uses a mid‑mounted
+        loading coil to achieve resonance on lower HF bands. Its small size makes it
+        suitable for limited-space installations, though performance depends heavily
+        on radial quality and coil efficiency.
+    </p>
+</section>
+
+<section class="antenna-modeling">
+    <h3>How This Antenna Is Modeled</h3>
+    <ul>
+        <li>Loading coil inductance sets the resonant frequency.</li>
+        <li>Coil position determines current distribution and efficiency.</li>
+        <li>Ground losses are included due to the short radiator.</li>
+        <li>Loading coil losses are modeled explicitly.</li>
+        <li>Radial count and length strongly affect overall performance.</li>
+        <li>Radiation resistance is low and modeled with precision.</li>
+    </ul>
+</section>
