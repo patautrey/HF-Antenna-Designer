@@ -1,5 +1,5 @@
 /* ============================================================
-   HF/VHF/UHF Antenna Designer — Flowerpot (T2LT) Engine
+   Flowerpot (T2LT) Antenna Engine
    Fully Parametric, Coax-Aware, PVC-Aware, NEC-Style Geometry
    ============================================================ */
 
@@ -11,7 +11,6 @@ export default class FlowerpotEngine extends BaseEngine {
     constructor(config) {
         super(config);
 
-        // Built-in coax library
         this.coaxDB = {
             "RG58":  { od: 4.95, vf: 0.66 },
             "RG8X":  { od: 6.10, vf: 0.78 },
@@ -22,45 +21,28 @@ export default class FlowerpotEngine extends BaseEngine {
         };
     }
 
-    /* ------------------------------------------------------------
-       Compute element lengths based on frequency, VF, PVC mode
-       ------------------------------------------------------------ */
     computeElementLengths(freq, coaxType, pvcMode) {
         const c = 299792458;
         const coax = this.coaxDB[coaxType] || this.coaxDB["RG58"];
 
-        // Base half-wave length
         let L = (c / (2 * freq)) * coax.vf;
 
-        // PVC dielectric shortening
         const pvcFactor = pvcMode === "inside" ? 0.95 : 0.98;
         L *= pvcFactor;
 
-        // Split into top/bottom elements (Flowerpot ratio ~50/50)
         return {
             top: L * 0.50,
             bottom: L * 0.50
         };
     }
 
-    /* ------------------------------------------------------------
-       Compute required choke turns using Wheeler's formula
-       ------------------------------------------------------------ */
     computeChokeTurns(freq, pvcOD, coaxType, targetXL = 500) {
         const coax = this.coaxDB[coaxType] || this.coaxDB["RG58"];
+        const Lreq = targetXL / (2 * Math.PI * freq);
 
-        // Required inductance
-        const Lreq = targetXL / (2 * Math.PI * freq); // Henries
-
-        // Wheeler's formula for single-layer solenoid
-        // L(µH) = (r^2 * N^2) / (9r + 10l)
-        // Convert to meters
         const r = (pvcOD / 1000) / 2;
-
-        // Assume coil length = N * coax diameter
         const d = coax.od / 1000;
 
-        // Solve iteratively for N
         let N = 1;
         while (N < 40) {
             const l = N * d;
@@ -73,9 +55,6 @@ export default class FlowerpotEngine extends BaseEngine {
         return N;
     }
 
-    /* ------------------------------------------------------------
-       Build NEC-style geometry
-       ------------------------------------------------------------ */
     buildGeometry() {
         const {
             frequency,
@@ -95,9 +74,6 @@ export default class FlowerpotEngine extends BaseEngine {
 
         const segList = [];
 
-        /* ------------------------------
-           Top radiator (center conductor)
-        ------------------------------ */
         const topSegs = Math.floor(segments * 0.4);
         for (let i = 0; i < topSegs; i++) {
             const f1 = i / topSegs;
@@ -107,13 +83,10 @@ export default class FlowerpotEngine extends BaseEngine {
                 x1: 0, y1: 0, z1: lengths.top * f1,
                 x2: 0, y2: 0, z2: lengths.top * f2,
                 radius: wireDiameter / 2000,
-                weight: adaptiveWeight(i, topSegs)
+                weight: 1
             });
         }
 
-        /* ------------------------------
-           Bottom sleeve (coax shield)
-        ------------------------------ */
         const bottomSegs = Math.floor(segments * 0.4);
         for (let i = 0; i < bottomSegs; i++) {
             const f1 = i / bottomSegs;
@@ -123,14 +96,11 @@ export default class FlowerpotEngine extends BaseEngine {
                 x1: 0, y1: 0, z1: -lengths.bottom * f1,
                 x2: 0, y2: 0, z2: -lengths.bottom * f2,
                 radius: wireDiameter / 2000,
-                weight: adaptiveWeight(i, bottomSegs)
+                weight: 1
             });
         }
 
-        /* ------------------------------
-           Choke coil (helix approximation)
-        ------------------------------ */
-        const coilSegs = turns * 4; // 4 segments per turn
+        const coilSegs = turns * 4;
         const radius = pvcOD / 2000;
         const pitch = (this.coaxDB[coaxType].od / 1000);
 
@@ -149,7 +119,6 @@ export default class FlowerpotEngine extends BaseEngine {
                 y2: radius * Math.sin(angle2),
                 z2,
                 radius: wireDiameter / 2000,
-                weight: 1.0,
                 load: { type: "coil", reactance: targetReactance }
             });
         }
@@ -177,9 +146,6 @@ export default class FlowerpotEngine extends BaseEngine {
         return BoostEngine.applyBoosts(this.config, geometry);
     }
 
-    /* ------------------------------------------------------------
-       Solve currents + impedance + pattern + SWR
-       ------------------------------------------------------------ */
     async calculate() {
         const geometry = this.buildGeometry();
         const result = await this.solve(geometry);
@@ -198,18 +164,6 @@ export default class FlowerpotEngine extends BaseEngine {
     }
 }
 
-/* ------------------------------------------------------------
-   Adaptive weighting
------------------------------------------------------------- */
-function adaptiveWeight(i, N) {
-    const center = 0;
-    const dist = Math.abs(i - center);
-    return 1 + 2 * Math.exp(-(dist * dist) / (N * 0.1));
-}
-
-/* ------------------------------------------------------------
-   Feed excitation vector
------------------------------------------------------------- */
 function buildFeedVector(N, feedIndex) {
     const V = new Array(N).fill(0);
     V[feedIndex] = 1.0;
