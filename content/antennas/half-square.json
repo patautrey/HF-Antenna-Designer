@@ -1,0 +1,17 @@
+{
+    "name": "Half-Square Antenna",
+    "imageQueries": [
+        "half_square_antenna",
+        "half_square_wire_array",
+        "half_square_hf_antenna_diagram"
+    ],
+    "description": "The Half-Square is a two-element wire array consisting of two vertical quarter-wave legs connected by a horizontal half-wave top wire. It provides strong low-angle radiation ideal for HF DX operation.",
+    "modelingNotes": [
+        "Vertical legs provide the primary low-angle radiation.",
+        "Horizontal top wire sets spacing and phase relationship.",
+        "Corner feedpoint provides a convenient 50-ohm match.",
+        "Height above ground strongly influences takeoff angle.",
+        "Mutual coupling between vertical legs shapes the pattern.",
+        "End effects adjust electrical length of each segment."
+    ]
+}
