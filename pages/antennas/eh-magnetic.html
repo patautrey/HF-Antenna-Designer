@@ -1,0 +1,36 @@
+<!-- ============================================================
+     HF Antenna Designer — Page: EH Magnetic Antenna
+     ============================================================ -->
+
+<section class="antenna-header">
+    <h1>{{ name }}</h1>
+    <p>{{ description }}</p>
+</section>
+
+<section class="visual-reference">
+    <h3>📸 Visual Reference</h3>
+    <div class="image-carousel">
+        {{ renderImageCarousel(imageQueries) }}
+    </div>
+</section>
+
+<section class="antenna-explanation">
+    <h3>What This Antenna Is</h3>
+    <p>
+        The EH Magnetic Antenna uses two short conductive cylinders driven with
+        carefully phased currents to create both electric and magnetic fields that
+        combine to produce radiation. Its extremely small size relative to wavelength
+        makes it attractive for HF operation in very limited spaces.
+    </p>
+</section>
+
+<section class="antenna-modeling">
+    <h3>How This Antenna Is Modeled</h3>
+    <ul>
+        <li>Cylinder dimensions and spacing determine resonant behavior.</li>
+        <li>Tuning capacitance sets the required E/H field phasing.</li>
+        <li>Radiation resistance is modeled explicitly due to its very low value.</li>
+        <li>Efficiency is computed from conductor and phasing losses.</li>
+        <li>Mounting height influences pattern but not basic operation.</li>
+    </ul>
+</section>
