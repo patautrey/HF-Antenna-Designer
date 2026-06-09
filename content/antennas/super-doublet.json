@@ -1,0 +1,16 @@
+{
+    "name": "Super Doublet",
+    "imageQueries": [
+        "hf_doublet_antenna",
+        "open_wire_fed_dipole",
+        "ladder_line_feed_antenna"
+    ],
+    "description": "The Super Doublet is a center-fed HF wire antenna of any convenient length, fed with open-wire line and matched with a balanced tuner. It is one of the most efficient and flexible multiband HF antennas available.",
+    "modelingNotes": [
+        "Total wire length determines lobe structure and multiband behavior.",
+        "Open-wire feedline minimizes loss even at high SWR.",
+        "Height above ground controls takeoff angle more than wire length.",
+        "Balanced tuner is required for proper matching across HF bands.",
+        "Longer doublets (>1λ) develop multiple lobes with DX potential."
+    ]
+}
