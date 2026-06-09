@@ -1,0 +1,37 @@
+<!-- ============================================================
+     HF Antenna Designer — Page: Inverted‑V Dipole
+     ============================================================ -->
+
+<section class="antenna-header">
+    <h1>{{ name }}</h1>
+    <p>{{ description }}</p>
+</section>
+
+<section class="visual-reference">
+    <h3>📸 Visual Reference</h3>
+    <div class="image-carousel">
+        {{ renderImageCarousel(imageQueries) }}
+    </div>
+</section>
+
+<section class="antenna-explanation">
+    <h3>What This Antenna Is</h3>
+    <p>
+        The Inverted‑V Dipole is a space‑efficient variation of the classic dipole.
+        By sloping the legs downward from a central apex, it reduces the required
+        horizontal span while maintaining strong performance across HF bands. Its
+        forgiving tuning and broad bandwidth make it a popular choice for portable
+        and permanent installations.
+    </p>
+</section>
+
+<section class="antenna-modeling">
+    <h3>How This Antenna Is Modeled</h3>
+    <ul>
+        <li>Leg angle determines feed impedance and bandwidth.</li>
+        <li>Apex height controls takeoff angle and pattern shape.</li>
+        <li>End effects shorten the required physical length.</li>
+        <li>Lower leg angles broaden bandwidth but reduce gain.</li>
+        <li>Radiation pattern becomes more omnidirectional as legs slope downward.</li>
+    </ul>
+</section>
