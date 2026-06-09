@@ -1,0 +1,17 @@
+{
+    "name": "Hentenna",
+    "imageQueries": [
+        "hentenna_antenna",
+        "hentenna_feedpoint",
+        "hentenna_wire_antenna_diagram"
+    ],
+    "description": "The Hentenna is a rectangular wire antenna originally developed in Japan. It offers strong horizontal polarization, moderate gain, and a distinctive rectangular shape that provides a clean, predictable radiation pattern.",
+    "modelingNotes": [
+        "Height and width determine resonant frequency and pattern shape.",
+        "Feedpoint offset controls impedance and matching behavior.",
+        "Horizontal polarization is typical when mounted vertically.",
+        "End effects shorten the required physical dimensions.",
+        "Current distribution is modeled along the full rectangular loop.",
+        "Mounting height influences takeoff angle and gain."
+    ]
+}
