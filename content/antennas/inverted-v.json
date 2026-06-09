@@ -1,0 +1,17 @@
+{
+    "name": "Inverted‑V Dipole",
+    "imageQueries": [
+        "inverted_v_dipole",
+        "inverted_v_antenna_diagram",
+        "inverted_v_hf_wire_antenna"
+    ],
+    "description": "The Inverted‑V Dipole is a variation of the half‑wave dipole where the legs slope downward from a central apex. It reduces required horizontal space, lowers feed impedance, and provides a broad, forgiving bandwidth.",
+    "modelingNotes": [
+        "Leg angle strongly influences feed impedance.",
+        "Apex height determines takeoff angle and pattern shape.",
+        "End effects shorten the required physical length.",
+        "Lower leg angles increase bandwidth but reduce gain.",
+        "Radiation pattern becomes more omnidirectional as legs slope downward.",
+        "Wire diameter affects Q factor and tuning sensitivity."
+    ]
+}
