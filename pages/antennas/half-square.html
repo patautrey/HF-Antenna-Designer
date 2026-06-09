@@ -1,0 +1,37 @@
+<!-- ============================================================
+     HF Antenna Designer — Page: Half-Square Antenna
+     ============================================================ -->
+
+<section class="antenna-header">
+    <h1>{{ name }}</h1>
+    <p>{{ description }}</p>
+</section>
+
+<section class="visual-reference">
+    <h3>📸 Visual Reference</h3>
+    <div class="image-carousel">
+        {{ renderImageCarousel(imageQueries) }}
+    </div>
+</section>
+
+<section class="antenna-explanation">
+    <h3>What This Antenna Is</h3>
+    <p>
+        The Half-Square antenna is a two-element wire array made from two vertical
+        quarter-wave legs connected by a horizontal half-wave top wire. It produces
+        strong low-angle radiation, making it an excellent HF DX antenna that is
+        simple to build and easy to install between two supports.
+    </p>
+</section>
+
+<section class="antenna-modeling">
+    <h3>How This Antenna Is Modeled</h3>
+    <ul>
+        <li>Vertical legs generate the low-angle DX radiation.</li>
+        <li>The horizontal top wire sets spacing and phase relationship.</li>
+        <li>Corner feedpoint provides a near 50-ohm match.</li>
+        <li>Height above ground determines takeoff angle and pattern shape.</li>
+        <li>Mutual coupling between legs is included for accuracy.</li>
+        <li>End effects adjust the electrical length of each segment.</li>
+    </ul>
+</section>
