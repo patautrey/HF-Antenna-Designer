@@ -1,0 +1,18 @@
+{
+    "name": "Magnetic Loop Antenna (John Portune Design)",
+    "imageQueries": [
+        "john_portune_magnetic_loop",
+        "mag_loop_copper_tubing",
+        "mag_loop_vacuum_capacitor"
+    ],
+    "description": "A high-efficiency HF magnetic loop based on John Portune’s design principles. It uses large-diameter copper tubing, a high-Q tuning capacitor, and a precisely sized coupling loop to achieve excellent performance in limited space.",
+    "modelingNotes": [
+        "Loop circumference should be 0.1λ to 0.25λ for optimal efficiency.",
+        "Large-diameter copper tubing dramatically reduces loss resistance.",
+        "High-Q vacuum or butterfly capacitors are essential for efficiency.",
+        "Efficiency is calculated from radiation vs. loss resistance.",
+        "Skin effect and conductor losses must be included for accuracy.",
+        "Coupling loop diameter should be 20–25% of the main loop diameter.",
+        "Capacitor voltage can exceed 5–10 kV at 100W power levels."
+    ]
+}
