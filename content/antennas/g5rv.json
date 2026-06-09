@@ -1,0 +1,17 @@
+{
+    "name": "G5RV Antenna",
+    "imageQueries": [
+        "g5rv_antenna",
+        "g5rv_ladder_line_section",
+        "g5rv_inverted_v"
+    ],
+    "description": "The G5RV is a classic multiband HF antenna consisting of a 102-foot dipole fed with a 34-foot section of ladder line that acts as an impedance transformer. With a tuner, it provides coverage from 80m through 10m.",
+    "modelingNotes": [
+        "The 34 ft ladder-line section acts as a matching transformer.",
+        "Coax feedline losses increase significantly on bands with high SWR.",
+        "Height above ground strongly affects performance on 80m and 40m.",
+        "The antenna can be installed as horizontal, inverted-V, or sloper.",
+        "A tuner is required for most bands except near 20m resonance.",
+        "The design originates from Louis Varney (G5RV) in 1946."
+    ]
+}
