@@ -1,0 +1,35 @@
+<!-- ============================================================
+     HF Antenna Designer — Page: Beverage Antenna
+     ============================================================ -->
+
+<section class="antenna-header">
+    <h1>{{ name }}</h1>
+    <p>{{ description }}</p>
+</section>
+
+<section class="visual-reference">
+    <h3>📸 Visual Reference</h3>
+    <div class="image-carousel">
+        {{ renderImageCarousel(imageQueries) }}
+    </div>
+</section>
+
+<section class="antenna-explanation">
+    <h3>What This Antenna Is</h3>
+    <p>
+        The Beverage antenna is a long-wire, low-noise receiving antenna used on the
+        low HF bands. It operates as a traveling-wave antenna, providing excellent
+        directivity and low-angle reception ideal for DX listening.
+    </p>
+</section>
+
+<section class="antenna-modeling">
+    <h3>How This Antenna Is Modeled</h3>
+    <ul>
+        <li>Wire length determines directivity and low-angle sensitivity.</li>
+        <li>Height above ground affects noise performance and pattern shape.</li>
+        <li>Termination resistor sets the directionality and reduces reflections.</li>
+        <li>Ground conductivity influences efficiency and pattern stability.</li>
+        <li>Orientation determines the primary receiving direction.</li>
+    </ul>
+</section>
