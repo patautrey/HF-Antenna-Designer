@@ -1,0 +1,42 @@
+/* ---------------------------------------------------------
+   HF Workbench — Flowerpot Coaxial UI Styles
+--------------------------------------------------------- */
+
+.tool-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.tool-list li {
+    margin: 0.4rem 0;
+}
+
+.tool-list a {
+    color: #2a6fdb;
+    text-decoration: none;
+}
+
+.tool-list a:hover {
+    text-decoration: underline;
+}
+
+.boost-grid label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.boost-grid input[type="checkbox"] {
+    transform: scale(1.2);
+}
+
+.summary h4 {
+    margin-top: 1.2rem;
+    margin-bottom: 0.4rem;
+}
+
+.summary ul {
+    margin: 0;
+    padding-left: 1.2rem;
+}
