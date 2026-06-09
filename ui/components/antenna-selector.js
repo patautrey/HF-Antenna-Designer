@@ -6,6 +6,9 @@ export function antennaSelector() {
         <option value="flowerpot-buildsheet">Flowerpot Build Sheet</option>
         <option value="flowerpot-multiband">Multi‑Band Flowerpot Designer</option>
         <option value="flowerpot-performance">Flowerpot Performance Analyzer</option>
+        <option value="flowerpot-field">Field Deployment Planner</option>
+        <option value="flowerpot-height">Height vs Gain Optimizer</option>
+        <option value="flowerpot-coaxloss">Coax Loss Calculator</option>
     </select>
     `;
 }
