@@ -1,0 +1,37 @@
+<!-- ============================================================
+     HF Antenna Designer — Page: Hentenna
+     ============================================================ -->
+
+<section class="antenna-header">
+    <h1>{{ name }}</h1>
+    <p>{{ description }}</p>
+</section>
+
+<section class="visual-reference">
+    <h3>📸 Visual Reference</h3>
+    <div class="image-carousel">
+        {{ renderImageCarousel(imageQueries) }}
+    </div>
+</section>
+
+<section class="antenna-explanation">
+    <h3>What This Antenna Is</h3>
+    <p>
+        The Hentenna is a rectangular wire antenna known for its simplicity and
+        excellent performance on VHF bands. Developed in Japan, it provides strong
+        horizontal polarization and a clean, predictable radiation pattern with
+        moderate gain. Its unique shape makes it easy to build and tune.
+    </p>
+</section>
+
+<section class="antenna-modeling">
+    <h3>How This Antenna Is Modeled</h3>
+    <ul>
+        <li>Height and width determine resonant frequency and pattern shape.</li>
+        <li>Feedpoint offset controls impedance and matching behavior.</li>
+        <li>Horizontal polarization is assumed for vertical mounting.</li>
+        <li>End effects adjust the required physical dimensions.</li>
+        <li>Current distribution is modeled along the entire loop.</li>
+        <li>Mounting height influences takeoff angle and gain.</li>
+    </ul>
+</section>
