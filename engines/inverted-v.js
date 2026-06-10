@@ -3,8 +3,8 @@
    NEC-Style Geometry + Adaptive Segmentation
    ============================================================ */
 
-import BaseEngine from "/engines/engine-base.js";
-import BoostEngine from "/engines/boost-engine.js";
+import BaseEngine from "./engine-base.js";
+import BoostEngine from "./boost-engine.js";
 
 export default class InvertedVEngine extends BaseEngine {
 
