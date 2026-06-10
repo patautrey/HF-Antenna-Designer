@@ -3,8 +3,8 @@
    NEC-Style Geometry + Adaptive Segmentation
    ============================================================ */
 
-import BaseEngine from "/engines/engine-base.js";
-import BoostEngine from "/engines/boost-engine.js";
+import BaseEngine from "./engine-base.js";
+import BoostEngine from "./boost-engine.js";
 
 export default class VerticalYagiEngine extends BaseEngine {
 
@@ -46,8 +46,13 @@ export default class VerticalYagiEngine extends BaseEngine {
             }
         };
 
+        // Driven element
         addElement(0, drivenLength, true);
+
+        // Reflector
         addElement(-spacing, reflectorLength, false);
+
+        // Director
         addElement(+spacing, directorLength, false);
 
         const feedSegment = 0;
@@ -75,11 +80,17 @@ export default class VerticalYagiEngine extends BaseEngine {
     }
 }
 
+/* ------------------------------------------------------------
+   Adaptive weighting
+------------------------------------------------------------ */
 function adaptiveWeight(i, N) {
     const dist = Math.abs(i - 0);
     return 1 + 2 * Math.exp(-(dist * dist) / (N * 0.1));
 }
 
+/* ------------------------------------------------------------
+   Feed excitation vector
+------------------------------------------------------------ */
 function buildFeedVector(N, feedIndex) {
     const V = new Array(N).fill(0);
     V[feedIndex] = 1.0;
