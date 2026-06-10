@@ -1,14 +1,33 @@
-/* ============================================================
-   Panel Loader
-   ============================================================ */
+// HF-Antenna-Designer/app/runPanel.js
+// Registry Mode — Full Replacement File
 
-import { PANEL_MAP } from "/ui/panels/index.js";
+export default function runPanel(app, panelName, targetId) {
+    const target = document.getElementById(targetId);
+    if (!target) {
+        console.error(`runPanel: target element '${targetId}' not found`);
+        return;
+    }
 
-export function runPanel(app, panelName, targetId) {
-    const PanelClass = PANEL_MAP[panelName];
-    if (!PanelClass) return;
+    const panelFn = app[panelName];
+    if (typeof panelFn !== "function") {
+        target.innerHTML = `
+            <div style="padding:1rem; color:red;">
+                Error: Panel '${panelName}' is not registered.
+            </div>
+        `;
+        return;
+    }
 
-    const panel = new PanelClass(app);
-    document.getElementById(targetId).innerHTML = panel.render();
-    panel.attachEvents();
+    try {
+        const html = panelFn();
+        target.innerHTML = html;
+    } catch (err) {
+        target.innerHTML = `
+            <div style="padding:1rem; color:red;">
+                Panel '${panelName}' failed to render.<br>
+                ${err.message}
+            </div>
+        `;
+        console.error(err);
+    }
 }
