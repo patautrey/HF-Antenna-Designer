@@ -1,7 +1,9 @@
-// app/app.js
-
-import flowerpot from "../engines/flowerpot.js";
+import flowerpot from "../modules/module-flowerpot.js";
+import invertedV from "../modules/module-inverted-v.js";
+import yagi3 from "../modules/module-vertical-yagi.js";
 
 export default {
-    flowerpot
+    flowerpot,
+    invertedV,
+    yagi3
 };
