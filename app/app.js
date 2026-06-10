@@ -1,30 +1,14 @@
-/* ============================================================
-   Application Core
-   Provides: runSimulation()
-   ============================================================ */
+// HF-Antenna-Designer/app/app.js
+// Registry Mode — Full Replacement File
 
-import { ENGINE_MAP } from "/engines/index.js";
+import flowerpot from "../modules/module-flowerpot.js";
+import invertedV from "../modules/module-inverted-v.js";
+import yagi3 from "../modules/module-vertical-yagi3.js";
 
-export const app = {
-
-    async runSimulation(config, targetId, callback) {
-
-        const EngineClass = ENGINE_MAP[config.type];
-        if (!EngineClass) {
-            document.getElementById(targetId).innerHTML =
-                "<p>Unknown engine type.</p>";
-            return;
-        }
-
-        const engine = new EngineClass(config);
-        const result = await engine.calculate();
-
-        if (callback) {
-            callback(result);
-            return;
-        }
-
-        document.getElementById(targetId).innerHTML =
-            `<pre>${JSON.stringify(result, null, 2)}</pre>`;
-    }
+const app = {
+    flowerpot,
+    invertedV,
+    yagi3
 };
+
+export default app;
