@@ -1,4 +1,5 @@
-// app/runPanel.js
+// HF-Antenna-Designer/app/runPanel.js
+
 import { panels } from "../ui/panels/index.js";
 
 export default function runPanel(app, panelName) {
@@ -12,6 +13,9 @@ export default function runPanel(app, panelName) {
 
     const panel = new PanelClass(app);
 
+    // Render panel HTML
     document.getElementById("panel").innerHTML = panel.render();
+
+    // Attach all event handlers for that panel
     panel.attachEvents();
 }
