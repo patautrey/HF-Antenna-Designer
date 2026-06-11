@@ -1,15 +1,21 @@
-// ui/runPanel.js
-import panels from "./panels/index.js";
+// HF-Antenna-Designer/ui/runPanel.js
 
-export function runPanel(app, panelName) {
+import { panels } from "./panels/index.js";
+
+export default function runPanel(app, panelName) {
     const PanelClass = panels[panelName];
 
-    // FIXED: ES6 classes MUST be instantiated with "new"
+    if (!PanelClass) {
+        document.getElementById("panel").innerHTML =
+            `<p style="color:red;">Unknown panel: ${panelName}</p>`;
+        return;
+    }
+
     const panel = new PanelClass(app);
 
-    // Render the panel UI
+    // Render panel HTML
     document.getElementById("panel").innerHTML = panel.render();
 
-    // Attach event handlers
+    // Attach all event handlers for that panel
     panel.attachEvents();
 }
