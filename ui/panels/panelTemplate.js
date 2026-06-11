@@ -1,89 +1,53 @@
-// HF-Antenna-Designer/ui/panels/panelTemplate.js
-// Universal antenna configuration panel (Tailwind + Amber theme)
-
-export default function panelTemplate(onRun) {
-    const id = "panel_" + Math.random().toString(36).substring(2, 10);
-
+// ui/panels/panelTemplate.js
+export default function PanelTemplate(name, runSimulation) {
     return `
-    <div id="${id}" class="bg-white border border-amber-300 rounded-xl p-5 shadow">
+        <h2>${name} Antenna Configuration</h2>
 
-        <h3 class="text-xl font-bold text-amber-800 mb-4">
-            Antenna Configuration
-        </h3>
+        <label>Frequency (MHz)</label>
+        <input id="freq" type="number" value="146">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <label>Velocity Factor</label>
+        <input id="vf" type="number" step="0.01" value="0.66">
 
-            <!-- Frequency -->
-            <div>
-                <label class="block text-sm font-medium text-amber-700">Frequency (MHz)</label>
-                <input id="${id}_freq" type="number" value="146"
-                       class="mt-1 w-full border border-amber-300 rounded px-2 py-1
-                              focus:ring-amber-500 focus:border-amber-500" />
-            </div>
+        <label>PVC Outer Diameter (mm)</label>
+        <input id="pvc" type="number" value="25">
 
-            <!-- Coax Type -->
-            <div>
-                <label class="block text-sm font-medium text-amber-700">Coax Type</label>
-                <select id="${id}_coax"
-                        class="mt-1 w-full border border-amber-300 rounded px-2 py-1
-                               focus:ring-amber-500 focus:border-amber-500">
-                    <option value="RG-58">RG‑58</option>
-                    <option value="RG-8X">RG‑8X</option>
-                    <option value="RG-213">RG‑213</option>
-                    <option value="LMR-240">LMR‑240</option>
-                    <option value="LMR-400">LMR‑400</option>
-                </select>
-            </div>
+        <label>Target Choke Reactance (Ω)</label>
+        <input id="react" type="number" value="500">
 
-            <!-- PVC OD -->
-            <div>
-                <label class="block text-sm font-medium text-amber-700">PVC OD (mm)</label>
-                <input id="${id}_pvc" type="number" value="25"
-                       class="mt-1 w-full border border-amber-300 rounded px-2 py-1
-                              focus:ring-amber-500 focus:border-amber-500" />
-            </div>
+        <label>Radial Count</label>
+        <input id="radials" type="number" value="4">
 
-            <!-- Mounting Mode -->
-            <div>
-                <label class="block text-sm font-medium text-amber-700">Mounting Mode</label>
-                <select id="${id}_mount"
-                        class="mt-1 w-full border border-amber-300 rounded px-2 py-1
-                               focus:ring-amber-500 focus:border-amber-500">
-                    <option value="center">Center‑Mounted</option>
-                    <option value="end">End‑Mounted</option>
-                    <option value="side">Side‑Mounted</option>
-                </select>
-            </div>
+        <label>Radial Length (λ)</label>
+        <input id="radialLength" type="number" step="0.01" value="0.25">
 
-            <!-- Target Reactance -->
-            <div>
-                <label class="block text-sm font-medium text-amber-700">Target Choke Reactance (Ω)</label>
-                <input id="${id}_react" type="number" value="500"
-                       class="mt-1 w-full border border-amber-300 rounded px-2 py-1
-                              focus:ring-amber-500 focus:border-amber-500" />
-            </div>
+        <label>Elevated Radials</label>
+        <select id="elevated">
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+        </select>
 
-        </div>
+        <label>Element Height (m)</label>
+        <input id="height" type="number" value="1.5">
 
-        <!-- Run Button -->
-        <div class="mt-6">
-            <button
-                class="px-5 py-2 bg-amber-600 text-white rounded shadow hover:bg-amber-700"
-                onclick="
-                    const config = {
-                        type: document.getElementById('${id}_type')?.value || 'flowerpot',
-                        frequency: Number(document.getElementById('${id}_freq').value) * 1e6,
-                        coaxType: document.getElementById('${id}_coax').value,
-                        pvcOD: Number(document.getElementById('${id}_pvc').value),
-                        pvcMode: document.getElementById('${id}_mount').value,
-                        targetReactance: Number(document.getElementById('${id}_react').value)
-                    };
-                    (${onRun.toString()})(config);
-                ">
-                Run Simulation
-            </button>
-        </div>
+        <label>Location Model</label>
+        <select id="seaside">
+            <option value="normal">Normal</option>
+            <option value="seaside">Seaside DX</option>
+        </select>
 
-    </div>
+        <label>DX Turbo Mode</label>
+        <select id="turbo">
+            <option value="off">Disabled</option>
+            <option value="on">DX Turbo</option>
+        </select>
+
+        <label>Transmitter Power (W)</label>
+        <input id="power" type="number" value="100">
+
+        <label>Feedline Loss (dB)</label>
+        <input id="loss" type="number" step="0.1" value="1.0">
+
+        <button id="runBtn">Run Simulation</button>
     `;
 }
