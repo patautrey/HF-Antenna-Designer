@@ -1,35 +1,33 @@
 // HF-Antenna-Designer/app/app.js
-// Auto‑registry for unlimited antennas
+// Browser‑safe registry (NO import.meta.glob)
 
-// Dynamically import all engines in /engines
-const engineModules = import.meta.glob("../engines/*.js", { eager: true });
+// ENGINE IMPORTS
+import FlowerpotEngine from "../engines/FlowerpotEngine.js";
+import InvertedvEngine from "../engines/InvertedvEngine.js";
+import Yagi3Engine from "../engines/Yagi3Engine.js";
 
-// Dynamically import all panels in /ui/panels
-const panelModules = import.meta.glob("../ui/panels/*.js", { eager: true });
+// PANEL IMPORTS
+import FlowerpotPanel from "../ui/panels/FlowerpotPanel.js";
+import InvertedvPanel from "../ui/panels/InvertedvPanel.js";
+import Yagi3Panel from "../ui/panels/Yagi3Panel.js";
 
-// Build registries
-const engines = {};
-const panels = {};
-
-for (const path in engineModules) {
-    const mod = engineModules[path];
-    const name = path.split("/").pop().replace("Engine.js", "").toLowerCase();
-    engines[name] = (config) => new mod.default(config);
-}
-
-for (const path in panelModules) {
-    const mod = panelModules[path];
-    const name = path.split("/").pop().replace("Panel.js", "").toLowerCase();
-    panels[name] = mod.default;
-}
-
+// REGISTRY
 const app = {
-    engines,
-    panels,
+    engines: {
+        flowerpot: (config) => new FlowerpotEngine(config),
+        invertedv: (config) => new InvertedvEngine(config),
+        yagi3: (config) => new Yagi3Engine(config)
+    },
+
+    panels: {
+        flowerpot: FlowerpotPanel,
+        invertedv: InvertedvPanel,
+        yagi3: Yagi3Panel
+    },
 
     runSimulation(config) {
         const type = config.type.toLowerCase();
-        const factory = engines[type];
+        const factory = this.engines[type];
         if (!factory) throw new Error(`Engine '${type}' not found`);
         return factory(config).run();
     }
