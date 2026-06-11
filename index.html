@@ -1,46 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Flowerpot Antenna Design Suite</title>
+<script type="module">
+    import antennaSelector from "./ui/antenna-selector.js";
+    import runPanel from "./app/runPanel.js";
+    import app from "./app/app.js";
 
-    <link rel="stylesheet" href="./styles/workbench.css">
+    // Insert dropdown
+    document.getElementById("selector").innerHTML = antennaSelector();
 
-    <style>
-        body { font-family: Arial; margin: 20px; }
-        .antenna-panel { max-width: 600px; }
-        label { display: block; margin-top: 12px; }
-        input, select { width: 100%; padding: 6px; }
-        button { margin-top: 15px; padding: 10px; width: 100%; }
-        pre { background: #eee; padding: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ccc; padding: 6px; }
-    </style>
-</head>
+    // Dropdown change handler
+    document.getElementById("antenna_select").onchange = () => {
+        const panel = document.getElementById("antenna_select").value;
+        runPanel(app, panel);
+    };
 
-<body>
-    <h1>Flowerpot Antenna Design Suite</h1>
-
-    <div id="selector"></div>
-    <hr>
-    <div id="panel"></div>
-
-    <script type="module">
-        import antennaSelector from "./ui/antenna-selector.js";
-        import runPanel from "./app/runPanel.js";
-        import app from "./app/app.js";
-
-        // Insert dropdown
-        document.getElementById("selector").innerHTML = antennaSelector();
-
-        // Dropdown change handler
-        document.getElementById("antenna_select").onchange = () => {
-            const panel = document.getElementById("antenna_select").value;
-            runPanel(app, panel);
-        };
-
-        // Load default panel
-        runPanel(app, "flowerpot");
-    </script>
-</body>
-</html>
+    // Load default panel
+    runPanel(app, "flowerpot");
+</script>
