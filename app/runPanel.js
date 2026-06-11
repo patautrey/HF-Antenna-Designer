@@ -1,5 +1,3 @@
-// app/runPanel.js
-
 export default function runPanel(app, panelName, targetId) {
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -7,27 +5,21 @@ export default function runPanel(app, panelName, targetId) {
     const key = panelName.toLowerCase();
     const panelFn = app.panels[key];
 
-    if (!panelFn) {
-        target.innerHTML = `<div style="color:red;">Panel '${panelName}' not found.</div>`;
-        return;
-    }
-
-    // Insert panel HTML
     target.innerHTML = panelFn(app.runSimulation);
 
-    // Attach button handler AFTER HTML is inserted
     const btn = target.querySelector("#runBtn");
-    if (!btn) {
-        console.error("runPanel: #runBtn not found in panel HTML");
-        return;
-    }
+    if (!btn) return;
 
     btn.onclick = () => {
-        const config = {
-            type: key,
-            freq: parseFloat(target.querySelector("#freq").value),
-            vf: parseFloat(target.querySelector("#vf").value)
-        };
+        const config = { type: key };
+
+        target.querySelectorAll("input, select").forEach(el => {
+            const id = el.id;
+            let val = el.value;
+
+            if (el.type === "number") val = parseFloat(val);
+            config[id] = val;
+        });
 
         const result = app.runSimulation(config);
         console.log("Simulation result:", result);
