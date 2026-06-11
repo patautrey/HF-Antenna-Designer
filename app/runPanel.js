@@ -1,36 +1,18 @@
-// HF-Antenna-Designer/app/runPanel.js
-// Corrected Panel Loader — FINAL VERSION
-
 export default function runPanel(app, panelName, targetId) {
     const target = document.getElementById(targetId);
-    if (!target) {
-        console.error(`runPanel: target element '${targetId}' not found`);
-        return;
-    }
+    if (!target) return;
 
-    // Panels live inside app.panels
-    const panelFn = app.panels?.[panelName];
+    const key = panelName.toLowerCase();
+    const panelFn = app.panels[key];
 
-    if (typeof panelFn !== "function") {
-        target.innerHTML = `
-            <div style="padding:1rem; color:red;">
-                Error: Panel '${panelName}' is not registered.
-            </div>
-        `;
+    if (!panelFn) {
+        target.innerHTML = `<div style="color:red;">Panel '${panelName}' not found.</div>`;
         return;
     }
 
     try {
-        // Panels expect runSimulation to be passed in
-        const html = panelFn(app.runSimulation);
-        target.innerHTML = html;
+        target.innerHTML = panelFn(app.runSimulation);
     } catch (err) {
-        target.innerHTML = `
-            <div style="padding:1rem; color:red;">
-                Panel '${panelName}' failed to render.<br>
-                ${err.message}
-            </div>
-        `;
-        console.error(err);
+        target.innerHTML = `<div style="color:red;">${err.message}</div>`;
     }
 }
