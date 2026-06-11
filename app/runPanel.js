@@ -8,7 +8,7 @@ export default function runPanel(app, panelName, targetId) {
         return;
     }
 
-    // FIXED: Panels live inside app.panels, not app
+    // Panels live inside app.panels
     const panelFn = app.panels?.[panelName];
 
     if (typeof panelFn !== "function") {
