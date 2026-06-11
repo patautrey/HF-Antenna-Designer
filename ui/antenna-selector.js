@@ -1,12 +1,13 @@
-// HF-Antenna-Designer/ui/antenna-selector.js
+import app from "../app/app.js";
 
 export default function antennaSelector() {
+    const options = Object.keys(app.panels)
+        .sort()
+        .map(name => `<option value="${name}">${name}</option>`)
+        .join("");
+
     return `
         <label for="antenna_select">Select Antenna:</label>
-        <select id="antenna_select">
-            <option value="flowerpot">Flowerpot</option>
-            <option value="invertedV">Inverted‑V</option>
-            <option value="yagi3">Vertical Yagi 3‑Element</option>
-        </select>
+        <select id="antenna_select">${options}</select>
     `;
 }
