@@ -1,27 +1,12 @@
-export default function runPanel(app, panelName, targetId) {
-    const target = document.getElementById(targetId);
-    if (!target) return;
+// app/runPanel.js
+import panels from "../ui/panels/index.js";
 
-    const key = panelName.toLowerCase();
-    const panelFn = app.panels[key];
+export default function runPanel(app, panelName) {
+    const PanelClass = panels[panelName];
 
-    target.innerHTML = panelFn(app.runSimulation);
+    // MUST use "new"
+    const panel = new PanelClass(app);
 
-    const btn = target.querySelector("#runBtn");
-    if (!btn) return;
-
-    btn.onclick = () => {
-        const config = { type: key };
-
-        target.querySelectorAll("input, select").forEach(el => {
-            const id = el.id;
-            let val = el.value;
-
-            if (el.type === "number") val = parseFloat(val);
-            config[id] = val;
-        });
-
-        const result = app.runSimulation(config);
-        console.log("Simulation result:", result);
-    };
+    document.getElementById("panel").innerHTML = panel.render();
+    panel.attachEvents();
 }
