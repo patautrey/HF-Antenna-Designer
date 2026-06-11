@@ -1,3 +1,5 @@
+// cache-bust: v2   <-- harmless modification to force GitHub Pages refresh
+
 /* ============================================================
    Flowerpot (T2LT) Antenna — UI Panel (Upgraded)
    Includes: Presets + Simulation + Tuning Calculator
@@ -156,7 +158,7 @@ export default class FlowerpotPanel {
                 frequency: Number(document.getElementById("fp_freq").value) * 1e6,
                 coaxType: document.getElementById("fp_coax").value,
                 pvcOD: Number(document.getElementById("fp_pvc_od").value),
-                pvcMode: document.getElementById("fp_pvc_mode").value,
+                pvcMode: Number(document.getElementById("fp_pvc_mode").value),
                 targetReactance: Number(document.getElementById("fp_xl").value),
 
                 // Universal fields
