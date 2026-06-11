@@ -1,15 +1,18 @@
+
 // app/runPanel.js
 import { panels } from "../ui/panels/index.js";
 
 export default function runPanel(app, panelName) {
     const PanelClass = panels[panelName];
 
-    // Instantiate the panel class
+    if (!PanelClass) {
+        document.getElementById("panel").innerHTML =
+            `<p style="color:red;">Unknown panel: ${panelName}</p>`;
+        return;
+    }
+
     const panel = new PanelClass(app);
 
-    // Render the panel UI
     document.getElementById("panel").innerHTML = panel.render();
-
-    // Attach event handlers
     panel.attachEvents();
 }
