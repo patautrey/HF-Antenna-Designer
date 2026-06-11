@@ -1,3 +1,5 @@
+// app/runPanel.js
+
 export default function runPanel(app, panelName, targetId) {
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -15,16 +17,19 @@ export default function runPanel(app, panelName, targetId) {
 
     // Attach button handler AFTER HTML is inserted
     const btn = target.querySelector("#runBtn");
-    if (btn) {
-        btn.onclick = () => {
-            const config = {
-                type: key,
-                freq: parseFloat(target.querySelector("#freq").value),
-                vf: parseFloat(target.querySelector("#vf").value)
-            };
-
-            const result = app.runSimulation(config);
-            console.log("Simulation result:", result);
-        };
+    if (!btn) {
+        console.error("runPanel: #runBtn not found in panel HTML");
+        return;
     }
+
+    btn.onclick = () => {
+        const config = {
+            type: key,
+            freq: parseFloat(target.querySelector("#freq").value),
+            vf: parseFloat(target.querySelector("#vf").value)
+        };
+
+        const result = app.runSimulation(config);
+        console.log("Simulation result:", result);
+    };
 }
