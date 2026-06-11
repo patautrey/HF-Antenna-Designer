@@ -1,5 +1,3 @@
-// HF-Antenna-Designer/ui/panels/index.js
-
 import FlowerpotPanel from "./FlowerpotPanel.js";
 import DipolePanel from "./DipolePanel.js";
 import EndFedPanel from "./EndFedPanel.js";
