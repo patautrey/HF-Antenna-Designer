@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Flowerpot Antenna Design Suite</title>
 
-    <!-- Workbench styling -->
     <link rel="stylesheet" href="./styles/workbench.css">
 
     <style>
@@ -31,17 +30,17 @@
         import runPanel from "./app/runPanel.js";
         import app from "./app/app.js";
 
-        // Insert the antenna selector dropdown
+        // Insert dropdown
         document.getElementById("selector").innerHTML = antennaSelector();
 
-        // When the user selects a different antenna type
+        // Dropdown change handler
         document.getElementById("antenna_select").onchange = () => {
             const panel = document.getElementById("antenna_select").value;
-            runPanel(app, panel, "panel");
+            runPanel(app, panel);
         };
 
-        // Load the default panel on startup
-        runPanel(app, "flowerpot", "panel");
+        // Load default panel
+        runPanel(app, "flowerpot");
     </script>
 </body>
 </html>
