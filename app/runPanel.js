@@ -1,4 +1,4 @@
-// HF-Antenna-Designer/app/runPanel.js
+// app/runPanel.js
 import { panels } from "../ui/panels/index.js";
 
 export default function runPanel(app, panelName) {
