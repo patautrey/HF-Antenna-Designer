@@ -26,21 +26,23 @@
     <div id="panel"></div>
 
     <script type="module">
-        import antennaSelector from "./ui/antenna-selector.js";
-        import runPanel from "./app/runPanel.js";
-        import app from "./app/app.js";
+        window.addEventListener("DOMContentLoaded", async () => {
+            const { default: antennaSelector } = await import("./ui/antenna-selector.js");
+            const { default: runPanel } = await import("./app/runPanel.js");
+            const { default: app } = await import("./app/app.js");
 
-        // Insert dropdown
-        document.getElementById("selector").innerHTML = antennaSelector();
+            // Insert dropdown AFTER DOM is ready
+            document.getElementById("selector").innerHTML = antennaSelector();
 
-        // Dropdown change handler
-        document.getElementById("antenna_select").onchange = () => {
-            const panel = document.getElementById("antenna_select").value;
-            runPanel(app, panel);
-        };
+            // Attach handler AFTER dropdown exists
+            document.getElementById("antenna_select").onchange = () => {
+                const panel = document.getElementById("antenna_select").value;
+                runPanel(app, panel);
+            };
 
-        // Load default panel
-        runPanel(app, "flowerpot");
+            // Load default panel
+            runPanel(app, "flowerpot");
+        });
     </script>
 </body>
 </html>
