@@ -44,6 +44,14 @@ const app = {
         dipole: DipolePanel,
         invertedV: InvertedVPanel,
         yagi3: Yagi3Panel
+    },
+
+    // Simulation entry point (your engines call this)
+    runSimulation: (config) => {
+        const engineFactory = app.engines[config.type];
+        if (!engineFactory) throw new Error(`Engine '${config.type}' not found`);
+        const engine = engineFactory(config);
+        return engine.run();
     }
 };
 
