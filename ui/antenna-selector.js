@@ -1,8 +1,8 @@
-// ui/antenna-selector.js
+// HF-Antenna-Designer/ui/antenna-selector.js
 
 export default function antennaSelector() {
     return `
-        <label>Select Antenna:</label>
+        <label for="antenna_select">Select Antenna:</label>
         <select id="antenna_select">
             <option value="flowerpot">Flowerpot (T2LT)</option>
             <option value="dipole">Dipole</option>
