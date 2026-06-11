@@ -1,38 +1,50 @@
 // HF-Antenna-Designer/app/app.js
-// Central engine registry for all antenna types (scalable to 200+ engines)
+// Central registry for BOTH engines and panels
 
-// Import your antenna engines here
-// Example imports — add your real engines as you build them
+// ----------------------
+// Engine Imports
+// ----------------------
 import FlowerpotEngine from "../engines/FlowerpotEngine.js";
 import VerticalYagiEngine from "../engines/VerticalYagiEngine.js";
 import EndFedEngine from "../engines/EndFedEngine.js";
 import DipoleEngine from "../engines/DipoleEngine.js";
+import InvertedVEngine from "../engines/InvertedVEngine.js";
+import Yagi3Engine from "../engines/Yagi3Engine.js";
 
-// ------------------------------------------------------------
-// Engine Registry
-// ------------------------------------------------------------
-//
-// Each key is the antenna type string used in config.type
-// Each value is a factory function returning a new engine instance
-//
-// Example:
-//   config.type = "flowerpot"
-//   → engineFactory = app["flowerpot"]
-//   → engine = engineFactory(config)
-//
+// ----------------------
+// Panel Imports
+// ----------------------
+import FlowerpotPanel from "../ui/panels/FlowerpotPanel.js";
+import VerticalYagiPanel from "../ui/panels/VerticalYagiPanel.js";
+import EndFedPanel from "../ui/panels/EndFedPanel.js";
+import DipolePanel from "../ui/panels/DipolePanel.js";
+import InvertedVPanel from "../ui/panels/InvertedVPanel.js";
+import Yagi3Panel from "../ui/panels/Yagi3Panel.js";
 
+// ----------------------
+// App Registry
+// ----------------------
 const app = {
-    flowerpot: (config) => new FlowerpotEngine(config),
-    verticalYagi: (config) => new VerticalYagiEngine(config),
-    endFed: (config) => new EndFedEngine(config),
-    dipole: (config) => new DipoleEngine(config),
 
-    // Add new antennas here:
-    // myNewAntenna: (config) => new MyNewAntennaEngine(config),
+    // ENGINE FACTORIES
+    engines: {
+        flowerpot: (config) => new FlowerpotEngine(config),
+        verticalYagi: (config) => new VerticalYagiEngine(config),
+        endFed: (config) => new EndFedEngine(config),
+        dipole: (config) => new DipoleEngine(config),
+        invertedV: (config) => new InvertedVEngine(config),
+        yagi3: (config) => new Yagi3Engine(config)
+    },
+
+    // PANEL FACTORIES
+    panels: {
+        flowerpot: FlowerpotPanel,
+        verticalYagi: VerticalYagiPanel,
+        endFed: EndFedPanel,
+        dipole: DipolePanel,
+        invertedV: InvertedVPanel,
+        yagi3: Yagi3Panel
+    }
 };
-
-// ------------------------------------------------------------
-// Safe Export
-// ------------------------------------------------------------
 
 export default app;
