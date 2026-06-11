@@ -1,57 +1,37 @@
 // HF-Antenna-Designer/app/app.js
-// Central registry for BOTH engines and panels
+// Auto‑registry for unlimited antennas
 
-// ----------------------
-// Engine Imports
-// ----------------------
-import FlowerpotEngine from "../engines/FlowerpotEngine.js";
-import VerticalYagiEngine from "../engines/VerticalYagiEngine.js";
-import EndFedEngine from "../engines/EndFedEngine.js";
-import DipoleEngine from "../engines/DipoleEngine.js";
-import InvertedVEngine from "../engines/InvertedVEngine.js";
-import Yagi3Engine from "../engines/Yagi3Engine.js";
+// Dynamically import all engines in /engines
+const engineModules = import.meta.glob("../engines/*.js", { eager: true });
 
-// ----------------------
-// Panel Imports
-// ----------------------
-import FlowerpotPanel from "../ui/panels/FlowerpotPanel.js";
-import VerticalYagiPanel from "../ui/panels/VerticalYagiPanel.js";
-import EndFedPanel from "../ui/panels/EndFedPanel.js";
-import DipolePanel from "../ui/panels/DipolePanel.js";
-import InvertedVPanel from "../ui/panels/InvertedVPanel.js";
-import Yagi3Panel from "../ui/panels/Yagi3Panel.js";
+// Dynamically import all panels in /ui/panels
+const panelModules = import.meta.glob("../ui/panels/*.js", { eager: true });
 
-// ----------------------
-// App Registry
-// ----------------------
+// Build registries
+const engines = {};
+const panels = {};
+
+for (const path in engineModules) {
+    const mod = engineModules[path];
+    const name = path.split("/").pop().replace("Engine.js", "").toLowerCase();
+    engines[name] = (config) => new mod.default(config);
+}
+
+for (const path in panelModules) {
+    const mod = panelModules[path];
+    const name = path.split("/").pop().replace("Panel.js", "").toLowerCase();
+    panels[name] = mod.default;
+}
+
 const app = {
+    engines,
+    panels,
 
-    // ENGINE FACTORIES
-    engines: {
-        flowerpot: (config) => new FlowerpotEngine(config),
-        verticalYagi: (config) => new VerticalYagiEngine(config),
-        endFed: (config) => new EndFedEngine(config),
-        dipole: (config) => new DipoleEngine(config),
-        invertedV: (config) => new InvertedVEngine(config),
-        yagi3: (config) => new Yagi3Engine(config)
-    },
-
-    // PANEL FACTORIES
-    panels: {
-        flowerpot: FlowerpotPanel,
-        verticalYagi: VerticalYagiPanel,
-        endFed: EndFedPanel,
-        dipole: DipolePanel,
-        invertedV: InvertedVPanel,
-        yagi3: Yagi3Panel
-    },
-
-    // Simulation entry point (your engines call this)
-    runSimulation: (config) => {
-        const engineFactory = app.engines[config.type];
-        if (!engineFactory) throw new Error(`Engine '${config.type}' not found`);
-        const engine = engineFactory(config);
-        return engine.run();
+    runSimulation(config) {
+        const type = config.type.toLowerCase();
+        const factory = engines[type];
+        if (!factory) throw new Error(`Engine '${type}' not found`);
+        return factory(config).run();
     }
 };
 
