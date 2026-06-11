@@ -26,26 +26,23 @@
     <div id="panel"></div>
 
     <script type="module">
-        window.onload = () => {
-            import("./ui/antenna-selector.js").then(({ default: antennaSelector }) => {
-                import("./app/runPanel.js").then(({ default: runPanel }) => {
-                    import("./app/app.js").then(({ default: app }) => {
+        window.addEventListener("DOMContentLoaded", async () => {
+            const { default: antennaSelector } = await import("./ui/antenna-selector.js");
+            const { default: runPanel } = await import("./app/runPanel.js");
+            const { default: app } = await import("./app/app.js");
 
-                        // Insert dropdown
-                        document.getElementById("selector").innerHTML = antennaSelector();
+            // Insert dropdown
+            document.getElementById("selector").innerHTML = antennaSelector();
 
-                        // Dropdown change handler
-                        document.getElementById("antenna_select").onchange = () => {
-                            const panel = document.getElementById("antenna_select").value;
-                            runPanel(app, panel);
-                        };
+            // Dropdown change handler
+            document.getElementById("antenna_select").onchange = () => {
+                const panel = document.getElementById("antenna_select").value;
+                runPanel(app, panel);
+            };
 
-                        // Load default panel
-                        runPanel(app, "flowerpot");
-                    });
-                });
-            });
-        };
+            // Load default panel
+            runPanel(app, "flowerpot");
+        });
     </script>
 </body>
 </html>
