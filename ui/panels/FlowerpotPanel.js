@@ -4,8 +4,8 @@
    + Universal Options (DX Turbo, Seaside, Radials, Power, Loss)
    ============================================================ */
 
-import { FlowerpotPresets } from "/ui/presets/flowerpot-presets.js";
-import { computeFlowerpotTuning } from "/ui/tools/flowerpot-tuning-calc.js";
+import { FlowerpotPresets } from "../presets/flowerpot-presets.js";
+import { computeFlowerpotTuning } from "../tools/flowerpot-tuning-calc.js";
 
 export default class FlowerpotPanel {
 
