@@ -1,5 +1,5 @@
 // HF-Antenna-Designer/app/runPanel.js
-// Registry Mode — Full Replacement File
+// Corrected Panel Loader — FINAL VERSION
 
 export default function runPanel(app, panelName, targetId) {
     const target = document.getElementById(targetId);
@@ -8,7 +8,9 @@ export default function runPanel(app, panelName, targetId) {
         return;
     }
 
-    const panelFn = app[panelName];
+    // FIXED: Panels live inside app.panels, not app
+    const panelFn = app.panels?.[panelName];
+
     if (typeof panelFn !== "function") {
         target.innerHTML = `
             <div style="padding:1rem; color:red;">
@@ -19,7 +21,8 @@ export default function runPanel(app, panelName, targetId) {
     }
 
     try {
-        const html = panelFn();
+        // Panels expect runSimulation to be passed in
+        const html = panelFn(app.runSimulation);
         target.innerHTML = html;
     } catch (err) {
         target.innerHTML = `
