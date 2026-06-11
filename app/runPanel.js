@@ -10,9 +10,21 @@ export default function runPanel(app, panelName, targetId) {
         return;
     }
 
-    try {
-        target.innerHTML = panelFn(app.runSimulation);
-    } catch (err) {
-        target.innerHTML = `<div style="color:red;">${err.message}</div>`;
+    // Insert panel HTML
+    target.innerHTML = panelFn(app.runSimulation);
+
+    // Attach button handler AFTER HTML is inserted
+    const btn = target.querySelector("#runBtn");
+    if (btn) {
+        btn.onclick = () => {
+            const config = {
+                type: key,
+                freq: parseFloat(target.querySelector("#freq").value),
+                vf: parseFloat(target.querySelector("#vf").value)
+            };
+
+            const result = app.runSimulation(config);
+            console.log("Simulation result:", result);
+        };
     }
 }
