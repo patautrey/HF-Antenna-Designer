@@ -4,7 +4,7 @@ import panels from "./panels/index.js";
 export function runPanel(app, panelName) {
     const PanelClass = panels[panelName];
 
-    // FIX: must instantiate ES6 classes with "new"
+    // FIXED: ES6 classes MUST be instantiated with "new"
     const panel = new PanelClass(app);
 
     // Render the panel UI
