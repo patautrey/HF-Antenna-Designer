@@ -1,5 +1,3 @@
-// File: ui/antenna-selector.js
-
 export default function antennaSelector() {
     return `
 <label for="antenna_select">Select Antenna:</label>
