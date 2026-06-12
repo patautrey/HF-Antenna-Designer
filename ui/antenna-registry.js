@@ -1,57 +1,65 @@
 export const antennaRegistry = {
+  // Flowerpot (has module + diagram, but NO JSON)
   flowerpot: {
     label: "Flowerpot (T2LT)",
     module: () => import("../modules/module-flowerpot.js"),
-    json: () => import("../content/antennas/flowerpot.json", { assert: { type: "json" } }),
+    json: null, // no JSON exists
     diagram: () => import("../ui/diagrams/flowerpot-diagram.js")
   },
 
+  // Inverted V (has module + JSON)
   invertedV: {
     label: "Inverted V",
     module: () => import("../modules/module-inverted-v.js"),
     json: () => import("../content/antennas/inverted-v.json", { assert: { type: "json" } }),
-    diagram: () => import("../ui/diagrams/inverted-v-diagram.js")
+    diagram: null // no diagram exists
   },
 
-  verticalYagi3: {
-    label: "Vertical Yagi (3‑Element)",
-    module: () => import("../modules/module-vertical-yagi3.js"),
-    json: () => import("../content/antennas/vertical-yagi3.json", { assert: { type: "json" } }),
-    diagram: () => import("../ui/diagrams/vertical-yagi3-diagram.js")
+  // G5RV (has module + JSON)
+  g5rv: {
+    label: "G5RV",
+    module: () => import("../modules/module-g5rv.js"),
+    json: () => import("../content/antennas/g5rv.json", { assert: { type: "json" } }),
+    diagram: null
   },
 
-  dipole: {
-    label: "Dipole",
-    module: () => import("../modules/module-dipole.js"),
-    json: () => import("../content/antennas/dipole.json", { assert: { type: "json" } }),
-    diagram: () => import("../ui/diagrams/dipole-diagram.js")
+  // Ground Plane (has module + JSON)
+  groundPlane: {
+    label: "Ground Plane",
+    module: () => import("../modules/module-ground-plane.js"),
+    json: () => import("../content/antennas/ground-plane.json", { assert: { type: "json" } }),
+    diagram: null
   },
 
-  endFed: {
-    label: "End‑Fed",
-    module: () => import("../modules/module-endfed.js"),
-    json: () => import("../content/antennas/endfed.json", { assert: { type: "json" } }),
-    diagram: () => import("../ui/diagrams/endfed-diagram.js")
+  // Horizontal Loop (has module + JSON)
+  horizontalLoop: {
+    label: "Horizontal Loop",
+    module: () => import("../modules/module-horizontal-loop.js"),
+    json: () => import("../content/antennas/horizontal-loop.json", { assert: { type: "json" } }),
+    diagram: null
   },
 
-  loop: {
-    label: "Loop",
-    module: () => import("../modules/module-loop.js"),
-    json: () => import("../content/antennas/loop.json", { assert: { type: "json" } }),
-    diagram: () => import("../ui/diagrams/loop-diagram.js")
+  // Magnetic Loop (has module + JSON)
+  magneticLoop: {
+    label: "Magnetic Loop",
+    module: () => import("../modules/module-magnetic-loop.js"),
+    json: () => import("../content/antennas/magnetic-loop.json", { assert: { type: "json" } }),
+    diagram: null
   },
 
-  quad: {
-    label: "Quad",
-    module: () => import("../modules/module-quad.js"),
-    json: () => import("../content/antennas/quad.json", { assert: { type: "json" } }),
-    diagram: () => import("../ui/diagrams/quad-diagram.js")
+  // Hex Beam (has module + JSON)
+  hexBeam: {
+    label: "Hex Beam",
+    module: () => import("../modules/module-hex-beam.js"),
+    json: () => import("../content/antennas/hex-beam.json", { assert: { type: "json" } }),
+    diagram: null
   },
 
-  moxon: {
-    label: "Moxon",
-    module: () => import("../modules/module-moxon.js"),
-    json: () => import("../content/antennas/moxon.json", { assert: { type: "json" } }),
-    diagram: () => import("../ui/diagrams/moxon-diagram.js")
+  // Discone (has module + JSON)
+  discone: {
+    label: "Discone",
+    module: () => import("../modules/module-discone.js"),
+    json: () => import("../content/antennas/discone.json", { assert: { type: "json" } }),
+    diagram: null
   }
 };
