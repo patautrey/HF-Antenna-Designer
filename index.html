@@ -2,31 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HF Antenna Designer</title>
-  <link rel="stylesheet" href="./assetts/workbench.css">
+  <link rel="icon" href="./favicon.ico">
+  <link rel="stylesheet" href="./styles/main.css">
 </head>
-
 <body>
   <h1>HF Antenna Designer</h1>
 
-  <div id="selector"></div>
-  <hr>
-  <div id="panel"></div>
+  <label for="antennaSelect">Select Antenna:</label>
+  <select id="antennaSelect"></select>
 
-  <script type="module">
-    import antennaSelector from "./ui/antenna-selector.js";
-    import { loadAntenna } from "./ui/load-antenna.js";
-    import { renderAntenna } from "./ui/render-antenna.js";
+  <section id="antennaParams"></section>
+  <section id="necDeck"></section>
 
-    document.getElementById("selector").innerHTML = antennaSelector();
-
-    document.getElementById("antenna_select").onchange = async () => {
-      const name = document.getElementById("antenna_select").value;
-      const data = await loadAntenna(name);
-      renderAntenna(data);
-    };
-
-    loadAntenna("flowerpot").then(renderAntenna);
-  </script>
+  <script type="module" src="./ui/load-antenna.js"></script>
 </body>
 </html>
