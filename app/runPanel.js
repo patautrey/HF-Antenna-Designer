@@ -1,21 +1,12 @@
-// HF-Antenna-Designer/app/runPanel.js
-
-import { panels } from "../ui/panels/index.js";
+// File: app/runPanel.js
 
 export default function runPanel(app, panelName) {
-    const PanelClass = panels[panelName];
+    const panelDiv = document.getElementById("panel");
 
-    if (!PanelClass) {
-        document.getElementById("panel").innerHTML =
-            `<p style="color:red;">Unknown panel: ${panelName}</p>`;
+    if (!app.panels[panelName]) {
+        panelDiv.innerHTML = `<p style="color:red;">Panel not found: ${panelName}</p>`;
         return;
     }
 
-    const panel = new PanelClass(app);
-
-    // Render panel HTML
-    document.getElementById("panel").innerHTML = panel.render();
-
-    // Attach all event handlers for that panel
-    panel.attachEvents();
+    panelDiv.innerHTML = app.panels[panelName]();
 }
