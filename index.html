@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <title>Flowerpot Antenna Design Suite</title>
 
-    <!-- Updated path to CSS -->
-    <link rel="stylesheet" href="./assetts/workbench.css">
+    <link rel="stylesheet" href="./assets/workbench.css">
 
     <style>
         body { font-family: Arial; margin: 20px; }
@@ -29,21 +28,17 @@
     <script type="module">
         window.addEventListener("DOMContentLoaded", async () => {
 
-            // Load modules
             const { default: antennaSelector } = await import("./ui/antenna-selector.js");
             const { default: runPanel } = await import("./app/runPanel.js");
             const { default: app } = await import("./app/app.js");
 
-            // Insert dropdown
             document.getElementById("selector").innerHTML = antennaSelector();
 
-            // Attach handler
             document.getElementById("antenna_select").onchange = () => {
                 const panel = document.getElementById("antenna_select").value;
                 runPanel(app, panel);
             };
 
-            // Load default panel
             runPanel(app, "flowerpot");
         });
     </script>
