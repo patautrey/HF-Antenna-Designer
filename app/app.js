@@ -1,35 +1,28 @@
-// HF-Antenna-Designer/app/app.js
-// Browser‑safe registry (NO import.meta.glob)
+// File: app/app.js
 
-// ENGINE IMPORTS
-import FlowerpotEngine from "../engines/FlowerpotEngine.js";
-import InvertedVEngine from "../engines/InvertedVEngine.js";
-import Yagi3Engine from "../engines/Yagi3Engine.js";
+import flowerpotPanel from "../ui/panels/flowerpot.js";
+import dipolePanel from "../ui/panels/dipole.js";
+import endFedPanel from "../ui/panels/endFed.js";
+import loopPanel from "../ui/panels/loop.js";
+import quadPanel from "../ui/panels/quad.js";
+import moxonPanel from "../ui/panels/moxon.js";
+import verticalYagiPanel from "../ui/panels/verticalYagi.js";
+import jPolePanel from "../ui/panels/jPole.js";
+import invertedVPanel from "../ui/panels/invertedV.js";
+import yagi3Panel from "../ui/panels/yagi3.js";
 
-// PANEL IMPORTS
-import FlowerpotPanel from "../ui/panels/FlowerpotPanel.js";
-import InvertedVPanel from "../ui/panels/InvertedVPanel.js";
-import Yagi3Panel from "../ui/panels/Yagi3Panel.js";
-
-// REGISTRY
 const app = {
-    engines: {
-        flowerpot: (config) => new FlowerpotEngine(config),
-        invertedv: (config) => new InvertedVEngine(config),
-        yagi3: (config) => new Yagi3Engine(config)
-    },
-
     panels: {
-        flowerpot: FlowerpotPanel,
-        invertedv: InvertedVPanel,
-        yagi3: Yagi3Panel
-    },
-
-    runSimulation(config) {
-        const type = config.type.toLowerCase();
-        const factory = this.engines[type];
-        if (!factory) throw new Error(`Engine '${type}' not found`);
-        return factory(config).run();
+        flowerpot: flowerpotPanel,
+        dipole: dipolePanel,
+        endFed: endFedPanel,
+        loop: loopPanel,
+        quad: quadPanel,
+        moxon: moxonPanel,
+        verticalYagi: verticalYagiPanel,
+        jPole: jPolePanel,
+        invertedV: invertedVPanel,
+        yagi3: yagi3Panel
     }
 };
 
