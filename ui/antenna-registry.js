@@ -1,16 +1,7 @@
-export const antennaRegistry = {
-  flowerpot: {
-    label: "Flowerpot (T2LT)",
-    necDeck: `
-CM Flowerpot T2LT
-CE
-GW 1 21 0 0 0 0 0 5.456 0.001
-GE 0
-GN 2 0 0 0 13 0.005
-EX 0 1 11 0 1 0
-FR 0 1 0 0 27.2 0
-RP 0 181 1 1000 0 0 1 1
-EN
-`
-  }
-};
+paramsSchema: {
+  frequencyMHz: { label: "Frequency (MHz)", type: "number", default: 7.1 },
+  apexHeight: { label: "Apex Height (m)", type: "number", default: 10 },
+  legLength: { label: "Leg Length (m)", type: "number", default: 10.556 },
+  wireDiameter: { label: "Wire Diameter (m)", type: "number", default: 0.002 },
+  angle: { label: "Included Angle (°)", type: "number", default: 120 }
+}
