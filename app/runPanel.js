@@ -1,5 +1,3 @@
-// File: app/runPanel.js
-
 export default function runPanel(app, panelName) {
     const panelDiv = document.getElementById("panel");
 
