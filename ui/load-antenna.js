@@ -1,36 +1,22 @@
+// /ui/load-antenna.js
+
 import { antennaRegistry } from "./antenna-registry.js";
 
-export async function loadAntenna(name) {
-  const entry = antennaRegistry[name];
-  if (!entry) throw new Error(`Unknown antenna: ${name}`);
+export async function loadAntenna(id) {
+  const entry = antennaRegistry[id];
 
-  // Load module
-  const modulePromise = entry.module();
+  if (!entry) {
+    throw new Error(`Antenna '${id}' not found in registry`);
+  }
 
-  // Load JSON via fetch
-  const jsonPromise = entry.json
-    ? fetch(entry.json).then(r => r.json()).catch(() => null)
-    : Promise.resolve(null);
-
-  // Load diagram
-  const diagramPromise = entry.diagram ? entry.diagram() : Promise.resolve(null);
-
-  const [module, json, diagram] = await Promise.all([
-    modulePromise,
-    jsonPromise,
-    diagramPromise
-  ]);
-
-  // Run calculation
-  const output =
-    module && module.default
-      ? module.default(entry.params || {})
-      : null;
+  // NEW: entry IS the module object
+  const module = entry;
 
   return {
-    name,
-    json,
-    diagram: diagram ? (diagram.default || diagram) : null,
-    output
+    name: module.name,
+    description: module.description,
+    paramsSchema: module.paramsSchema,
+    generateDeck: module.generateDeck,
+    modelingNotes: module.modelingNotes || ""
   };
 }
