@@ -7,11 +7,9 @@ export async function loadAntenna(name) {
   // Load module
   const modulePromise = entry.module();
 
-  // Load JSON via fetch instead of import()
+  // Load JSON via fetch
   const jsonPromise = entry.json
-    ? fetch(entry.json)
-        .then(r => r.json())
-        .catch(() => null)
+    ? fetch(entry.json).then(r => r.json()).catch(() => null)
     : Promise.resolve(null);
 
   // Load diagram
@@ -23,10 +21,16 @@ export async function loadAntenna(name) {
     diagramPromise
   ]);
 
+  // Run calculation
+  const output =
+    module && module.default
+      ? module.default(entry.params || {})
+      : null;
+
   return {
     name,
-    module: module.default || module,
     json,
-    diagram: diagram ? (diagram.default || diagram) : null
+    diagram: diagram ? (diagram.default || diagram) : null,
+    output
   };
 }
