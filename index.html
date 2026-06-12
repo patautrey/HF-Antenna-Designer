@@ -1,46 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Flowerpot Antenna Design Suite</title>
-
-    <link rel="stylesheet" href="./assets/workbench.css">
-
-    <style>
-        body { font-family: Arial; margin: 20px; }
-        .antenna-panel { max-width: 600px; }
-        label { display: block; margin-top: 12px; }
-        input, select { width: 100%; padding: 6px; }
-        button { margin-top: 15px; padding: 10px; width: 100%; }
-        pre { background: #eee; padding: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ccc; padding: 6px; }
-    </style>
+  <meta charset="UTF-8">
+  <title>HF Antenna Designer</title>
+  <link rel="stylesheet" href="./assets/workbench.css">
 </head>
 
 <body>
-    <h1>Flowerpot Antenna Design Suite</h1>
+  <h1>HF Antenna Designer</h1>
 
-    <div id="selector"></div>
-    <hr>
-    <div id="panel"></div>
+  <div id="selector"></div>
+  <hr>
+  <div id="panel"></div>
 
-    <script type="module">
-        window.addEventListener("DOMContentLoaded", async () => {
+  <script type="module">
+    import antennaSelector from "./ui/antenna-selector.js";
+    import { loadAntenna } from "./ui/load-antenna.js";
+    import { renderAntenna } from "./ui/render-antenna.js";
 
-            const { default: antennaSelector } = await import("./ui/antenna-selector.js");
-            const { default: runPanel } = await import("./app/runPanel.js");
-            const { default: app } = await import("./app/app.js");
+    // Insert dropdown
+    document.getElementById("selector").innerHTML = antennaSelector();
 
-            document.getElementById("selector").innerHTML = antennaSelector();
+    // Handle selection
+    document.getElementById("antenna_select").onchange = async () => {
+      const name = document.getElementById("antenna_select").value;
+      const data = await loadAntenna(name);
+      renderAntenna(data);
+    };
 
-            document.getElementById("antenna_select").onchange = () => {
-                const panel = document.getElementById("antenna_select").value;
-                runPanel(app, panel);
-            };
-
-            runPanel(app, "flowerpot");
-        });
-    </script>
+    // Load default antenna
+    loadAntenna("flowerpot").then(renderAntenna);
+  </script>
 </body>
 </html>
