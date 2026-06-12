@@ -1,120 +1,58 @@
-// ------------------------------------------------------------
-// NEC‑STYLE POLAR RADIATION PATTERN (SVG)
-// ------------------------------------------------------------
 export function renderPolarPlot(pattern, container) {
   if (!pattern || pattern.length === 0) {
     container.innerHTML = "<p>No pattern data.</p>";
     return;
   }
 
-  const size = 320;
+  const size = 360;
   const center = size / 2;
-  const maxGain = Math.max(...pattern.map(p => p.gain));
 
-  const rings = [0.25, 0.5, 0.75, 1];
+  // Convert linear gain to dB
+  const patternDb = pattern.map(p => ({
+    angle: p.angle,
+    db: 20 * Math.log10(p.gain <= 0 ? 0.0001 : p.gain)
+  }));
 
-  const svg = [
-    `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">`,
+  const maxDb = 0;          // normalized
+  const minDb = -20;        // outer ring
+  const ringStep = 5;       // 0, -5, -10, -15, -20
 
-    // Gain rings
-    ...rings.map(r => `
-      <circle cx="${center}" cy="${center}" r="${r * center}"
-        stroke="#999" stroke-width="0.6" fill="none" />
-    `),
+  const svg = [];
 
-    // Pattern curve
-    `<path d="` +
-      pattern.map((p, i) => {
-        const angle = (p.angle - 90) * Math.PI / 180;
-        const radius = (p.gain / maxGain) * center;
-        const x = center + radius * Math.cos(angle);
-        const y = center + radius * Math.sin(angle);
-        return `${i === 0 ? "M" : "L"} ${x} ${y}`;
-      }).join(" ") +
-    `" stroke="#ff6600" stroke-width="2" fill="none" />`,
+  svg.push(`<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">`);
 
-    `</svg>`
-  ].join("");
-
-  container.innerHTML = svg;
-}
-
-
-
-// ------------------------------------------------------------
-// NEC‑STYLE SWR CURVE (SVG)
-// ------------------------------------------------------------
-export function renderSWRPlot(swrData, container) {
-  if (!swrData || swrData.length === 0) {
-    container.innerHTML = "<p>No SWR data.</p>";
-    return;
+  // Draw dB rings
+  for (let db = 0; db >= minDb; db -= ringStep) {
+    const r = ((db - minDb) / (maxDb - minDb)) * center;
+    svg.push(`
+      <circle cx="${center}" cy="${center}" r="${r}"
+        stroke="#bbb" stroke-width="0.6" fill="none" />
+      <text x="${center + 4}" y="${center - r + 4}" font-size="10" fill="#666">${db} dB</text>
+    `);
   }
 
-  const width = 420;
-  const height = 220;
+  // Draw angle lines
+  const angles = [0, 90, 180, 270];
+  angles.forEach(a => {
+    const rad = (a - 90) * Math.PI / 180;
+    const x = center + center * Math.cos(rad);
+    const y = center + center * Math.sin(rad);
+    svg.push(`<line x1="${center}" y1="${center}" x2="${x}" y2="${y}" stroke="#ccc" stroke-width="0.6"/>`);
+    svg.push(`<text x="${x}" y="${y}" font-size="10" fill="#666">${a}°</text>`);
+  });
 
-  const minFreq = Math.min(...swrData.map(p => p.freq));
-  const maxFreq = Math.max(...swrData.map(p => p.freq));
-  const maxSWR = Math.max(...swrData.map(p => p.swr));
+  // Draw pattern curve
+  svg.push(`<path d="`);
+  patternDb.forEach((p, i) => {
+    const radius = ((p.db - minDb) / (maxDb - minDb)) * center;
+    const angleRad = (p.angle - 90) * Math.PI / 180;
+    const x = center + radius * Math.cos(angleRad);
+    const y = center + radius * Math.sin(angleRad);
+    svg.push(`${i === 0 ? "M" : "L"} ${x} ${y}`);
+  });
+  svg.push(`" stroke="#ff6600" stroke-width="2" fill="none"/>`);
 
-  const svg = [
-    `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">`,
+  svg.push(`</svg>`);
 
-    // Axes
-    `<line x1="40" y1="10" x2="40" y2="${height - 20}" stroke="#999"/>`,
-    `<line x1="40" y1="${height - 20}" x2="${width - 10}" y2="${height - 20}" stroke="#999"/>`,
-
-    // SWR curve
-    `<path d="` +
-      swrData.map((p, i) => {
-        const x = 40 + ((p.freq - minFreq) / (maxFreq - minFreq)) * (width - 60);
-        const y = (height - 20) - (p.swr / maxSWR) * (height - 40);
-        return `${i === 0 ? "M" : "L"} ${x} ${y}`;
-      }).join(" ") +
-    `" stroke="#ff6600" stroke-width="2" fill="none" />`,
-
-    `</svg>`
-  ].join("");
-
-  container.innerHTML = svg;
-}
-
-
-
-// ------------------------------------------------------------
-// NEC‑STYLE LENGTH‑VS‑FREQUENCY CURVE (SVG)
-// ------------------------------------------------------------
-export function renderLengthPlot(lengthData, container) {
-  if (!lengthData || lengthData.length === 0) {
-    container.innerHTML = "<p>No length sweep data.</p>";
-    return;
-  }
-
-  const width = 420;
-  const height = 220;
-
-  const minFreq = Math.min(...lengthData.map(p => p.freq));
-  const maxFreq = Math.max(...lengthData.map(p => p.freq));
-  const maxLen = Math.max(...lengthData.map(p => p.length));
-
-  const svg = [
-    `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">`,
-
-    // Axes
-    `<line x1="40" y1="10" x2="40" y2="${height - 20}" stroke="#999"/>`,
-    `<line x1="40" y1="${height - 20}" x2="${width - 10}" y2="${height - 20}" stroke="#999"/>`,
-
-    // Length curve
-    `<path d="` +
-      lengthData.map((p, i) => {
-        const x = 40 + ((p.freq - minFreq) / (maxFreq - minFreq)) * (width - 60);
-        const y = (height - 20) - (p.length / maxLen) * (height - 40);
-        return `${i === 0 ? "M" : "L"} ${x} ${y}`;
-      }).join(" ") +
-    `" stroke="#0099ff" stroke-width="2" fill="none" />`,
-
-    `</svg>`
-  ].join("");
-
-  container.innerHTML = svg;
+  container.innerHTML = svg.join("");
 }
