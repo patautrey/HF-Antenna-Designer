@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>HF Antenna Designer</title>
-  <link rel="stylesheet" href="./assets/workbench.css">
+  <link rel="stylesheet" href="./assetts/workbench.css">
 </head>
 
 <body>
@@ -18,17 +18,14 @@
     import { loadAntenna } from "./ui/load-antenna.js";
     import { renderAntenna } from "./ui/render-antenna.js";
 
-    // Insert dropdown
     document.getElementById("selector").innerHTML = antennaSelector();
 
-    // Handle selection
     document.getElementById("antenna_select").onchange = async () => {
       const name = document.getElementById("antenna_select").value;
       const data = await loadAntenna(name);
       renderAntenna(data);
     };
 
-    // Load default antenna
     loadAntenna("flowerpot").then(renderAntenna);
   </script>
 </body>
