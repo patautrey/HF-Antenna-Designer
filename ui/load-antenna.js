@@ -2,21 +2,38 @@
 
 import { antennaRegistry } from "./antenna-registry.js";
 
-export async function loadAntenna(id) {
-  const entry = antennaRegistry[id];
+const select = document.getElementById("antennaSelect");
+const paramsSection = document.getElementById("antennaParams");
+const deckSection = document.getElementById("necDeck");
 
+function populateDropdown() {
+  Object.keys(antennaRegistry).forEach(key => {
+    const opt = document.createElement("option");
+    opt.value = key;
+    opt.textContent = antennaRegistry[key].name;
+    select.appendChild(opt);
+  });
+}
+
+async function loadAntenna(id) {
+  const entry = antennaRegistry[id];
   if (!entry) {
-    throw new Error(`Antenna '${id}' not found in registry`);
+    deckSection.textContent = "Error: antenna not found.";
+    return;
   }
 
-  // NEW: entry IS the module object
   const module = entry;
+  paramsSection.innerHTML = `
+    <h2>${module.name}</h2>
+    <p>${module.description}</p>
+  `;
 
-  return {
-    name: module.name,
-    description: module.description,
-    paramsSchema: module.paramsSchema,
-    generateDeck: module.generateDeck,
-    modelingNotes: module.modelingNotes || ""
-  };
+  const deck = module.generateDeck(module.paramsSchema);
+  deckSection.innerHTML = `
+    <h3>NEC Input Deck</h3>
+    <pre>${deck}</pre>
+  `;
 }
+
+select.addEventListener("change", e => loadAntenna(e.target.value));
+populateDropdown();
