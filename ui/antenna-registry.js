@@ -2,8 +2,8 @@ export const antennaRegistry = {
   flowerpot: {
     label: "Flowerpot (T2LT)",
     module: () => import("../modules/module-flowerpot.js"),
-    json: null,
-    params: { frequencyMHz: 7.1 },
+    json: "./content/antennas/flowerpot.json",
+    params: { frequencyMHz: 27.2, velocityFactor: 0.66 },
     diagram: () => import("../ui/diagrams/flowerpot-diagram.js")
   },
 
