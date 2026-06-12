@@ -1,0 +1,16 @@
+{
+  "name": "Flowerpot (T2LT)",
+  "description": "A coaxial half‑wave vertical antenna using a radiating section and a coaxial sleeve balun.",
+  "imageQueries": [
+    "t2lt_flowerpot_antenna",
+    "coaxial_vertical_antenna_diagram",
+    "t2lt_hf_antenna"
+  ],
+  "modelingNotes": [
+    "The radiating element is typically a half‑wave of coax inner conductor.",
+    "The outer braid forms a sleeve balun to suppress feedline radiation.",
+    "Precise velocity factor of the coax affects element length.",
+    "Height above ground strongly influences radiation angle.",
+    "Good for portable and fixed HF/VHF operation."
+  ]
+}
