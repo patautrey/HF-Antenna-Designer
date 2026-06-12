@@ -9,7 +9,7 @@ export const antennaRegistry = {
   invertedV: {
     label: "Inverted V",
     module: () => import("../modules/module-inverted-v.js"),
-    json: "../content/antennas/inverted-v.json",
+    json: "./content/antennas/inverted-v.json",
     diagram: null
   }
 };
