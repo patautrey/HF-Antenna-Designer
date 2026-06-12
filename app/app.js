@@ -1,5 +1,3 @@
-// File: app/app.js
-
 import flowerpotPanel from "../ui/panels/flowerpot.js";
 import dipolePanel from "../ui/panels/dipole.js";
 import endFedPanel from "../ui/panels/endFed.js";
