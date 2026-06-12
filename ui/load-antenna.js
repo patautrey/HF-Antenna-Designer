@@ -6,16 +6,20 @@ export async function loadAntenna(name) {
     throw new Error(`Unknown antenna: ${name}`);
   }
 
+  const modulePromise = entry.module();
+  const jsonPromise = entry.json ? entry.json() : Promise.resolve(null);
+  const diagramPromise = entry.diagram ? entry.diagram() : Promise.resolve(null);
+
   const [module, json, diagram] = await Promise.all([
-    entry.module(),
-    entry.json(),
-    entry.diagram()
+    modulePromise,
+    jsonPromise,
+    diagramPromise
   ]);
 
   return {
     name,
     module: module.default || module,
-    json: json.default || json,
-    diagram: diagram.default || diagram
+    json: json ? (json.default || json) : null,
+    diagram: diagram ? (diagram.default || diagram) : null
   };
 }
