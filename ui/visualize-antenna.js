@@ -1,5 +1,3 @@
-// /ui/visualize-antenna.js
-
 export function visualizeAntenna(deckText) {
   const canvas = document.createElement("canvas");
   canvas.width = 600;
@@ -12,7 +10,7 @@ export function visualizeAntenna(deckText) {
 
   const lines = deckText.split("\n").filter(l => l.startsWith("GW"));
   lines.forEach(line => {
-    const parts = line.split(" ");
+    const parts = line.split(" ").filter(Boolean);
     const x1 = parseFloat(parts[3]);
     const z1 = parseFloat(parts[5]);
     const x2 = parseFloat(parts[6]);
