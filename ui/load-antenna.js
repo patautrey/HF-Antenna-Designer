@@ -41,7 +41,7 @@ function renderParamsForm(params, antennaId) {
   });
 
   const button = document.createElement("button");
-  button.type = "submit";   // FIXES DEAD BUTTON
+  button.type = "submit";
   button.textContent = "Generate NEC Deck";
   form.appendChild(button);
 
@@ -67,15 +67,31 @@ function loadAntenna(id, overrideParams = null) {
 
   deckSection.innerHTML = `
     <h3>NEC Input Deck</h3>
-    <pre>${deck}</pre>
+    <pre id="necText">${deck}</pre>
+
+    <button id="downloadNecBtn">Download NEC Deck</button>
+
     <h3>Antenna Geometry</h3>
   `;
 
-  // VISUALIZATION FIX — ensure canvas is appended
+  // Visualization
   const viz = visualizeAntenna(deck);
   deckSection.appendChild(viz);
 
-  // RESULTS PANEL
+  // Download button logic
+  document.getElementById("downloadNecBtn").addEventListener("click", () => {
+    const blob = new Blob([deck], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${id}.nec`;
+    a.click();
+
+    URL.revokeObjectURL(url);
+  });
+
+  // Results panel
   const resultsDiv = document.createElement("div");
   resultsDiv.id = "resultsPanel";
   resultsDiv.innerHTML = `
