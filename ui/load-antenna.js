@@ -1,6 +1,5 @@
-// /ui/load-antenna.js
-
 import { antennaRegistry } from "./antenna-registry.js";
+import { visualizeAntenna } from "./visualize-antenna.js";
 
 const select = document.getElementById("antennaSelect");
 const paramsSection = document.getElementById("antennaParams");
@@ -58,6 +57,9 @@ function loadAntenna(id, overrideParams = null) {
     <h3>NEC Input Deck</h3>
     <pre>${deck}</pre>
   `;
+
+  const viz = visualizeAntenna(deck);
+  deckSection.appendChild(viz);
 }
 
 select.addEventListener("change", e => loadAntenna(e.target.value));
