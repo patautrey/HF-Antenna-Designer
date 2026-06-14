@@ -1,3 +1,5 @@
+// /ui/parse-nec-output.js
+
 export function parseNecOutput(text) {
   const gainMatch = text.match(/GAIN\s*=\s*([\d.]+)/i);
   const impedanceMatch = text.match(/IMPEDANCE\s*=\s*([\d.]+)\s*\+\s*j([\d.]+)/i);
