@@ -1,0 +1,51 @@
+/* /styles/main.css */
+
+/* Basic layout */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  color: #222;
+  margin: 40px;
+}
+
+/* Headings */
+h1 {
+  color: #1e3a5f;
+  margin-bottom: 20px;
+}
+
+h2, h3 {
+  color: #1e3a5f;
+}
+
+/* Dropdown */
+select {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+/* Sections */
+section {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+}
+
+/* NEC deck text */
+pre {
+  background: #f4f4f4;
+  padding: 15px;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+/* Labels */
+label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 8px;
+}
