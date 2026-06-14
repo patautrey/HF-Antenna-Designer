@@ -4,6 +4,7 @@ import { antennaRegistry } from "./antenna-registry.js";
 import { visualizeAntenna } from "./visualize-antenna.js";
 import { parseNecOutput } from "./parse-nec-output.js";
 import { plotSWR } from "./plot-swr.js";
+import { renderAntenna3D } from "./antenna-3d.js";
 
 const select = document.getElementById("antennaSelect");
 const paramsSection = document.getElementById("antennaParams");
@@ -72,6 +73,7 @@ function loadAntenna(id, overrideParams = null) {
 
     <button id="downloadNecBtn">Download NEC Deck</button>
     <button id="plotSWRBtn">Plot SWR Curve</button>
+    <button id="view3DBtn">Show 3D View</button>
 
     <h3>Antenna Geometry</h3>
   `;
@@ -91,7 +93,6 @@ function loadAntenna(id, overrideParams = null) {
     URL.revokeObjectURL(url);
   });
 
-  // SWR Plotting
   const swrDiv = document.createElement("div");
   swrDiv.id = "swrPlot";
   deckSection.appendChild(swrDiv);
@@ -100,7 +101,14 @@ function loadAntenna(id, overrideParams = null) {
     plotSWR(entry.generateDeck, params, swrDiv);
   });
 
-  // Results panel
+  const viewer3D = document.createElement("div");
+  viewer3D.id = "viewer3D";
+  deckSection.appendChild(viewer3D);
+
+  document.getElementById("view3DBtn").addEventListener("click", () => {
+    renderAntenna3D(deck, viewer3D);
+  });
+
   const resultsDiv = document.createElement("div");
   resultsDiv.id = "resultsPanel";
   resultsDiv.innerHTML = `
