@@ -2,18 +2,13 @@
 
 export default {
   name: "Flowerpot (T2LT)",
-  description: "A coaxial sleeve dipole using a 12‑wire segmented RG‑58 braid sleeve balun.",
-  imageQueries: [
-    "t2lt_flowerpot_antenna_diagram",
-    "coaxial_sleeve_dipole_nec_geometry"
-  ],
-
+  description: "A coaxial sleeve dipole using a 12-wire segmented RG-58 braid sleeve balun.",
   paramsSchema: {
-    frequencyMHz: { label: "Frequency (MHz)", type: "number", default: 27.2 },
-    radiatorLength: { label: "Radiator Length (m)", type: "number", default: 3.637 },
-    sleeveLength: { label: "Sleeve Length (m)", type: "number", default: 1.819 },
-    height: { label: "Height Above Ground (m)", type: "number", default: 5 },
-    wireDiameter: { label: "Wire Diameter (m)", type: "number", default: 0.002 }
+    frequencyMHz: 27.2,
+    radiatorLength: 3.637,
+    sleeveLength: 1.819,
+    heightAboveGround: 5,
+    wireDiameter: 0.002
   },
 
   generateDeck(params) {
@@ -21,30 +16,26 @@ export default {
       frequencyMHz,
       radiatorLength,
       sleeveLength,
-      height,
+      heightAboveGround,
       wireDiameter
     } = params;
 
-    const braidRadius = 0.0025; // RG‑58 radius
-    const wires = 12;
     const segments = 31;
+    const sleeveTop = heightAboveGround;
+    const sleeveBottom = heightAboveGround - sleeveLength;
+    const radiatorTop = sleeveBottom;
+    const radiatorBottom = sleeveBottom - radiatorLength;
 
     let deck = `
-CM Flowerpot (T2LT) with 12‑wire segmented RG‑58 braid
+CM Flowerpot (T2LT) with 12-wire segmented RG-58 braid
 CE
 `;
 
-    // Radiator wire (inside sleeve)
-    deck += `GW 1 ${segments} 0 0 ${height} 0 0 ${height - radiatorLength} ${wireDiameter}\n`;
+    // Sleeve section
+    deck += `GW 1 ${segments} 0 0 ${sleeveTop} 0 0 ${sleeveBottom} ${wireDiameter}\n`;
 
-    // Sleeve wires (12 around circumference)
-    for (let i = 0; i < wires; i++) {
-      const angle = (2 * Math.PI * i) / wires;
-      const x = braidRadius * Math.cos(angle);
-      const y = braidRadius * Math.sin(angle);
-
-      deck += `GW ${i + 2} ${segments} ${x} ${y} ${height} ${x} ${y} ${height - sleeveLength} ${wireDiameter}\n`;
-    }
+    // Radiator section
+    deck += `GW 2 ${segments} 0 0 ${radiatorTop} 0 0 ${radiatorBottom} ${wireDiameter}\n`;
 
     deck += `
 GE 0
@@ -56,10 +47,5 @@ EN
 `;
 
     return deck;
-  },
-
-  modelingNotes: `
-This model uses a 12‑wire segmented RG‑58 braid sleeve with 31 segments per wire.
-The radiator is centered inside the sleeve. The sleeve is shorted at the top and open at the bottom.
-`
+  }
 };
