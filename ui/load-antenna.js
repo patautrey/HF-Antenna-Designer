@@ -41,7 +41,7 @@ function renderParamsForm(params, antennaId) {
   });
 
   const button = document.createElement("button");
-  button.type = "submit";   // <-- FIXES DEAD BUTTON
+  button.type = "submit";   // FIXES DEAD BUTTON
   button.textContent = "Generate NEC Deck";
   form.appendChild(button);
 
@@ -71,10 +71,11 @@ function loadAntenna(id, overrideParams = null) {
     <h3>Antenna Geometry</h3>
   `;
 
+  // VISUALIZATION FIX — ensure canvas is appended
   const viz = visualizeAntenna(deck);
   deckSection.appendChild(viz);
 
-  // --- RESULTS PANEL ---
+  // RESULTS PANEL
   const resultsDiv = document.createElement("div");
   resultsDiv.id = "resultsPanel";
   resultsDiv.innerHTML = `
