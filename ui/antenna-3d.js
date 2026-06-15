@@ -1,6 +1,4 @@
 // /ui/antenna-3d.js
-// ✅ Correct CDN imports for browser use
-
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.164/build/three.module.js";
 import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.164/examples/jsm/controls/OrbitControls.js";
 
@@ -23,13 +21,11 @@ export function renderAntenna3D(deckText, container) {
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
 
-  // Lighting
   const light = new THREE.DirectionalLight(0xffffff, 1);
   light.position.set(5, 5, 5);
   scene.add(light);
   scene.add(new THREE.AmbientLight(0x888888));
 
-  // Parse NEC geometry (GW lines)
   const lines = deckText.split("\n").filter(l => l.startsWith("GW"));
   const material = new THREE.LineBasicMaterial({ color: 0x1e3a5f });
   const group = new THREE.Group();
@@ -54,7 +50,6 @@ export function renderAntenna3D(deckText, container) {
 
   scene.add(group);
 
-  // Auto‑center and scale
   const box = new THREE.Box3().setFromObject(group);
   const size = box.getSize(new THREE.Vector3()).length();
   const center = box.getCenter(new THREE.Vector3());
@@ -62,7 +57,6 @@ export function renderAntenna3D(deckText, container) {
   camera.position.set(center.x + size, center.y + size, center.z + size);
   camera.lookAt(center);
 
-  // Axes helper
   const axesHelper = new THREE.AxesHelper(2);
   scene.add(axesHelper);
 
