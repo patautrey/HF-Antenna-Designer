@@ -1,11 +1,11 @@
 // /ui/antenna-3d.js
-// Corrected Three.js imports for browser use
+// ✅ Correct CDN imports for browser use
 
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.164/build/three.module.js";
 import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.164/examples/jsm/controls/OrbitControls.js";
 
 export function renderAntenna3D(deckText, container) {
-  container.innerHTML = ""; // Clear previous render
+  container.innerHTML = "";
 
   const width = 600;
   const height = 400;
