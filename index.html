@@ -1,21 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
   <title>HF Antenna Designer</title>
-  <link rel="icon" href="./favicon.ico">
-  <link rel="stylesheet" href="./styles/main.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f4f4f4;
+    }
+    h1, h2, h3 {
+      margin-top: 20px;
+    }
+    #antennaSelect {
+      padding: 8px;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    #antennaParams label {
+      display: block;
+      margin-top: 10px;
+    }
+    #antennaParams input {
+      width: 200px;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 8px 14px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    pre {
+      background: #fff;
+      padding: 10px;
+      border: 1px solid #ccc;
+      overflow-x: auto;
+    }
+    #viewer3D, #radiation3D, #swrPlot {
+      margin-top: 20px;
+      background: #fff;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+  </style>
 </head>
+
 <body>
+
   <h1>HF Antenna Designer</h1>
 
-  <label for="antennaSelect">Select Antenna:</label>
-  <select id="antennaSelect"></select>
+  <h2>Select Antenna</h2>
+  <select id="antennaSelect">
+    <option value="">-- Choose an antenna --</option>
+  </select>
 
-  <section id="antennaParams"></section>
-  <section id="necDeck"></section>
+  <div id="antennaParams"></div>
 
+  <div id="necDeck"></div>
+
+  <!-- Load main JS entry point -->
   <script type="module" src="./ui/load-antenna.js"></script>
+
 </body>
 </html>
