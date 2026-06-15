@@ -1,4 +1,5 @@
 // /ui/antenna-3d.js
+// Corrected Three.js imports for browser use
 
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.164/build/three.module.js";
 import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.164/examples/jsm/controls/OrbitControls.js";
@@ -22,22 +23,22 @@ export function renderAntenna3D(deckText, container) {
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
 
-  const axesHelper = new THREE.AxesHelper(2);
-  scene.add(axesHelper);
+  // Lighting
+  const light = new THREE.DirectionalLight(0xffffff, 1);
+  light.position.set(5, 5, 5);
+  scene.add(light);
+  scene.add(new THREE.AmbientLight(0x888888));
 
+  // Parse NEC geometry (GW lines)
   const lines = deckText.split("\n").filter(l => l.startsWith("GW"));
-
   const material = new THREE.LineBasicMaterial({ color: 0x1e3a5f });
-
   const group = new THREE.Group();
 
   lines.forEach(line => {
     const parts = line.split(" ").filter(Boolean);
-
     const x1 = parseFloat(parts[3]);
     const y1 = parseFloat(parts[4]);
     const z1 = parseFloat(parts[5]);
-
     const x2 = parseFloat(parts[6]);
     const y2 = parseFloat(parts[7]);
     const z2 = parseFloat(parts[8]);
@@ -53,13 +54,17 @@ export function renderAntenna3D(deckText, container) {
 
   scene.add(group);
 
+  // Auto‑center and scale
   const box = new THREE.Box3().setFromObject(group);
   const size = box.getSize(new THREE.Vector3()).length();
   const center = box.getCenter(new THREE.Vector3());
-
   controls.target.copy(center);
   camera.position.set(center.x + size, center.y + size, center.z + size);
   camera.lookAt(center);
+
+  // Axes helper
+  const axesHelper = new THREE.AxesHelper(2);
+  scene.add(axesHelper);
 
   function animate() {
     requestAnimationFrame(animate);
