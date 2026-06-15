@@ -1,4 +1,6 @@
 // /ui/antenna-3d.js
+// ✅ Correct CDN imports for browser use
+
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.164/build/three.module.js";
 import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.164/examples/jsm/controls/OrbitControls.js";
 
